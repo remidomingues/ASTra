@@ -152,10 +152,10 @@ def processRouteRequest(src, destinations, junctionsDict):
 		if first:
 			first = False
 		else:
-			tmproute.pop(0)
+			tmpRoute.pop(0)
 		
 		route.extend(tmpRoute)
-		if len(route) != 0:
+		if len(tmpRoute) != 0:
 			src = tmpRoute[-1]
 	
 	

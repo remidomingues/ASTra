@@ -5,11 +5,11 @@
 @author  Remi Domingues
 @date    24/06/2013
 
-(0) Traffic lights POSITIONS request: COO tllId1 ... tllIdN
+(0) Traffic lights COORDINATES request: COO tllId1 ... tllIdN
         If no traffic light ID is specified, the geographic coordinates of every traffic light will be sent
 
-(1) Traffic lights POSITIONS response: COO tllId1 lon1 lat1 ... tllIdN lonN latN (N in [0-X] (See constants for X value)
-    These messages of followed by an end message: TLL END
+(1) Traffic lights COORDINATES response: COO tllId1 lon1 lat1 ... tllIdN lonN latN (N in [0-X] if all traffic lights were requested (See constants for X value))
+        If ALL TRAFFIC LIGHTS were requested, these messages are followed by an end message (response): TLL END
 
 (2) Traffic lights DETAILS request: GET tmsLogin tllId zoom answerDetailsLevel
         The zoom is an integer between 100 (min) and 100 000 (max). 100 means a 100% zoom, the entire map can fit in the screen.
@@ -450,30 +450,12 @@ def getScreenshotAbsolutePath(login):
 
 """ Returns the geographic coordinates of a traffic light from its SUMO ID """
 def getTrafficLightCoordinates(trafficId, mtraci):
-    coordsList = []
-
     mtraci.acquire()
-    lanes = traci.trafficlights.getControlledLanes(trafficId)
+    coords = traci.junction.getPosition(trafficId)
+    coordsGeo = traci.simulation.convertGeo(coords[0], coords[1], False)
     mtraci.release()
     
-    for lane in lanes:
-        edge = lane.split('_')[0]
-        mtraci.acquire()
-        coords = traci.simulation.convert2D(edge, traci.lane.getLength(lane), 0, True)
-        mtraci.release()
-        coordsList.append(coords)
-    
-    coordsListLen = len(coordsList)
-    tllCoords = [0.0, 0.0]
-    
-    for coords in coordsList:
-        tllCoords[0] += coords[0]
-        tllCoords[1] += coords[1]
-    
-    tllCoords[0] /= coordsListLen
-    tllCoords[1] /= coordsListLen
-    
-    return tllCoords
+    return coordsGeo
 
 
 """ Returns a list according to the following pattern: state0 duration0 state1 duration1 ... stateN durationN from a complete phases definition"""
@@ -530,7 +512,7 @@ def setCompletePhasesDefinition(tllId, phasesDetails, currentPhaseIndex, mtraci)
     
 
 """ Sends traffic lights position messages(*) to the remote client using an output socket """
-def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket):
+def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket, uniqueMsg):
     trafficLightsNumber = 0
     trafficLightsPos = []
     trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
@@ -548,7 +530,7 @@ def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket):
         
         trafficLightsNumber += 1
         
-        if trafficLightsNumber == constants.TLL_NUMBER_PER_MESSAGE:
+        if not uniqueMsg and trafficLightsNumber == constants.TLL_NUMBER_PER_MESSAGE:
             trafficLightsPos.append(constants.SEPARATOR)
             trafficLightsPos.append(constants.END_OF_MESSAGE)
             strmsg = ''.join(trafficLightsPos)
@@ -561,21 +543,7 @@ def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket):
             trafficLightsPos[:] = []
             trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
     
-    if trafficLightsNumber != 0:
-        trafficLightsPos.append(constants.END_OF_MESSAGE)
-        
-        strmsg = ''.join(trafficLightsPos)
-        try:
-            outputSocket.send(strmsg.encode())
-        except:
-            raise constants.ClosedSocketException("The listening socket has been closed")
-        Logger.infoFile("{} Message sent: <{} traffic lights positions>".format(constants.PRINT_PREFIX_TLL, trafficLightsNumber))
-
-    #Sending end of traffic lights position messages
-    trafficLightsPos[:] = []
-    trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
-    trafficLightsPos.append(constants.SEPARATOR)
-    trafficLightsPos.append(constants.TLL_POS_END)
+    
     trafficLightsPos.append(constants.END_OF_MESSAGE)
     
     strmsg = ''.join(trafficLightsPos)
@@ -583,7 +551,23 @@ def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket):
         outputSocket.send(strmsg.encode())
     except:
         raise constants.ClosedSocketException("The listening socket has been closed")
-    Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_TLL, strmsg))
+    Logger.infoFile("{} Message sent: <{} traffic lights positions>".format(constants.PRINT_PREFIX_TLL, trafficLightsNumber))
+    
+
+    if not uniqueMsg:
+        #Sending end of traffic lights position messages
+        trafficLightsPos[:] = []
+        trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
+        trafficLightsPos.append(constants.SEPARATOR)
+        trafficLightsPos.append(constants.TLL_POS_END)
+        trafficLightsPos.append(constants.END_OF_MESSAGE)
+        
+        strmsg = ''.join(trafficLightsPos)
+        try:
+            outputSocket.send(strmsg.encode())
+        except:
+            raise constants.ClosedSocketException("The listening socket has been closed")
+        Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_TLL, strmsg))
     
     
 """ Saves a screenshot centered on the specified junction from SUMO GUI """
@@ -665,7 +649,7 @@ def sendTrafficLightsDetails(tllId, tmsLogin, screenshotPath, outputSocket, mtra
 
 """ Gets a traffic lights details information from SUMO, then sends them(***) to the remote client by an output socket """
 def processGetDetailsRequest(tmsLogin, tllId, zoom, outputSocket, mtraci, detailsLevel):
-    if not POSIX_OS:
+    if not constants.POSIX_OS:
         screenshotPath = saveTrafficLightScreenshot(tmsLogin, tllId, zoom, mtraci)
     else:
         screenshotPath = 'null'
@@ -714,6 +698,10 @@ def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
 def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eManagerReady):
     bufferSize = 1024
     
+    mtraci.acquire()
+    trafficLightsId = traci.trafficlights.getIDList()
+    mtraci.release()
+    
     eTrafficLightsReady.set()
     while not eManagerReady.is_set():
         time.sleep(constants.SLEEP_SYNCHRONISATION)
@@ -744,16 +732,13 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eMana
                     
                     # Send all traffic lights geographic coordinates to the client
                     if commandSize == 1 and command[0] == constants.ALL_TLL_COORDS_REQUEST_HEADER:
-                        mtraci.acquire()
-                        trafficLightsId = traci.trafficlights.getIDList()
-                        mtraci.release()
-                        sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket)
+                        sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket, False)
                     
                     
                     # Send the requested traffic lights geographic coordinates to the client    
                     elif commandSize > 1 and command[0] == constants.TLL_COORDS_REQUEST_HEADER:
                         command.pop(0)
-                        sendTrafficLightsPosition(command, mtraci, outputSocket)
+                        sendTrafficLightsPosition(command, mtraci, outputSocket, True)
                         
                         
                     # Process a GET details request (**)

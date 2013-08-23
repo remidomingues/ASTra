@@ -76,11 +76,11 @@ def appendEdge(route, edgesNumber, mtraci):
 """ Sends an acknowledge(2) message to the remote client using an output socket """
 def sendIdentifiedAck(vehicleId, errorCode, outputSocket):
 	errorMsg = []
-	errorMsg.append(constants.ACK_HEADER)
+	errorMsg.append(constants.ACKNOWLEDGE_HEADER)
 	errorMsg.append(constants.SEPARATOR)
 	errorMsg.append(vehicleId)
 	errorMsg.append(constants.SEPARATOR)
-	errorMsg.append(errorCode)
+	errorMsg.append(str(errorCode))
 	errorMsg.append(constants.END_OF_MESSAGE)
 		
 	strmsg = ''.join(errorMsg)
@@ -186,7 +186,7 @@ def addVehicle(vehicleId, priority, route, mtraci, cRouteId, outputSocket, prior
 		
 		mVehicles.acquire()
 		vehicles.append(vehicleId)
-		mVehicles.remove()
+		mVehicles.release()
 		
 	sendIdentifiedAck(vehicleId, returnCode, outputSocket)	
 	
@@ -263,14 +263,17 @@ def sendVehiclesSpeed(vehiclesId, outputSocket, mtraci, mVehicles):
 	
 	mVehicles.acquire()
 	for vehicleId in vehiclesId:
-		mtraci.acquire()
-		speed = traci.vehicle.getSpeed(vehicleId)
-		mtraci.release()
+		try:
+			mtraci.acquire()
+			speed = traci.vehicle.getSpeed(vehicleId)
+			mtraci.release()
 		
-		speedMsg.append(constants.SEPARATOR)
-		speedMsg.append(vehicleId)
-		speedMsg.append(constants.SEPARATOR)
-		speedMsg.append(str(speed))
+			speedMsg.append(constants.SEPARATOR)
+			speedMsg.append(vehicleId)
+			speedMsg.append(constants.SEPARATOR)
+			speedMsg.append(str(speed))
+		except:
+			mtraci.release()
 	mVehicles.release()
 		
 	speedMsg.append(constants.END_OF_MESSAGE)
@@ -294,17 +297,18 @@ def getRegularVehicles(vehicles):
 
 """ Gets every vehicles position from SUMO and send then these ones to the remote client by an output socket """
 def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket, mVehicles):
-		#If the simulated vehicles number we have to take into account is not 0
-		vehiclesPos = []
-		vehiclesPos.append(constants.VEHICLE_COORDS_RESPONSE_HEADER)
-		
-		mVehicles.acquire()
-		for vehicleId in vehiclesId:
+	#If the simulated vehicles number we have to take into account is not 0
+	vehiclesPos = []
+	vehiclesPos.append(constants.VEHICLE_COORDS_RESPONSE_HEADER)
+	
+	mVehicles.acquire()
+	for vehicleId in vehiclesId:
+		try:
 			mtraci.acquire()
 			coords = traci.vehicle.getPosition(vehicleId)
 			coordsGeo = traci.simulation.convertGeo(coords[0], coords[1], False)
 			mtraci.release()
-
+	
 			#Build the message to send by the output socket
 			vehiclesPos.append(constants.SEPARATOR)
 			vehiclesPos.append(vehicleId)
@@ -312,16 +316,19 @@ def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket, mVehicles):
 			vehiclesPos.append(str(coordsGeo[0]))
 			vehiclesPos.append(constants.SEPARATOR)
 			vehiclesPos.append(str(coordsGeo[1]))
-		mVehicles.release()
-		
-		#Send the position of each vehicle by the output socket
-		vehiclesPos.append(constants.END_OF_MESSAGE)
-		strmsg = ''.join(vehiclesPos)
-		
-		try:
-			outputSocket.send(strmsg.encode())
 		except:
-			raise constants.ClosedSocketException("The listening socket has been closed")
+			mtraci.release()
+		
+	mVehicles.release()
+	
+	#Send the position of each vehicle by the output socket
+	vehiclesPos.append(constants.END_OF_MESSAGE)
+	strmsg = ''.join(vehiclesPos)
+	
+	try:
+		outputSocket.send(strmsg.encode())
+	except:
+		raise constants.ClosedSocketException("The listening socket has been closed")
 	
 
 """ Gets all arrived vehicles ID from SUMO and send them to the remote client by output socket """
@@ -413,16 +420,16 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
 							sendVehiclesSpeed(vehicles, outputSocket, mtraci, mVehicles)
 						else:
 							command.pop(0)
-							sendVehiclesSpeed(command, outputSocket, mtraci)
+							sendVehiclesSpeed(command, outputSocket, mtraci, mVehicles)
 						
 						
 					#Send vehicles geographic coordinates to the remote client
 					elif commandSize >= 1 and command[0] == constants.VEHICLE_COORDS_REQUEST_HEADER:
 						if commandSize == 1:
-							sendVehiclesCoordinates(vehicles, outputSocket, mtraci, mVehicles)
+							sendVehiclesCoordinates(vehicles, mtraci, outputSocket, mVehicles)
 						else:
 							command.pop(0)
-							sendVehiclesCoordinates(command, outputSocket, mtraci)
+							sendVehiclesCoordinates(command, mtraci, outputSocket, mVehicles)
 						
 						
 					#Send arrived vehicles ID to the remote client

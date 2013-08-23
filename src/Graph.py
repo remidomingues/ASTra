@@ -13,8 +13,8 @@ EDGES COORDINATES
 
 (2) Get specified edges coordinates (request): COO edge1 edge2...edgeN
 
-(3) Edges coordinates (response): COO edge1 lon1A lat1A lon1B lat1B...edgeN lonNA latNA lonNB latNB (N in [0-Y] (See constants for Y value)
-		These messages of followed by an end message (response): EDG END
+(3) Edges coordinates (response): COO edge1 lon1A lat1A lon1B lat1B...edgeN lonNA latNA lonNB latNB (N in [0-Y] if all edges were requested (See constants for Y value))
+		If ALL EDGES were requested, these messages are followed by an end message (response): COO END
 		With A and B the edge extremities
 		
 		
@@ -23,8 +23,8 @@ EDGES LENGTH
 
 (5) Get specified edges length (request): LEN edge1 edge2...edgeN
 
-(6) Edges length (response): LEN edge1 length1...edgeN lengthN (N in [0-Y] (See constants for Y value)
-		These messages of followed by an end message (response): LEN END
+(6) Edges length (response): LEN edge1 length1...edgeN lengthN (N in [0-Y] if all edges were requested (See constants for Y value))
+		If ALL EDGES were requested, these messages are followed by an end message (response): LEN END
 		
 		
 EDGES CONGESTION
@@ -32,8 +32,8 @@ EDGES CONGESTION
 
 (8) Get specified edges congestion (request): CON edge1 edge2...edgeN
 
-(9) Edges congestion (response): CON edge1 congestion1...edgeN congestionN (N in [0-Y] (See constants for Y value)
-		These messages of followed by an end message (response): CON END
+(9) Edges congestion (response): CON edge1 congestion1...edgeN congestionN (N in [0-Y] if all edges were requested (See constants for Y value))
+		If ALL EDGES were requested, these messages are followed by an end message (response): CON END
 		With congestion = average speed on the edge during the last step / max speed on this step
 		
 
@@ -42,8 +42,8 @@ EDGES SUCCESSORS (GRAPH)
 
 (11) Get some specified edges successors (request): SUC edge1 edge2...edgeN
 
-(12) Edges successors (response): SUCC,edge1 succ1 succ11 succ12,edge2 succ21 succ22,...,edgeN succN1 succN2 (N in [0-Y] (See constants for Y value)
-		These messages of followed by an end message (response): SUCC,END
+(12) Edges successors (response): SUCC,edge1 succ1 succ11 succ12,edge2 succ21 succ22,...,edgeN succN1 succN2 (N in [0-Y] if all edges were requested (See constants for Y value))
+		If ALL EDGES were requested, these messages are followed by an end message (response): SUCC,END
 		
 		
 BLOCK/UNBLOCK EDGE
@@ -409,7 +409,7 @@ Send information messages to Client, followed by and end message.
 The dictionary must be the edgesDictionary if an edges coordinates () request is specified
 The dictionary must be the graphDictionary if a graph () or successors () request is specified
 """
-def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
+def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, uniqueMsg):
 	edgesNumber = 0
 	edgesMsg = []
 	
@@ -483,7 +483,7 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 			edgesNumber += 1
 			
 			#Sending the message if this one has reached the maximum edges number per message
-			if edgesNumber == maximumEdgesPerMsg:
+			if not uniqueMsg and edgesNumber == maximumEdgesPerMsg:
 				edgesMsg.append(constants.END_OF_MESSAGE)
 				strmsg = ''.join(edgesMsg)
 				try:
@@ -498,26 +498,7 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 				#Adding specified header
 				edgesMsg.append(informationHeader)
 		
-	if edgesNumber != 0:
-		edgesMsg.append(constants.END_OF_MESSAGE)
 		
-		strmsg = ''.join(edgesMsg)
-		try:
-			outputSocket.send(strmsg.encode())
-		except:
-			raise constants.ClosedSocketException("The listening socket has been closed")
-			Logger.infoFile("{} Message sent: <{} edges information ({})>".format(constants.PRINT_PREFIX_GRAPH, edgesNumber, informationType))
-		
-	
-	#Sending end of edges information messages
-	edgesMsg[:] = []
-	
-	#Adding specified header
-	edgesMsg.append(informationHeader)
-	edgesMsg.append(edgeListSeparator)
-
-	#Adding specified ending
-	edgesMsg.append(informationEnd)
 	edgesMsg.append(constants.END_OF_MESSAGE)
 	
 	strmsg = ''.join(edgesMsg)
@@ -525,7 +506,27 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 		outputSocket.send(strmsg.encode())
 	except:
 		raise constants.ClosedSocketException("The listening socket has been closed")
-	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_GRAPH, strmsg))
+		Logger.infoFile("{} Message sent: <{} edges information ({})>".format(constants.PRINT_PREFIX_GRAPH, edgesNumber, informationType))
+		
+	
+	if not uniqueMsg: 
+		#Sending end of edges information messages
+		edgesMsg[:] = []
+	
+		#Adding specified header
+		edgesMsg.append(informationHeader)
+		edgesMsg.append(edgeListSeparator)
+	
+		#Adding specified ending
+		edgesMsg.append(informationEnd)
+		edgesMsg.append(constants.END_OF_MESSAGE)
+		
+		strmsg = ''.join(edgesMsg)
+		try:
+			outputSocket.send(strmsg.encode())
+		except:
+			raise constants.ClosedSocketException("The listening socket has been closed")
+		Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_GRAPH, strmsg))
 	
 	
 """ Blocks edges in the SUMO simulated network by adding stopped vehicles """
@@ -650,45 +651,45 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eGraphReady, eManagerReady
 					#===== EDGES COORDINATES =====
 					# Send all edges coordinates to Client
 					if commandSize == 1 and command[0] == constants.ALL_EDGES_COORDS_REQUEST_HEADER:
-						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_COORDS, edgesDict)
+						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_COORDS, edgesDict, False)
 					
 					# Send the specified edges coordinates to Client	
 					elif commandSize > 1 and command[0] == constants.EDGES_COORDS_REQUEST_HEADER:
 						command.pop(0)
-						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_COORDS, edgesDict)
+						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_COORDS, edgesDict, True)
 					
 					
 					#===== EDGES LENGTH =====
 					# Send all edges length to Client
 					elif commandSize == 1 and command[0] == constants.ALL_EDGES_LENGTH_REQUEST_HEADER:
-						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_LENGTH, None)
+						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_LENGTH, None, False)
 					
 					# Send the specified edges length to Client	
 					elif commandSize > 1 and command[0] == constants.EDGES_LENGTH_REQUEST_HEADER:
 						command.pop(0)
-						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_LENGTH, None)
+						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_LENGTH, None, True)
 					
 					
 					#===== EDGES CONGESTION =====
 					# Send all edges congestion to Client
 					elif commandSize == 1 and command[0] == constants.ALL_EDGES_CONGESTION_REQUEST_HEADER:
-						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_CONGESTION, None)
+						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_CONGESTION, None, False)
 					
 					# Send the specified edges congestion to Client	
 					elif commandSize > 1 and command[0] == constants.EDGES_CONGESTION_REQUEST_HEADER:
 						command.pop(0)
-						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_CONGESTION, None)
+						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_CONGESTION, None, True)
 					
 					
 					#===== EDGES SUCCESSORS (GRAPH) =====
-					# Send the  graph dictionary to Client
+					# Send the graph dictionary to Client
 					elif commandSize == 1 and command[0] == constants.ALL_SUCCESSORS_REQUEST_HEADER:
-						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_SUCCESSORS, graphDict)
+						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_SUCCESSORS, graphDict, False)
 					
 					# Send the specified edges successors with the corresponding distance to Client	
 					elif commandSize > 1 and command[0] == constants.SUCCESSORS_REQUEST_HEADER:
 						command.pop(0)
-						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_SUCCESSORS, graphDict)
+						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_SUCCESSORS, graphDict, True)
 						
 						
 					#===== BLOCK/UNBLOCK EDGES =====

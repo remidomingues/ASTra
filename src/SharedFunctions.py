@@ -49,12 +49,11 @@ def isDictionaryOutOfDate(dictionaryFile, networkFile):
 
 """ Removes opposite edges in a route given in parameter, thanks to its source and destination edge ID """
 def correctRoute(edgeSrc, edgeDest, route):
-	if(len(route) > 1):
-		# Delete the first route element if this one is the opposite of the second
-		if (not(isJunction(edgeSrc)) and route[1] == getOppositeEdge(edgeSrc)) or isJunction(edgeSrc):
-			route.pop(0)
+	# Delete the first route element if this one is the opposite of the second
+	if len(route) > 1 and (not(isJunction(edgeSrc)) and route[1] == getOppositeEdge(edgeSrc)) or isJunction(edgeSrc):
+		route.pop(0)
 		
-		if isJunction(edgeDest) or route[-2] == getOppositeEdge(edgeDest):
+		if len(route) > 1 and isJunction(edgeDest) or route[-2] == getOppositeEdge(edgeDest):
 			route.pop()
 		
 	return route
@@ -63,15 +62,15 @@ def correctRoute(edgeSrc, edgeDest, route):
 """ Send an acknowledge with a return code to the remote client """
 def sendAck(printPrefix, code, outputSocket):
     ack = []
-    ack.append(Constants.ACKNOWLEDGE_HEADER)
-    ack.append(Constants.SEPARATOR)
+    ack.append(constants.ACKNOWLEDGE_HEADER)
+    ack.append(constants.SEPARATOR)
     ack.append(str(code))
-    ack.append(Constants.SEPARATOR)
-    ack.append(Constants.END_OF_MESSAGE)
+    ack.append(constants.SEPARATOR)
+    ack.append(constants.END_OF_MESSAGE)
         
     strmsg = ''.join(ack)
     try:
         outputSocket.send(strmsg.encode())
     except:
-        raise Constants.ClosedSocketException("The listening socket has been closed")
+        raise constants.ClosedSocketException("The listening socket has been closed")
     Logger.infoFile("{} Message sent: {}".format(printPrefix, strmsg))

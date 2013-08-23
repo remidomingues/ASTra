@@ -94,7 +94,7 @@ def run(mtraci, outputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVe
 			mVehicles.release()
 			
 			if constants.SEND_VEHICLES_COORDS and (constants.SEND_MSG_EVEN_IF_EMPTY or (not constants.SEND_MSG_EVEN_IF_EMPTY and vehicles)):
-				sendVehiclesCoordinates(vehicles, outputSocket, mtraci, mVehicles)
+				sendVehiclesCoordinates(vehicles, mtraci, outputSocket, mVehicles)
 				
 			
 			updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tllDict, yellowTllDict, managedTllDict)
