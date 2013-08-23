@@ -21,7 +21,7 @@ POSIX_OS = False
 """ Functionalities """
 ROUTING_ENABLED = True
 GRAPH_ENABLED = True
-VEHICLES_ENABLED = True
+VEHICLE_ENABLED = True
 SIMULATION_ENABLED = True
 TLL_ENABLED = True
 
@@ -36,8 +36,8 @@ class ClosedSocketException(Exception):
 
 """ Main directories """
 if not SERVER:
-	ASTRA_DIRECTORY = os.path.abspath('C:/Temp/workspace/cardemo/src/main/app/astra')
-	#ASTRA_DIRECTORY = os.path.abspath('src/main/app/astra')
+	#ASTRA_DIRECTORY = os.path.abspath('C:/Temp/workspace/cardemo/src/main/app/astra')
+	ASTRA_DIRECTORY = os.path.abspath('src/main/app/astra')
 else:
 	ASTRA_DIRECTORY = os.path.abspath("../apps/cardemo/astra")
 SUMO_DIRECTORY = os.path.abspath(os.path.dirname(ASTRA_DIRECTORY) + '/sumo-0.16.0')
@@ -45,8 +45,8 @@ CONFIG_DIRECTORY = ASTRA_DIRECTORY + "/config"
 DICT_DIRECTORY = ASTRA_DIRECTORY + "/dict"
 LOG_DIRECTORY = ASTRA_DIRECTORY + "/log"
 TMP_DIRECTORY = ASTRA_DIRECTORY + "/tmp"
-SCREEN_DIRECTORY = ASTRA_DIRECTORY + "/screen"
-#SCREEN_DIRECTORY = os.path.abspath(ASTRA_DIRECTORY + "/../html/img/screenshots")
+#SCREEN_DIRECTORY = ASTRA_DIRECTORY + "/screen"
+SCREEN_DIRECTORY = os.path.abspath(ASTRA_DIRECTORY + "/../html/img/screenshots")
 
 """ Networks constants """
 """
@@ -99,7 +99,7 @@ SUMO_GUI_SETTINGS_FILE = CONFIG_DIRECTORY + "/sumo-gui-settings.xml"
 SUMO_JUNCTIONS_DICTIONARY_FILE = DICT_DIRECTORY + "/{}JunctionsDictionary".format(SUMO_CHOSEN_NETWORK)
 SUMO_EDGES_DICTIONARY_FILE = DICT_DIRECTORY + "/{}EdgesDictionary".format(SUMO_CHOSEN_NETWORK)
 SUMO_TLL_DICTIONARY_FILE = DICT_DIRECTORY + "/{}TrafficLightsDictionary".format(SUMO_CHOSEN_NETWORK)
-SUMO_GRAPH_FILE = DICT_DIRECTORY + "/{}Graph".format(SUMO_CHOSEN_NETWORK)
+SUMO_GRAPH_FILE = DICT_DIRECTORY + "/{}GraphDictionary".format(SUMO_CHOSEN_NETWORK)
 
 
 """ Shared constants """
@@ -130,6 +130,7 @@ ROUTE_ROUTING_REQUEST_FAILED = 10
 VEHICLE_INVALID_ROUTE = 4
 VEHICLE_EMPTY_ROUTE = 5
 VEHICLE_MOCK_FAILED = 9
+VEHICLE_DELETE_FAILED_UNKNOWN = 11
 
 TLL_PHASE_INDEX_ERROR = 21
 TLL_PHASE_STATE_ERROR = 22
@@ -138,7 +139,7 @@ TLL_PHASE_DURATION_ERROR = 23
 
 
 """ Socket configuration """
-HOST = "localhost"
+HOST = "127.0.0.1"
 MANAGER_OUTPUT_PORT = 18000
 GRAPH_INPUT_PORT = 18001
 GRAPH_OUTPUT_PORT = 18002
@@ -221,8 +222,9 @@ ROUTING_REQUEST_HEADER = "GET"
 ROUTING_RESPONSE_HEADER = "ROU"
 DIJKSTRA_REQUEST = "DIJ"
 DUAROUTER_REQUEST = "DUA"
-EDGES_ID = "0"
-GEOGRAPHIC_COORDS = "1"
+EDGES_ID = 0
+GEOGRAPHIC_COORDS = 1
+ERROR_HEADER = "ERR"
 
 
 """ DijkstraRoute """
@@ -264,8 +266,9 @@ every vehicle when requested for all vehicles information (delete / coordinates 
 If you want access the information of a vehicle you ignore, you must specify the corresponding vehicle ID
 in one of the previous messages
 => These vehicles are ignored ONLY with messages about ALL VEHICLES
+=> These ones cannot be priority
 """
-IGNORED_VEHICLES = "^COL*$"
+IGNORED_VEHICLES = "^(COL*)|(MOC*)$"
 IGNORED_VEHICLES_REGEXP = re.compile(IGNORED_VEHICLES)
 
 VEHICLE_ADD_REQUEST_HEADER = "ADD"

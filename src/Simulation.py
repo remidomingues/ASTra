@@ -24,16 +24,17 @@ import optparse
 import subprocess
 import socket
 import time
-import Constants
+import constants
 import traci
 import traceback
-from SharedFunctions import getEdgeFromLane
-from SharedFunctions import isJunction
-from TrafficLights import updateTllForPriorityVehicles
-from TrafficLights import getTrafficLightsDictionary
-from Vehicle import sendArrivedVehicles
-from Vehicle import sendVehiclesCoordinates
-from Logger import Logger
+from sharedFunctions import getEdgeFromLane
+from sharedFunctions import isJunction
+from trafficLights import updateTllForPriorityVehicles
+from trafficLights import getTrafficLightsDictionary
+from vehicle import sendArrivedVehicles
+from vehicle import sendVehiclesCoordinates
+from vehicle import getRegularVehicles
+from logger import Logger
 
 """ Runs one SUMO simulation step """
 def runSimulationStep(mtraci, outputSocket):
@@ -43,33 +44,36 @@ def runSimulationStep(mtraci, outputSocket):
 		
 	
 """ Removes every arrived vehicles from the priority vehicles shared list """
-def removePriorityArrivedVehicles(arrivedVehicles, priorityVehicles, mPriorityVehicles, managedTllDict):
+def removeArrivedVehicles(arrivedVehicles, priorityVehicles, mPriorityVehicles, managedTllDict, vehicles):
 	for vehicleId in arrivedVehicles:
-		mPriorityVehicles.acquire()
-		if vehicleId in priorityVehicles:
-			priorityVehicles.remove(vehicleId)
-		mPriorityVehicles.release()
 		
-		for key in managedTllDict.keys():
-			if managedTllDict[key][0] == vehicleId:
-				del managedTllDict[key]
+		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicle):
+			vehicles.remove(vehicleId)
+		
+			mPriorityVehicles.acquire()
+			if vehicleId in priorityVehicles:
+				priorityVehicles.remove(vehicleId)
+			mPriorityVehicles.release()
+			
+			for key in managedTllDict.keys():
+				if managedTllDict[key][0] == vehicleId:
+					del managedTllDict[key]
 	
 
 """ Sends an arrived vehicles message (2) to the remote client and Remove every arrived vehicles from the priority vehicles shared list """
-def notifyAndUpdateArrivedVehicles(mtraci, outputSocket, priorityVehicles, mPriorityVehicles, managedTllDict):
+def notifyAndUpdateArrivedVehicles(mtraci, outputSocket, priorityVehicles, mPriorityVehicles, managedTllDict, vehicles):
 	mtraci.acquire()
 	arrivedVehicles = traci.simulation.getArrivedIDList()
 	mtraci.release()
 	arrivedVehicles = getRegularVehicles(arrivedVehicles)
 	
-	if Constants.SEND_ARRIVED_VEHICLES:
-		if Constants.SEND_MSG_EVEN_IF_EMPTY or (not Constants.SEND_MSG_EVEN_IF_EMPTY and arrivedVehicles):
-			sendArrivedVehicles(arrivedVehicles, mtraci, outputSocket)
-	removePriorityArrivedVehicles(arrivedVehicles, priorityVehicles, mPriorityVehicles, managedTllDict)
+	if constants.SEND_ARRIVED_VEHICLES and (constants.SEND_MSG_EVEN_IF_EMPTY or (not constants.SEND_MSG_EVEN_IF_EMPTY and arrivedVehicles)):
+		sendArrivedVehicles(arrivedVehicles, mtraci, outputSocket)
+	removeArrivedVehicles(arrivedVehicles, priorityVehicles, mPriorityVehicles, managedTllDict, vehicles)
 	
 
 """ See file description """
-def run(mtraci, outputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVehicles, mPriorityVehicles, eManagerReady):
+def run(mtraci, outputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVehicles, mPriorityVehicles, eManagerReady, vehicles, mVehicles):
 	yellowTllDict = dict()
 	managedTllDict = dict();
 	tllDict = getTrafficLightsDictionary(mtraci)
@@ -77,42 +81,39 @@ def run(mtraci, outputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVe
 	mRelaunch.acquire()
 	eSimulationReady.set()
 	while not eManagerReady.is_set():
-		time.sleep(Constants.SLEEP_SYNCHRONISATION)
+		time.sleep(constants.SLEEP_SYNCHRONISATION)
 
 	while not eShutdown.is_set():
 		startTime = time.clock()
 		
 		try:
+			mVehicles.acquire()
 			runSimulationStep(mtraci, outputSocket)
 			
-			if Constants.SEND_VEHICLES_COORDS:
-				mtraci.acquire()
-				vehicles = traci.vehicle.getIDList()
-				mtraci.release()
-				vehicles = getRegularVehicles(vehicles)
+			notifyAndUpdateArrivedVehicles(mtraci, outputSocket, priorityVehicles, mPriorityVehicles, managedTllDict, vehicles)
+			mVehicles.release()
+			
+			if constants.SEND_VEHICLES_COORDS and (constants.SEND_MSG_EVEN_IF_EMPTY or (not constants.SEND_MSG_EVEN_IF_EMPTY and vehicles)):
+				sendVehiclesCoordinates(vehicles, outputSocket, mtraci, mVehicles)
 				
-				if Constants.SEND_MSG_EVEN_IF_EMPTY or (not Constants.SEND_MSG_EVEN_IF_EMPTY and vehicles):
-					sendVehiclesCoordinates(vehicles, outputSocket, mtraci)
-				
-			notifyAndUpdateArrivedVehicles(mtraci, outputSocket, priorityVehicles, mPriorityVehicles, managedTllDict)
 			
 			updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tllDict, yellowTllDict, managedTllDict)
 
 		except Exception as e:
-			if e.__class__.__name__ == Constants.TRACI_EXCEPTION or e.__class__.__name__ == Constants.CLOSED_SOCKET_EXCEPTION:
+			if e.__class__.__name__ == constants.TRACI_EXCEPTION or e.__class__.__name__ == constants.CLOSED_SOCKET_EXCEPTION:
 				Logger.exception(e)
 				mRelaunch.release()
-				Logger.info("{}Shutting down current thread".format(Constants.PRINT_PREFIX_SIMULATOR))
+				Logger.info("{}Shutting down current thread".format(constants.PRINT_PREFIX_SIMULATOR))
 				sys.exit()
 			else:
-				Logger.error("{}A {} exception occurred:".format(Constants.PRINT_PREFIX_SIMULATOR, e.__class__.__name__))
+				Logger.error("{}A {} exception occurred:".format(constants.PRINT_PREFIX_SIMULATOR, e.__class__.__name__))
 				Logger.exception(e)
 				
 		
 		endTime = time.clock()
 		duration = endTime - startTime
-		sleepTime = Constants.SIMULATOR_SLEEP - duration
+		sleepTime = constants.SIMULATOR_SLEEP - duration
 		
-		#Logger.info("{}Sleep time: {}".format(Constants.PRINT_PREFIX_SIMULATOR, sleepTime))
+		#Logger.info("{}Sleep time: {}".format(constants.PRINT_PREFIX_SIMULATOR, sleepTime))
 		if sleepTime > 0:
 			time.sleep(sleepTime)

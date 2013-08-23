@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 
 """
-@file	Graph.py
+@file	graph.py
 @author  Remi Domingues
 @date	13/08/2013
 
 This script reads an input socket connected to the remote client and process a request when received
-
-Algorithm:
-while 1:
-	Waiting for a socket input data
-	Processing one of the following requests and sending (if relevant) the corresponding response
 		
 Socket messages:
 EDGES COORDINATES
@@ -18,7 +13,7 @@ EDGES COORDINATES
 
 (2) Get specified edges coordinates (request): COO edge1 edge2...edgeN
 
-(3) Edges coordinates (response): COO edge1 lon1A lat1A lon1B lat1B...edgeN lonNA latNA lonNB latNB (N in [0-Y] (See Constants for Y value)
+(3) Edges coordinates (response): COO edge1 lon1A lat1A lon1B lat1B...edgeN lonNA latNA lonNB latNB (N in [0-Y] (See constants for Y value)
 		These messages of followed by an end message (response): EDG END
 		With A and B the edge extremities
 		
@@ -28,7 +23,7 @@ EDGES LENGTH
 
 (5) Get specified edges length (request): LEN edge1 edge2...edgeN
 
-(6) Edges length (response): LEN edge1 length1...edgeN lengthN (N in [0-Y] (See Constants for Y value)
+(6) Edges length (response): LEN edge1 length1...edgeN lengthN (N in [0-Y] (See constants for Y value)
 		These messages of followed by an end message (response): LEN END
 		
 		
@@ -37,7 +32,7 @@ EDGES CONGESTION
 
 (8) Get specified edges congestion (request): CON edge1 edge2...edgeN
 
-(9) Edges congestion (response): CON edge1 congestion1...edgeN congestionN (N in [0-Y] (See Constants for Y value)
+(9) Edges congestion (response): CON edge1 congestion1...edgeN congestionN (N in [0-Y] (See constants for Y value)
 		These messages of followed by an end message (response): CON END
 		With congestion = average speed on the edge during the last step / max speed on this step
 		
@@ -47,7 +42,7 @@ EDGES SUCCESSORS (GRAPH)
 
 (11) Get some specified edges successors (request): SUC edge1 edge2...edgeN
 
-(12) Edges successors (response): SUCC,edge1 succ1 succ11 succ12,edge2 succ21 succ22,...,edgeN succN1 succN2 (N in [0-Y] (See Constants for Y value)
+(12) Edges successors (response): SUCC,edge1 succ1 succ11 succ12,edge2 succ21 succ22,...,edgeN succN1 succN2 (N in [0-Y] (See constants for Y value)
 		These messages of followed by an end message (response): SUCC,END
 		
 		
@@ -86,22 +81,21 @@ Dictionaries:
 					- Value=edge length between the two edges=successor edge length
 """
 
-import os
+import os, sys
 import traci
 import socket
 import traceback
 import time
-import Constants
+import constants
 import traci
 import traceback
-from Logger import Logger
+from logger import Logger
 import xml.sax
-from Logger import Logger
-from SharedFunctions import getOppositeEdge
-from SharedFunctions import isJunction
-from SharedFunctions import isDictionaryOutOfDate
-from SharedFunctions import sendAck
-from Route import getEdgeFromCoords
+from sharedFunctions import getOppositeEdge
+from sharedFunctions import isJunction
+from sharedFunctions import isDictionaryOutOfDate
+from sharedFunctions import sendAck
+from route import getEdgeFromCoords
 
 """
 ============================================================================================================================================
@@ -110,39 +104,39 @@ from Route import getEdgeFromCoords
 """
 """ Writes the junctions dictionary in an output file """
 def exportJunctionsDictionary(junctionsDict):
-	Logger.info("{}Exporting junctions dictionary...".format(Constants.PRINT_PREFIX_DIJKSTRA))
-	file = open(Constants.SUMO_JUNCTIONS_DICTIONARY_FILE, 'w')
+	Logger.info("{}Exporting junctions dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+	file = open(constants.SUMO_JUNCTIONS_DICTIONARY_FILE, 'w')
 	
 	for pair in junctionsDict.items():
 		file.write(pair[0])
-		file.write(Constants.END_OF_LINE)
+		file.write(constants.END_OF_LINE)
 		
 		size = len(pair[1][0])
 		i = 1
 		for value in pair[1][0]:
 			file.write(value)
 			if i != size: 
-				file.write(Constants.SEPARATOR)
+				file.write(constants.SEPARATOR)
 				i += 1
-		file.write(Constants.END_OF_LINE)
+		file.write(constants.END_OF_LINE)
 		
 		size = len(pair[1][1])
 		i = 1
 		for value in pair[1][1]:
 			file.write(value)
 			if i != size: 
-				file.write(Constants.SEPARATOR)
+				file.write(constants.SEPARATOR)
 				i += 1
-		file.write(Constants.END_OF_LINE)
+		file.write(constants.END_OF_LINE)
 		
 	file.close()
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_DIJKSTRA))
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
 	
 	
 """ Reads the junctions dictionary from an input file """
 def importJunctionsDictionary():
-	Logger.info("{}Importing junctions dictionary...".format(Constants.PRINT_PREFIX_DIJKSTRA))
-	file = open(Constants.SUMO_JUNCTIONS_DICTIONARY_FILE, 'r')
+	Logger.info("{}Importing junctions dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+	file = open(constants.SUMO_JUNCTIONS_DICTIONARY_FILE, 'r')
 	junctionsDict = dict()
 	
 	key = file.readline()[0:-1]
@@ -150,12 +144,12 @@ def importJunctionsDictionary():
 		value = [set(), set()]
 		
 		strvalues = file.readline()[0:-1]
-		lvalues = strvalues.split(Constants.SEPARATOR)
+		lvalues = strvalues.split(constants.SEPARATOR)
 		for v in lvalues:
 			value[0].add(v)
 			
 		strvalues = file.readline()[0:-1]
-		lvalues = strvalues.split(Constants.SEPARATOR)
+		lvalues = strvalues.split(constants.SEPARATOR)
 		for v in lvalues:
 			value[1].add(v)
 			
@@ -163,7 +157,7 @@ def importJunctionsDictionary():
 		key = file.readline()[0:-1]
 	
 	file.close()
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_DIJKSTRA))
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
 	return junctionsDict
 
 
@@ -175,35 +169,35 @@ def importJunctionsDictionary():
 """
 """ Writes the edges dictionary in an output file """
 def exportEdgesDictionary(edgesDict):
-	Logger.info("{}Exporting edges dictionary...".format(Constants.PRINT_PREFIX_DIJKSTRA))
-	file = open(Constants.SUMO_EDGES_DICTIONARY_FILE, 'w')
+	Logger.info("{}Exporting edges dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+	file = open(constants.SUMO_EDGES_DICTIONARY_FILE, 'w')
 	
 	for pair in edgesDict.items():
 		file.write(pair[0])
-		file.write(Constants.SEPARATOR)
+		file.write(constants.SEPARATOR)
 		file.write(pair[1][0])
-		file.write(Constants.SEPARATOR)
+		file.write(constants.SEPARATOR)
 		file.write(pair[1][1])
-		file.write(Constants.END_OF_LINE)
+		file.write(constants.END_OF_LINE)
 
 	file.close()
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_DIJKSTRA))
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
 	
 	
 """ Reads the edges dictionary from an input file """
 def importEdgesDictionary():
-	Logger.info("{}Importing edges dictionary...".format(Constants.PRINT_PREFIX_DIJKSTRA))
-	file = open(Constants.SUMO_EDGES_DICTIONARY_FILE, 'r')
+	Logger.info("{}Importing edges dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+	file = open(constants.SUMO_EDGES_DICTIONARY_FILE, 'r')
 	edgesDict = dict()
 	
 	line = file.readline()[0:-1]
 	while line:
-		array = line.split(Constants.SEPARATOR)
+		array = line.split(constants.SEPARATOR)
 		edgesDict[array[0]] = [array[1], array[2]]
 		line = file.readline()[0:-1]
 		
 	file.close()
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_DIJKSTRA))
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
 	return edgesDict
 
 
@@ -214,49 +208,49 @@ def importEdgesDictionary():
 ============================================================================================================================================
 """
 """ Writes the graph in an output file """
-def exportGraph(graph):
-	Logger.info("{}Exporting graph...".format(Constants.PRINT_PREFIX_DIJKSTRA))
-	file = open(Constants.SUMO_GRAPH_FILE, 'w')
+def exportGraph(graphDict):
+	Logger.info("{}Exporting graph...".format(constants.PRINT_PREFIX_DIJKSTRA))
+	file = open(constants.SUMO_GRAPH_FILE, 'w')
 	
-	for pair in graph.items():
+	for pair in graphDict.items():
 		file.write(pair[0])
 		
 		for valuePair in pair[1].items():
-			file.write(Constants.SEPARATOR)
+			file.write(constants.SEPARATOR)
 			file.write(valuePair[0])
-			file.write(Constants.SEPARATOR)
+			file.write(constants.SEPARATOR)
 			file.write(str(valuePair[1]))
 			
-		file.write(Constants.END_OF_LINE)
+		file.write(constants.END_OF_LINE)
 		
 	file.close()
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_DIJKSTRA))
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
 	
 	
 """ Reads the network graph from an input file """
 def importGraph():
-	Logger.info("{}Importing graph...".format(Constants.PRINT_PREFIX_DIJKSTRA))
-	file = open(Constants.SUMO_GRAPH_FILE, 'r')
-	graph = dict()
+	Logger.info("{}Importing graph...".format(constants.PRINT_PREFIX_DIJKSTRA))
+	file = open(constants.SUMO_GRAPH_FILE, 'r')
+	graphDict = dict()
 	
 	line = file.readline()[0:-1]
 	while line:
-		lineArray = line.split(Constants.SEPARATOR)
+		lineArray = line.split(constants.SEPARATOR)
 		junctionNode = lineArray[0]
-		graph[junctionNode] = dict()
+		graphDict[junctionNode] = dict()
 		
 		i = 1
 		while i < len(lineArray):
 			junctionSuccessor = lineArray[i]
 			edgeLength = lineArray[i+1]
-			graph[junctionNode][junctionSuccessor] = float(edgeLength)
+			graphDict[junctionNode][junctionSuccessor] = float(edgeLength)
 			i += 2
 
 		line = file.readline()[0:-1]
 	
 	file.close()
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_DIJKSTRA))
-	return graph
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+	return graphDict
 
 
 
@@ -270,23 +264,23 @@ SAX handler used for parsing a SUMO network file in order to build
 a graph, junctions and edges dictionary
 """
 class NetworkHandler(xml.sax.ContentHandler):
-	def __init__(self, graph, junctionsDict, edgesDict, mtraci):
+	def __init__(self, graphDict, junctionsDict, edgesDict, mtraci):
 		xml.sax.ContentHandler.__init__(self)
 		self.junctionFrom = ''
 		self.junctionTo = ''
 		self.edgeId = ''
-		self.graph = graph
+		self.graphDict = graphDict
 		self.junctionsDict = junctionsDict
 		self.edgesDict = edgesDict
 		self.mtraci = mtraci
 
 	def startElement(self, name, attrs):
-		if name == Constants.XML_EDGE_ELEMENT:
-			self.edgeId = str(attrs.get(Constants.XML_EDGE_ID))
+		if name == constants.XML_EDGE_ELEMENT:
+			self.edgeId = str(attrs.get(constants.XML_EDGE_ID))
 			
 			if self.edgeId[0] != ':':
-				self.junctionFrom = str(attrs.get(Constants.XML_EDGE_FROM_JUNCTION))
-				self.junctionTo = str(attrs.get(Constants.XML_EDGE_TO_JUNCTION))
+				self.junctionFrom = str(attrs.get(constants.XML_EDGE_FROM_JUNCTION))
+				self.junctionTo = str(attrs.get(constants.XML_EDGE_TO_JUNCTION))
 				
 				#Junctions dictionary
 				if not self.junctionFrom in self.junctionsDict:
@@ -302,12 +296,12 @@ class NetworkHandler(xml.sax.ContentHandler):
 				self.edgesDict[self.edgeId] = [self.junctionFrom, self.junctionTo]
 			
 				#Graph
-				if not self.edgeId in self.graph:
-					self.graph[self.edgeId] = dict()
+				if not self.edgeId in self.graphDict:
+					self.graphDict[self.edgeId] = dict()
 					
 					
-		elif name == Constants.XML_LANE_ELEMENT:
-			laneId = attrs.get(Constants.XML_LANE_ID)
+		elif name == constants.XML_LANE_ELEMENT:
+			laneId = attrs.get(constants.XML_LANE_ID)
 			if laneId[0] != ':':
 				laneId = str(laneId)
 				self.mtraci.acquire()
@@ -321,7 +315,7 @@ class NetworkHandler(xml.sax.ContentHandler):
 					length = traci.lane.getLength(successorLaneId[0])
 					self.mtraci.release()
 					
-					self.graph[self.edgeId][successorEdgeId] = length
+					self.graphDict[self.edgeId][successorEdgeId] = length
 
 
 """
@@ -331,35 +325,34 @@ Returns
 - An edges dictionary as {Key=edgeId, Value=[junction predecessor, junction successor]
 """
 def buildGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci):
-	Logger.info("{}Building graph, junctions dictionary and edges dictionary...".format(Constants.PRINT_PREFIX_DIJKSTRA))
+	Logger.info("{}Building graph, junctions dictionary and edges dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
 	
 	#Initializing variables
-	graph = dict()
+	graphDict = dict()
 	junctionsDict = dict()
 	edgesDict = dict()
 		
 	#Parsing XML network file
 	parser = xml.sax.make_parser()
-	parser.setContentHandler(NetworkHandler(graph, junctionsDict, edgesDict, mtraci))
-	parser.parse(Constants.SUMO_NETWORK_FILE)
-	#correctGraph(graph)
+	parser.setContentHandler(NetworkHandler(graphDict, junctionsDict, edgesDict, mtraci))
+	parser.parse(constants.SUMO_NETWORK_FILE)
 		
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_DIJKSTRA))
-	return graph, junctionsDict, edgesDict
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+	return graphDict, junctionsDict, edgesDict
 
 
 """ Returns the graph(*), junctions(**) and edges(***) dictionary. This one is obtained from a text file, updated if new map data are detected """
 def getGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci):
-	if isDictionaryOutOfDate(Constants.SUMO_JUNCTIONS_DICTIONARY_FILE, Constants.SUMO_NETWORK_FILE) or isDictionaryOutOfDate(Constants.SUMO_EDGES_DICTIONARY_FILE, Constants.SUMO_NETWORK_FILE) or isDictionaryOutOfDate(Constants.SUMO_GRAPH_FILE, Constants.SUMO_NETWORK_FILE):
-		graph, junctionsDict, edgesDict = buildGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci)
-		exportGraph(graph)
+	if isDictionaryOutOfDate(constants.SUMO_JUNCTIONS_DICTIONARY_FILE, constants.SUMO_NETWORK_FILE) or isDictionaryOutOfDate(constants.SUMO_EDGES_DICTIONARY_FILE, constants.SUMO_NETWORK_FILE) or isDictionaryOutOfDate(constants.SUMO_GRAPH_FILE, constants.SUMO_NETWORK_FILE):
+		graphDict, junctionsDict, edgesDict = buildGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci)
+		exportGraph(graphDict)
 		exportJunctionsDictionary(junctionsDict)
 		exportEdgesDictionary(edgesDict)
 	else:
-		graph = importGraph()
+		graphDict = importGraph()
 		junctionsDict = importJunctionsDictionary()
 		edgesDict = importEdgesDictionary()
-	return graph, junctionsDict, edgesDict
+	return graphDict, junctionsDict, edgesDict
 
 
 
@@ -370,45 +363,45 @@ def getGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci):
 """
 """ Returns the information header corresponding to the given information type """
 def getInformationHeader(informationType):
-	if informationType == Constants.EDGES_COORDS:
-		return  Constants.EDGES_COORDS_RESPONSE_HEADER
-	elif informationType == Constants.EDGES_CONGESTION:
-		return Constants.EDGES_CONGESTION_RESPONSE_HEADER
-	elif informationType == Constants.EDGES_LENGTH:
-		return Constants.EDGES_LENGTH_RESPONSE_HEADER
-	elif informationType == Constants.EDGES_SUCCESSORS:
-		return  Constants.SUCCESSORS_RESPONSE_HEADER
+	if informationType == constants.EDGES_COORDS:
+		return  constants.EDGES_COORDS_RESPONSE_HEADER
+	elif informationType == constants.EDGES_CONGESTION:
+		return constants.EDGES_CONGESTION_RESPONSE_HEADER
+	elif informationType == constants.EDGES_LENGTH:
+		return constants.EDGES_LENGTH_RESPONSE_HEADER
+	elif informationType == constants.EDGES_SUCCESSORS:
+		return  constants.SUCCESSORS_RESPONSE_HEADER
 	
 	
 """ Returns the information end corresponding to the given information type """
 def getInformationEnd(informationType):
-	if informationType == Constants.EDGES_COORDS:
-		return  Constants.EDGES_COORDS_END
-	elif informationType == Constants.EDGES_LENGTH:
-		return Constants.EDGES_LENGTH_END
-	elif informationType == Constants.EDGES_CONGESTION:
-		return Constants.EDGES_CONGESTION_END
-	elif informationType == Constants.EDGES_SUCCESSORS:
-		return  Constants.SUCCESSORS_END
+	if informationType == constants.EDGES_COORDS:
+		return  constants.EDGES_COORDS_END
+	elif informationType == constants.EDGES_LENGTH:
+		return constants.EDGES_LENGTH_END
+	elif informationType == constants.EDGES_CONGESTION:
+		return constants.EDGES_CONGESTION_END
+	elif informationType == constants.EDGES_SUCCESSORS:
+		return  constants.SUCCESSORS_END
 	
 	
 """ Returns the edge list separator corresponding to the given information type """
 def getEdgeListSeparator(informationType):
-	if informationType == Constants.EDGES_SUCCESSORS:
-		return Constants.SUCCESSORS_LIST_SEPARATOR
-	return Constants.SEPARATOR
+	if informationType == constants.EDGES_SUCCESSORS:
+		return constants.SUCCESSORS_LIST_SEPARATOR
+	return constants.SEPARATOR
 	
 	
 """ Returns the maximum edges number per message corresponding to the given information type """
 def getMaximumEdgesPerMessage(informationType):
-	if informationType == Constants.EDGES_COORDS:
-		return  Constants.EDGES_NUMBER_PER_COORDS_MESSAGE
-	elif informationType == Constants.EDGES_LENGTH:
-		return Constants.EDGES_NUMBER_PER_LENGTH_MESSAGE
-	elif informationType == Constants.EDGES_CONGESTION:
-		return Constants.EDGES_NUMBER_PER_CONGESTION_MESSAGE
-	elif informationType == Constants.EDGES_SUCCESSORS:
-		return  Constants.SUCCESSORS_NUMBER_PER_MESSAGE
+	if informationType == constants.EDGES_COORDS:
+		return  constants.EDGES_NUMBER_PER_COORDS_MESSAGE
+	elif informationType == constants.EDGES_LENGTH:
+		return constants.EDGES_NUMBER_PER_LENGTH_MESSAGE
+	elif informationType == constants.EDGES_CONGESTION:
+		return constants.EDGES_NUMBER_PER_CONGESTION_MESSAGE
+	elif informationType == constants.EDGES_SUCCESSORS:
+		return  constants.SUCCESSORS_NUMBER_PER_MESSAGE
 
 
 """
@@ -432,10 +425,10 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 		if edge[0] != ':':
 			edgesMsg.append(edgeListSeparator)
 			edgesMsg.append(edge)
-			edgesMsg.append(Constants.SEPARATOR)
+			edgesMsg.append(constants.SEPARATOR)
 			
 			#EDGES COORDINATES
-			if(informationType == Constants.EDGES_COORDS):
+			if(informationType == constants.EDGES_COORDS):
 				#Getting the two junctions ID linked with the current edge
 				edgesJunctions = dictionary[edge]
 				
@@ -449,15 +442,15 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 	
 				#Adding to the current message
 				edgesMsg.append(str(predecessorCoordsGeo[0]))
-				edgesMsg.append(Constants.SEPARATOR)
+				edgesMsg.append(constants.SEPARATOR)
 				edgesMsg.append(str(predecessorCoordsGeo[1]))
-				edgesMsg.append(Constants.SEPARATOR)
+				edgesMsg.append(constants.SEPARATOR)
 				edgesMsg.append(str(successorCoordsGeo[0]))
-				edgesMsg.append(Constants.SEPARATOR)
+				edgesMsg.append(constants.SEPARATOR)
 				edgesMsg.append(str(successorCoordsGeo[1]))
 			
 			#EDGES LENGTH
-			elif(informationType == Constants.EDGES_LENGTH):
+			elif(informationType == constants.EDGES_LENGTH):
 				lane = edge + '_0'
 				
 				#Getting edge length
@@ -469,7 +462,7 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 				edgesMsg.append(str(length))
 			
 			#EDGES CONGESTION
-			elif(informationType == Constants.EDGES_CONGESTION):
+			elif(informationType == constants.EDGES_CONGESTION):
 				lane = edge + '_0'
 				
 				#Calculating congestion
@@ -481,23 +474,23 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 				edgesMsg.append(str(congestion))
 			
 			#EDGES SUCCESSORS (GRAPH)
-			elif(informationType == Constants.EDGES_SUCCESSORS):
+			elif(informationType == constants.EDGES_SUCCESSORS):
 				for edgeSucc in dictionary[edge]:
 					edgesMsg.append(edgeSucc)
-					edgesMsg.append(Constants.SEPARATOR)
+					edgesMsg.append(constants.SEPARATOR)
 			
 			
 			edgesNumber += 1
 			
 			#Sending the message if this one has reached the maximum edges number per message
 			if edgesNumber == maximumEdgesPerMsg:
-				edgesMsg.append(Constants.END_OF_MESSAGE)
+				edgesMsg.append(constants.END_OF_MESSAGE)
 				strmsg = ''.join(edgesMsg)
 				try:
 					outputSocket.send(strmsg.encode())
 				except:
-					raise Constants.ClosedSocketException("The listening socket has been closed")
-				Logger.infoFile("{} Message sent: <{} edges information ({})>".format(Constants.PRINT_PREFIX_GRAPH, maximumEdgesPerMsg, informationType))
+					raise constants.ClosedSocketException("The listening socket has been closed")
+				Logger.infoFile("{} Message sent: <{} edges information ({})>".format(constants.PRINT_PREFIX_GRAPH, maximumEdgesPerMsg, informationType))
 				
 				edgesNumber = 0
 				edgesMsg[:] = []
@@ -506,14 +499,14 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 				edgesMsg.append(informationHeader)
 		
 	if edgesNumber != 0:
-		edgesMsg.append(Constants.END_OF_MESSAGE)
+		edgesMsg.append(constants.END_OF_MESSAGE)
 		
 		strmsg = ''.join(edgesMsg)
 		try:
 			outputSocket.send(strmsg.encode())
 		except:
-			raise Constants.ClosedSocketException("The listening socket has been closed")
-			Logger.infoFile("{} Message sent: <{} edges information ({})>".format(Constants.PRINT_PREFIX_GRAPH, edgesNumber, informationType))
+			raise constants.ClosedSocketException("The listening socket has been closed")
+			Logger.infoFile("{} Message sent: <{} edges information ({})>".format(constants.PRINT_PREFIX_GRAPH, edgesNumber, informationType))
 		
 	
 	#Sending end of edges information messages
@@ -525,14 +518,14 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary):
 
 	#Adding specified ending
 	edgesMsg.append(informationEnd)
-	edgesMsg.append(Constants.END_OF_MESSAGE)
+	edgesMsg.append(constants.END_OF_MESSAGE)
 	
 	strmsg = ''.join(edgesMsg)
 	try:
 		outputSocket.send(strmsg.encode())
 	except:
-		raise Constants.ClosedSocketException("The listening socket has been closed")
-	Logger.infoFile("{} Message sent: {}".format(Constants.PRINT_PREFIX_GRAPH, strmsg))
+		raise constants.ClosedSocketException("The listening socket has been closed")
+	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_GRAPH, strmsg))
 	
 	
 """ Blocks edges in the SUMO simulated network by adding stopped vehicles """
@@ -545,7 +538,7 @@ def blockEdges(mtraci, edgesBlocked, idCpt, outputSocket):
 		nbLanesBlocked = int(edgesBlocked[i])
 		i += 1
 		
-		routeId = Constants.BLOCKED_ROUTE_ID_PREFIX + str(idCpt + cpt)
+		routeId = constants.BLOCKED_ROUTE_ID_PREFIX + str(idCpt + cpt)
 		route = [edgeBlocked]
 		laneIndex = 0
 		laneBlocked = edgeBlocked + '_0'
@@ -555,7 +548,7 @@ def blockEdges(mtraci, edgesBlocked, idCpt, outputSocket):
 		mtraci.release()
 	    
 		while laneIndex < nbLanesBlocked:
-			vehicleId = Constants.BLOCKED_VEHICLE_ID_PREFIX + str(idCpt + cpt)
+			vehicleId = constants.BLOCKED_VEHICLE_ID_PREFIX + str(idCpt + cpt)
 			#TODO: improve, we can use the lane number by adding it to a dictionary when parsing the network
 			try:
 			    mtraci.acquire()
@@ -568,7 +561,7 @@ def blockEdges(mtraci, edgesBlocked, idCpt, outputSocket):
 			laneLength /= 2.0
 	
 			mtraci.acquire()
-			traci.vehicle.add(vehicleId, routeId, -2, 0, 0, 0, Constants.DEFAULT_VEHICLE_TYPE)
+			traci.vehicle.add(vehicleId, routeId, -2, 0, 0, 0, constants.DEFAULT_VEHICLE_TYPE)
 			traci.vehicle.setStop(vehicleId, edgeBlocked, laneLength, laneIndex, 2147483646)
 			mtraci.release()
 			
@@ -576,7 +569,7 @@ def blockEdges(mtraci, edgesBlocked, idCpt, outputSocket):
 			laneIndex += 1
 			laneBlocked = laneBlocked[:-1] + str(laneIndex)
 			
-	sendAck(Constants.PRINT_PREFIX_GRAPH, Constants.ACK_OK, outputSocket)
+	sendAck(constants.PRINT_PREFIX_GRAPH, constants.ACK_OK, outputSocket)
 	return cpt
 
 				
@@ -588,16 +581,16 @@ def unblockEdges(mtraci, edgesBlocked):
 			blockedVehicles = traci.edge.getLastStepVehicleIDs(edgeBlocked)
 		except:
 			mtraci.release()
-			return sendAck(Constants.PRINT_PREFIX_GRAPH, Constants.GRAPH_UNKNOWN_EDGE, outputSocket)
+			return sendAck(constants.PRINT_PREFIX_GRAPH, constants.GRAPH_UNKNOWN_EDGE, outputSocket)
 		mtraci.release()
 		
 		for blockedVehicle in blockedVehicles:
-			if blockedVehicle.startswith(Constants.BLOCKED_VEHICLE_ID_PREFIX):
+			if blockedvehicle.startswith(constants.BLOCKED_VEHICLE_ID_PREFIX):
 				mtraci.acquire()
 				traci.vehicle.remove(vehicleId)
 				mtraci.release()
 				
-	sendAck(Constants.PRINT_PREFIX_GRAPH, Constants.ACK_OK, outputSocket)
+	sendAck(constants.PRINT_PREFIX_GRAPH, constants.ACK_OK, outputSocket)
 	
 	
 """ Sends an edge ID calculated from geographic coordinates to the remote client """
@@ -605,21 +598,21 @@ def sendEdgeId(mtraci, lon, lat, outputSocket):
 	edgeId = getEdgeFromCoords(lon, lat, mtraci)
 	
 	routeCoordsMsg = []
-	routeCoordsMsg.append(Constants.EDGE_ID_RESPONSE_HEADER)
-	routeCoordsMsg.append(Constants.SEPARATOR)
+	routeCoordsMsg.append(constants.EDGE_ID_RESPONSE_HEADER)
+	routeCoordsMsg.append(constants.SEPARATOR)
 	routeCoordsMsg.append(edgeId)
-	routeCoordsMsg.append(Constants.END_OF_MESSAGE)
+	routeCoordsMsg.append(constants.END_OF_MESSAGE)
 		
 	strmsg = ''.join(routeCoordsMsg)
 	try:
 		outputSocket.send(strmsg.encode())
 	except:
-		raise Constants.ClosedSocketException("The listening socket has been closed")
-	Logger.infoFile("{} Message sent: {}".format(Constants.PRINT_PREFIX_GRAPH, strmsg))
+		raise constants.ClosedSocketException("The listening socket has been closed")
+	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_GRAPH, strmsg))
 		
 
 """ Reads an input socket connected to the remote client and process a get coordinates(6), get congestion or block edge(7) request when received """
-def run(mtraci, inputSocket, outputSocket, eShutdown, eGraphReady, eManagerReady, graph, junctionsDict, edgesDict):
+def run(mtraci, inputSocket, outputSocket, eShutdown, eGraphReady, eManagerReady, graphDict, junctionsDict, edgesDict):
 	bufferSize = 32768
 	blockedIdCpt = 0
 						
@@ -629,7 +622,7 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eGraphReady, eManagerReady
 	
 	eGraphReady.set()
 	while not eManagerReady.is_set():
-		time.sleep(Constants.SLEEP_SYNCHRONISATION)
+		time.sleep(constants.SLEEP_SYNCHRONISATION)
 	
 	while not eShutdown.is_set():
 		try:
@@ -637,94 +630,94 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eGraphReady, eManagerReady
 				# Read the message from the input socket (blocked until a message is read)
 				buff = inputSocket.recv(bufferSize)
 			except:
-				raise Constants.ClosedSocketException("The listening socket has been closed")
+				raise constants.ClosedSocketException("The listening socket has been closed")
 			
 			if len(buff) == 0:
-					raise Constants.ClosedSocketException("The distant socket has been closed")
+					raise constants.ClosedSocketException("The distant socket has been closed")
 				
-			listCommands = buff.decode().split(Constants.MESSAGES_SEPARATOR)
+			listCommands = buff.decode().split(constants.MESSAGES_SEPARATOR)
 			
 			for cmd in listCommands:
 				if len(cmd) != 0:
-					command = cmd.split(Constants.SEPARATOR)
+					command = cmd.split(constants.SEPARATOR)
 					commandSize = len(command)
 					
 					for i in range(0, commandSize):
 						command[i] = str(command[i])
 						
-					Logger.infoFile("{} Message received: {}".format(Constants.PRINT_PREFIX_GRAPH, cmd))
+					Logger.infoFile("{} Message received: {}".format(constants.PRINT_PREFIX_GRAPH, cmd))
 						
 					#===== EDGES COORDINATES =====
 					# Send all edges coordinates to Client
-					if commandSize == 1 and command[0] == Constants.ALL_EDGES_COORDS_REQUEST_HEADER:
-						sendEdgesDetails(edges, outputSocket, mtraci, Constants.EDGES_COORDS, edgesDict)
+					if commandSize == 1 and command[0] == constants.ALL_EDGES_COORDS_REQUEST_HEADER:
+						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_COORDS, edgesDict)
 					
 					# Send the specified edges coordinates to Client	
-					elif commandSize > 1 and command[0] == Constants.EDGES_COORDS_REQUEST_HEADER:
+					elif commandSize > 1 and command[0] == constants.EDGES_COORDS_REQUEST_HEADER:
 						command.pop(0)
-						sendEdgesDetails(command, outputSocket, mtraci, Constants.EDGES_COORDS, edgesDict)
+						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_COORDS, edgesDict)
 					
 					
 					#===== EDGES LENGTH =====
 					# Send all edges length to Client
-					elif commandSize == 1 and command[0] == Constants.ALL_EDGES_LENGTH_REQUEST_HEADER:
-						sendEdgesDetails(edges, outputSocket, mtraci, Constants.EDGES_LENGTH, None)
+					elif commandSize == 1 and command[0] == constants.ALL_EDGES_LENGTH_REQUEST_HEADER:
+						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_LENGTH, None)
 					
 					# Send the specified edges length to Client	
-					elif commandSize > 1 and command[0] == Constants.EDGES_LENGTH_REQUEST_HEADER:
+					elif commandSize > 1 and command[0] == constants.EDGES_LENGTH_REQUEST_HEADER:
 						command.pop(0)
-						sendEdgesDetails(command, outputSocket, mtraci, Constants.EDGES_LENGTH, None)
+						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_LENGTH, None)
 					
 					
 					#===== EDGES CONGESTION =====
 					# Send all edges congestion to Client
-					elif commandSize == 1 and command[0] == Constants.ALL_EDGES_CONGESTION_REQUEST_HEADER:
-						sendEdgesDetails(edges, outputSocket, mtraci, Constants.EDGES_CONGESTION, None)
+					elif commandSize == 1 and command[0] == constants.ALL_EDGES_CONGESTION_REQUEST_HEADER:
+						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_CONGESTION, None)
 					
 					# Send the specified edges congestion to Client	
-					elif commandSize > 1 and command[0] == Constants.EDGES_CONGESTION_REQUEST_HEADER:
+					elif commandSize > 1 and command[0] == constants.EDGES_CONGESTION_REQUEST_HEADER:
 						command.pop(0)
-						sendEdgesDetails(command, outputSocket, mtraci, Constants.EDGES_CONGESTION, None)
+						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_CONGESTION, None)
 					
 					
 					#===== EDGES SUCCESSORS (GRAPH) =====
 					# Send the  graph dictionary to Client
-					elif commandSize == 1 and command[0] == Constants.ALL_SUCCESSORS_REQUEST_HEADER:
-						sendEdgesDetails(edges, outputSocket, mtraci, Constants.EDGES_SUCCESSORS, graph)
+					elif commandSize == 1 and command[0] == constants.ALL_SUCCESSORS_REQUEST_HEADER:
+						sendEdgesDetails(edges, outputSocket, mtraci, constants.EDGES_SUCCESSORS, graphDict)
 					
 					# Send the specified edges successors with the corresponding distance to Client	
-					elif commandSize > 1 and command[0] == Constants.SUCCESSORS_REQUEST_HEADER:
+					elif commandSize > 1 and command[0] == constants.SUCCESSORS_REQUEST_HEADER:
 						command.pop(0)
-						sendEdgesDetails(command, outputSocket, mtraci, Constants.EDGES_SUCCESSORS, graph)
+						sendEdgesDetails(command, outputSocket, mtraci, constants.EDGES_SUCCESSORS, graphDict)
 						
 						
 					#===== BLOCK/UNBLOCK EDGES =====
 					# Block edges in the SUMO simulation
-					elif commandSize > 1 and command[0] == Constants.BLOCK_EDGE_REQUEST_HEADER:
+					elif commandSize > 1 and command[0] == constants.BLOCK_EDGE_REQUEST_HEADER:
 						command.pop(0)
 						blockedIdCpt += blockEdges(mtraci, command, blockedIdCpt, outputSocket)
 						
 					# Unblock edges in the SUMO simulation
-					elif commandSize > 1 and command[0] == Constants.UNBLOCK_EDGE_REQUEST_HEADER:
+					elif commandSize > 1 and command[0] == constants.UNBLOCK_EDGE_REQUEST_HEADER:
 						command.pop(0)
 						unblockEdges(mtraci, command, outputSocket)
 						
 						
 					#===== EDGE ID =====
 					# Sending an edge ID from geographic coordinates
-					elif commandSize == 3 and command[0] == Constants.EDGE_ID_REQUEST_HEADER:
+					elif commandSize == 3 and command[0] == constants.EDGE_ID_REQUEST_HEADER:
 						sendEdgeId(mtraci, command[1], command[2], outputSocket)
 						
 						
 					#===== UNKNOWN REQUEST =====
 					else:
-						Logger.warning("{}Invalid command received: {}".format(Constants.PRINT_PREFIX_GRAPH, command))
-						sendAck(Constants.PRINT_PREFIX_GRAPH, Constants.INVALID_MESSAGE, outputSocket)
+						Logger.warning("{}Invalid command received: {}".format(constants.PRINT_PREFIX_GRAPH, command))
+						sendAck(constants.PRINT_PREFIX_GRAPH, constants.INVALID_MESSAGE, outputSocket)
 
 		except Exception as e:
-			if e.__class__.__name__ == Constants.CLOSED_SOCKET_EXCEPTION or e.__class__.__name__ == Constants.TRACI_EXCEPTION:
-				Logger.info("{}Shutting down current thread".format(Constants.PRINT_PREFIX_GRAPH))
+			if e.__class__.__name__ == constants.CLOSED_SOCKET_EXCEPTION or e.__class__.__name__ == constants.TRACI_EXCEPTION:
+				Logger.info("{}Shutting down current thread".format(constants.PRINT_PREFIX_GRAPH))
 				sys.exit()
 			else:
-				Logger.error("{}A {} exception occurred:".format(Constants.PRINT_PREFIX_GRAPH, e.__class__.__name__))
+				Logger.error("{}A {} exception occurred:".format(constants.PRINT_PREFIX_GRAPH, e.__class__.__name__))
 				Logger.exception(e)

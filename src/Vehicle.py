@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-@file	Vehicle.py
+@file	vehicle.py
 @author  Remi Domingues
 @date	07/06/2013
 
@@ -9,7 +9,7 @@ This script reads an input socket connected to the remote client and process an 
 		
 (1) Add request: ADD vehicleId priority lat1 lon1 lat2 lon2 ... latN lonN
 		priority = 0 (no priority) or 1 (priority vehicle)
-	Followed by (2) Acknowledge response: ACK vehicleId ackCode (See Constants for the detailed acknowledge codes)
+	Followed by (2) Acknowledge response: ACK vehicleId ackCode (See constants for the detailed acknowledge codes)
 
 (3) Delete request: DEL vehicleId1 vehicleId2 ... vehicleId3
 		If NO VEHICLE is specified, every vehicle will be deleted
@@ -39,15 +39,15 @@ import optparse
 import subprocess
 import socket
 import time
-import Constants
+import constants
 import traci
 import traceback
 from random import randint
-from SharedFunctions import isJunction
-from SharedFunctions import getFirstLaneFromEdge
-from SharedFunctions import getEdgeFromLane
-from SharedFunctions import sendAck
-from Logger import Logger
+from sharedFunctions import isJunction
+from sharedFunctions import getFirstLaneFromEdge
+from sharedFunctions import getEdgeFromLane
+from sharedFunctions import sendAck
+from logger import Logger
 
 """ Returns a route ID from a user vehicle ID """
 def getRouteIdFromVehicleId(vehicleId, cRouteId):
@@ -76,31 +76,19 @@ def appendEdge(route, edgesNumber, mtraci):
 """ Sends an acknowledge(2) message to the remote client using an output socket """
 def sendIdentifiedAck(vehicleId, errorCode, outputSocket):
 	errorMsg = []
-	errorMsg.append(Constants.ACK_HEADER)
-	errorMsg.append(Constants.SEPARATOR)
+	errorMsg.append(constants.ACK_HEADER)
+	errorMsg.append(constants.SEPARATOR)
 	errorMsg.append(vehicleId)
-	errorMsg.append(Constants.SEPARATOR)
+	errorMsg.append(constants.SEPARATOR)
 	errorMsg.append(errorCode)
-	errorMsg.append(Constants.END_OF_MESSAGE)
+	errorMsg.append(constants.END_OF_MESSAGE)
 		
 	strmsg = ''.join(errorMsg)
 	try:
 		outputSocket.send(strmsg.encode())
 	except:
-		raise Constants.ClosedSocketException("The listening socket has been closed")
-	Logger.infoFile("{} Message sent: {}".format(Constants.PRINT_PREFIX_VEHICLE, strmsg))
-
-
-""" Returns a route (list of edges ID) from a ADD(1) command """
-def getRouteFromCommand(command, commandSize):
-	index = 3
-	route = []
-	
-	while index < commandSize - 1:
-		route.append(command[index])
-		index += 1
-		
-	return route
+		raise constants.ClosedSocketException("The listening socket has been closed")
+	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_VEHICLE, strmsg))
 
 
 """ Return true if the given route is linked by SUMO lanes, false else """
@@ -151,34 +139,32 @@ def isRouteValid(route, junctionsDict, edgesDict):
 """ Adds a vehicle and its route to the SUMO simulation. An error may be sent to the remote client """
 def addRouteToSumo(vehicleId, routeId, route, mtraci, outputSocket):
 	if not isRouteValidForTraCI(mtraci, route):
-		Logger.warning("{}Invalid route detected: {}".format(Constants.PRINT_PREFIX_VEHICLE, route))
-		sendIdentifiedAck(vehicleId, Constants.VEHICLE_INVALID_ROUTE, outputSocket)
-		return -1
+		Logger.warning("{}Invalid route detected: {}".format(constants.PRINT_PREFIX_VEHICLE, route))
+		return constants.VEHICLE_INVALID_ROUTE
 	
 	try:
 		mtraci.acquire()
 		traci.route.add(routeId, route)
-		traci.vehicle.add(vehicleId, routeId, -2, 0, 0, 0, Constants.DEFAULT_VEHICLE_TYPE)
+		traci.vehicle.add(vehicleId, routeId, -2, 0, 0, 0, constants.DEFAULT_VEHICLE_TYPE)
 		if not(traci.vehicle.isRouteValid(vehicleId)):
-			Logger.error("{}IMMINENT FAILURE: vehicle {} must be removed: invalid route returned by TraCI: {}".format(Constants.PRINT_PREFIX_VEHICLE, vehicleId, route))
+			Logger.error("{}IMMINENT FAILURE: vehicle {} must be removed: invalid route returned by TraCI: {}".format(constants.PRINT_PREFIX_VEHICLE, vehicleId, route))
 			traci.vehicle.remove(vehicleId)
 			mtraci.release()
-			sendIdentifiedAck(vehicleId, Constants.VEHICLE_INVALID_ROUTE, outputSocket)
-			return -1
+			return constants.VEHICLE_INVALID_ROUTE
 		else:
 			mtraci.release()
 			
 	except:
 		mtraci.release()
-		Logger.error("{}Vehicle {} or its route cannot be added to SUMO Simulation".format(Constants.PRINT_PREFIX_VEHICLE, vehicleId))
+		Logger.error("{}Vehicle {} or its route cannot be added to SUMO Simulation".format(constants.PRINT_PREFIX_VEHICLE, vehicleId))
 		raise
 		
-	return 0
+	return constants.ACK_OK
 	
 	
 """ If the vehicle received is priority, this one is append in the priority vehicles shared list protected by a mutex """
 def savePriorityVehicles(mtraci, vehicleId, priority, priorityVehicles, mPriorityVehicles):
-	if priority == Constants.PRIORITY_VEHICLE:
+	if priority == constants.PRIORITY_VEHICLE:
 		mPriorityVehicles.acquire()
 		priorityVehicles.append(vehicleId)
 		mPriorityVehicles.release()
@@ -188,42 +174,54 @@ def savePriorityVehicles(mtraci, vehicleId, priority, priorityVehicles, mPriorit
 - Adds a vehicle and its route to the SUMO simulation
 - Saves this one as a priority vehicle if he is priority
 """
-def addVehicle(command, commandSize, mtraci, cRouteId, outputSocket, priorityVehicles, mPriorityVehicles):
-	vehicleId = command[1]
-	priority = command[2]
-	routeId = getRouteIdFromVehicleId(vehicleId, cRouteId)
-	route = getRouteFromCommand(command, commandSize)
+def addVehicle(vehicleId, priority, route, mtraci, cRouteId, outputSocket, priorityVehicles, mPriorityVehicles, vehicles, mVehicles):
 	if not route:
-		return sendIdentifiedAck(vehicleId, Constants.VEHICLE_EMPTY_ROUTE, outputSocket)
+		return sendIdentifiedAck(vehicleId, constants.VEHICLE_EMPTY_ROUTE, outputSocket)
+	
+	routeId = getRouteIdFromVehicleId(vehicleId, cRouteId)
 	returnCode = addRouteToSumo(vehicleId, routeId, route, mtraci, outputSocket)
-	if returnCode == 0:
+	
+	if returnCode == constants.ACK_OK:
 		savePriorityVehicles(mtraci, vehicleId, priority, priorityVehicles, mPriorityVehicles)
-	sendIdentifiedAck(vehicleId, Constants.ACK_OK, outputSocket)	
+		
+		mVehicles.acquire()
+		vehicles.append(vehicleId)
+		mVehicles.remove()
+		
+	sendIdentifiedAck(vehicleId, returnCode, outputSocket)	
 	
 
 """ Removes the specified vehicles from the simulation """
-def removeVehicles(vehicles, priorityVehicles, mPriorityVehicles, mtraci, outputSocket):
-	returnCode = Constants.ACK_OK
+def removeVehicles(vehiclesToDel, priorityVehicles, mPriorityVehicles, mtraci, outputSocket, vehicles, mVehicles):
+	returnCode = constants.ACK_OK
 	
-	for vehicle in vehicles:
+	
+	mVehicles.acquire()
+	for vehicle in vehiclesToDel:
 		mPriorityVehicles.acquire()
 		if vehicleId in priorityVehicles:
 			priorityVehicles.remove(vehicleId)
 		mPriorityVehicles.release()
 		
 		try:
+			vehicles.remove(vehicle)
+		except:
+			pass
+		
+		try:
 			mtraci.acquire()
 			traci.vehicle.remove(vehicleId)
 		except:
-			returnCode = Constants.GRAPH_UNKNOWN_EDGE
+			returnCode = constants.VEHICLE_DELETE_FAILED_UNKNOWN
 		mtraci.release()
+	mVehicles.release()
 	
-	sendAck(Constants.PRINT_PREFIX_VEHICLE, returnCode, outputSocket)
+	sendAck(constants.PRINT_PREFIX_VEHICLE, returnCode, outputSocket)
 	
 
 """ Adds vehiclesNumber vehicles to SUMO, linking each of these to a random route of routeSize edges """
-def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci):
-	Logger.info("{}Adding {} vehicles to the simulation...".format(Constants.PRINT_PREFIX_VEHICLE, vehiclesNumber))
+def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci, vehicles, mVehicles):
+	Logger.info("{}Adding {} vehicles to the simulation...".format(constants.PRINT_PREFIX_VEHICLE, vehiclesNumber))
 	i = 0
 	route = []
 	mtraci.acquire()
@@ -242,59 +240,65 @@ def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci):
 		
 		if route != -1:
 			#Adding route and vehicle to SUMO
+			mVehicles.acquire()
+			vehicles.append(vehicleId)
 			mtraci.acquire()
 			traci.route.add(routeId, route)
 			traci.vehicle.add(vehicleId,routeId,-2,0,0,0,"DEFAULT_VEHTYPE")
 			mtraci.release()
+			mVehicles.release()
 			route[:] = []
 			i += 1
 		else:
 			route = []
 			
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_VEHICLE))
-	sendAck(Constants.PRINT_PREFIX_VEHICLE, returnCode, outputSocket)
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_VEHICLE))
+	sendAck(constants.PRINT_PREFIX_VEHICLE, returnCode, outputSocket)
 	
 
 """ Send the speed of the given vehicles to the distant client """
-def sendVehiclesSpeed(vehiclesId, outputSocket, mtraci):
+def sendVehiclesSpeed(vehiclesId, outputSocket, mtraci, mVehicles):
 	speedMsg = []
-	speedMsg.append(Constants.VEHICLE_SPEED_RESPONSE_HEADER)
-		
+	speedMsg.append(constants.VEHICLE_SPEED_RESPONSE_HEADER)
+	
+	mVehicles.acquire()
 	for vehicleId in vehiclesId:
 		mtraci.acquire()
 		speed = traci.vehicle.getSpeed(vehicleId)
 		mtraci.release()
 		
-		speedMsg.append(Constants.SEPARATOR)
+		speedMsg.append(constants.SEPARATOR)
 		speedMsg.append(vehicleId)
-		speedMsg.append(Constants.SEPARATOR)
+		speedMsg.append(constants.SEPARATOR)
 		speedMsg.append(str(speed))
+	mVehicles.release()
 		
-	speedMsg.append(Constants.END_OF_MESSAGE)
+	speedMsg.append(constants.END_OF_MESSAGE)
 		
 	strmsg = ''.join(speedMsg)
 	try:
 		outputSocket.send(strmsg.encode())
 	except:
-		raise Constants.ClosedSocketException("The listening socket has been closed")
-	Logger.infoFile("{} Message sent: {}".format(Constants.PRINT_PREFIX_VEHICLE, strmsg))
+		raise constants.ClosedSocketException("The listening socket has been closed")
+	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_VEHICLE, strmsg))
 	
 	
-""" Return a vehicle list without the cologne vehicles """
+""" Return a vehicle list without the ignored vehicles (See constants) """
 def getRegularVehicles(vehicles):
 	regularVehicles = []
 	for vehicle in vehicles:
-		if not Constants.IGNORED_VEHICLES_REGEXP.match(vehicle) and not vehicle.startswith(Constants.BLOCKED_VEHICLE_ID_PREFIX):
+		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicle):
 			regularVehicles.append(vehicle)
 	return regularVehicles
 	
 
 """ Gets every vehicles position from SUMO and send then these ones to the remote client by an output socket """
-def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket):
+def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket, mVehicles):
 		#If the simulated vehicles number we have to take into account is not 0
 		vehiclesPos = []
-		vehiclesPos.append(Constants.VEHICLE_COORDS_RESPONSE_HEADER)
+		vehiclesPos.append(constants.VEHICLE_COORDS_RESPONSE_HEADER)
 		
+		mVehicles.acquire()
 		for vehicleId in vehiclesId:
 			mtraci.acquire()
 			coords = traci.vehicle.getPosition(vehicleId)
@@ -302,49 +306,50 @@ def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket):
 			mtraci.release()
 
 			#Build the message to send by the output socket
-			vehiclesPos.append(Constants.SEPARATOR)
+			vehiclesPos.append(constants.SEPARATOR)
 			vehiclesPos.append(vehicleId)
-			vehiclesPos.append(Constants.SEPARATOR)
+			vehiclesPos.append(constants.SEPARATOR)
 			vehiclesPos.append(str(coordsGeo[0]))
-			vehiclesPos.append(Constants.SEPARATOR)
+			vehiclesPos.append(constants.SEPARATOR)
 			vehiclesPos.append(str(coordsGeo[1]))
+		mVehicles.release()
 		
 		#Send the position of each vehicle by the output socket
-		vehiclesPos.append(Constants.END_OF_MESSAGE)
+		vehiclesPos.append(constants.END_OF_MESSAGE)
 		strmsg = ''.join(vehiclesPos)
 		
 		try:
 			outputSocket.send(strmsg.encode())
 		except:
-			raise Constants.ClosedSocketException("The listening socket has been closed")
+			raise constants.ClosedSocketException("The listening socket has been closed")
 	
 
 """ Gets all arrived vehicles ID from SUMO and send them to the remote client by output socket """
 def sendArrivedVehicles(arrivedVehicles, mtraci, outputSocket):
 	msgArrivedVehicles = []
-	msgArrivedVehicles.append(Constants.VEHICLE_ARRIVED_RESPONSE_HEADER)
+	msgArrivedVehicles.append(constants.VEHICLE_ARRIVED_RESPONSE_HEADER)
 	
 	for vehicleId in arrivedVehicles:				
-		msgArrivedVehicles.append(Constants.SEPARATOR)
+		msgArrivedVehicles.append(constants.SEPARATOR)
 		msgArrivedVehicles.append(vehicleId)	
 
-	msgArrivedVehicles.append(Constants.END_OF_MESSAGE)
+	msgArrivedVehicles.append(constants.END_OF_MESSAGE)
 	strmsg = ''.join(msgArrivedVehicles)
 	try:
 		outputSocket.send(strmsg.encode())
 	except:
-		raise Constants.ClosedSocketException("The listening socket has been closed")
-	Logger.infoFile("{} Message sent: {}".format(Constants.PRINT_PREFIX_SIMULATOR, strmsg))
+		raise constants.ClosedSocketException("The listening socket has been closed")
+	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_SIMULATOR, strmsg))
 	
 
 """ Reads an input socket connected to the remote client and process an add(1), delete(3) or stress(4) request when received """
-def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorityVehicles, eVehicleReady, eManagerReady):
+def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorityVehicles, eVehicleReady, eManagerReady, vehicles, mVehicles):
 	bufferSize = 32768
 	cRouteId = 0
 	
 	eVehicleReady.set()
 	while not eManagerReady.is_set():
-		time.sleep(Constants.SLEEP_SYNCHRONISATION)
+		time.sleep(constants.SLEEP_SYNCHRONISATION)
 	
 	while not eShutdown.is_set():
 		try:
@@ -352,82 +357,76 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
 				# Read the message from the input socket (blocked until a message is read)
 				buff = inputSocket.recv(bufferSize)
 			except:
-				raise Constants.ClosedSocketException("The listening socket has been closed")
+				raise constants.ClosedSocketException("The listening socket has been closed")
 			
 			if len(buff) == 0:
-					raise Constants.ClosedSocketException("The distant socket has been closed")
+					raise constants.ClosedSocketException("The distant socket has been closed")
 				
-			listCommands = buff.decode().split(Constants.MESSAGES_SEPARATOR)
+			listCommands = buff.decode().split(constants.MESSAGES_SEPARATOR)
 			
 			for cmd in listCommands:
 				if len(cmd) != 0:
-					command = cmd.split(Constants.SEPARATOR)
+					command = cmd.split(constants.SEPARATOR)
 					commandSize = len(command)
 					
 					for i in range(0, commandSize):
 						command[i] = str(command[i])
 						
-					Logger.infoFile("{} Message received: {}".format(Constants.PRINT_PREFIX_VEHICLE, cmd))
+					Logger.infoFile("{} Message received: {}".format(constants.PRINT_PREFIX_VEHICLE, cmd))
 					
 					# Add the user ID and the route to the map
-					if commandSize > 2 and command[0] == Constants.VEHICLE_ADD_REQUEST_HEADER:
+					if commandSize > 2 and command[0] == constants.VEHICLE_ADD_REQUEST_HEADER:
 						try:
-							addVehicle(command, commandSize, mtraci, cRouteId, outputSocket, priorityVehicles, mPriorityVehicles)
+							command.pop(0)
+							vehicleId = command[0]
+							command.pop(0)
+							priority = command[0]
+							command.pop(0)
+							addVehicle(vehicleId, priority, command, mtraci, cRouteId, outputSocket, priorityVehicles, mPriorityVehicles, vehicles, mVehicles)
 						except Exception as e:
-							sendIdentifiedAck(command[1], Constants.VEHICLE_INVALID_ROUTE, outputSocket)
+							sendIdentifiedAck(command[1], constants.VEHICLE_INVALID_ROUTE, outputSocket)
 							raise
 						cRouteId += 1
 						
 						
 					#Remove the specified vehicles from the simulation
-					elif commandSize > 1 and command[0] == Constants.VEHICLE_DELETE_REQUEST_HEADER:
+					elif commandSize >= 1 and command[0] == constants.VEHICLE_DELETE_REQUEST_HEADER:
 						if commandSize == 1:
-							mtraci.acquire()
-							vehicles = traci.vehicle.getIDList()
-							mtraci.release()
-							vehicles = getRegularVehicles(vehicles)
-							removeVehicles(vehicles, priorityVehicles, mPriorityVehicles, mtraci, outputSocket)
+							removeVehicles(list(vehicles), priorityVehicles, mPriorityVehicles, mtraci, outputSocket, vehicles, mVehicles)
 						else:
 							command.pop(0)
-							removeVehicles(command, priorityVehicles, mPriorityVehicles, mtraci, outputSocket)
+							removeVehicles(command, priorityVehicles, mPriorityVehicles, mtraci, outputSocket, vehicles, mVehicles)
 						
 						
 					#Stress test, add random vehicles to the simulation
-					elif commandSize == 4 and command[0] == Constants.VEHICLE_ADD_RAND_REQUEST_HEADER:
+					elif commandSize == 4 and command[0] == constants.VEHICLE_ADD_RAND_REQUEST_HEADER:
 						try:
-							addRandomVehicles(command[1], int(command[2]), int(command[3]), mtraci, outputSocket)
+							addRandomVehicles(command[1], int(command[2]), int(command[3]), mtraci, outputSocket, vehicles, mVehicles)
 						except:
-							sendAck(Constants.PRINT_PREFIX_VEHICLE, Constants.VEHICLE_MOCK_FAILED, outputSocket)
+							sendAck(constants.PRINT_PREFIX_VEHICLE, constants.VEHICLE_MOCK_FAILED, outputSocket)
+							raise
 						
 						
 					#Send vehicles speed to the remote client
-					elif commandSize > 1 and command[0] == Constants.VEHICLE_SPEED_REQUEST_HEADER:
+					elif commandSize >= 1 and command[0] == constants.VEHICLE_SPEED_REQUEST_HEADER:
 						if commandSize == 1:
-							mtraci.acquire()
-							vehicles = traci.vehicle.getIDList()
-							mtraci.release()
-							vehicles = getRegularVehicles(vehicles)
-							sendVehiclesSpeed(vehicles, outputSocket, mtraci)
+							sendVehiclesSpeed(vehicles, outputSocket, mtraci, mVehicles)
 						else:
 							command.pop(0)
 							sendVehiclesSpeed(command, outputSocket, mtraci)
 						
 						
 					#Send vehicles geographic coordinates to the remote client
-					elif commandSize >= 1 and command[0] == Constants.VEHICLE_COORDS_REQUEST_HEADER:
+					elif commandSize >= 1 and command[0] == constants.VEHICLE_COORDS_REQUEST_HEADER:
 						if commandSize == 1:
-							mtraci.acquire()
-							vehicles = traci.vehicle.getIDList()
-							mtraci.release()
-							vehicles = getRegularVehicles(vehicles)
-							sendVehiclesCoordinates(vehicles, outputSocket, mtraci)
+							sendVehiclesCoordinates(vehicles, outputSocket, mtraci, mVehicles)
 						else:
 							command.pop(0)
 							sendVehiclesCoordinates(command, outputSocket, mtraci)
 						
 						
 					#Send arrived vehicles ID to the remote client
-					elif commandSize == 1 and command[0] == Constants.VEHICLE_ARRIVED_REQUEST_HEADER:
+					elif commandSize == 1 and command[0] == constants.VEHICLE_ARRIVED_REQUEST_HEADER:
 						mtraci.acquire()
 						arrivedVehicles = traci.simulation.getArrivedIDList()
 						mtraci.release()
@@ -437,13 +436,13 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
 						
 					# Error
 					else:
-						Logger.warning("{}Invalid command received: {}".format(Constants.PRINT_PREFIX_VEHICLE, command))
-						sendAck(Constants.PRINT_PREFIX_VEHICLE, Constants.INVALID_MESSAGE, outputSocket)
+						Logger.warning("{}Invalid command received: {}".format(constants.PRINT_PREFIX_VEHICLE, command))
+						sendAck(constants.PRINT_PREFIX_VEHICLE, constants.INVALID_MESSAGE, outputSocket)
 
 		except Exception as e:
-			if e.__class__.__name__ == Constants.CLOSED_SOCKET_EXCEPTION or e.__class__.__name__ == Constants.TRACI_EXCEPTION:
-				Logger.info("{}Shutting down current thread".format(Constants.PRINT_PREFIX_VEHICLE))
+			if e.__class__.__name__ == constants.CLOSED_SOCKET_EXCEPTION or e.__class__.__name__ == constants.TRACI_EXCEPTION:
+				Logger.info("{}Shutting down current thread".format(constants.PRINT_PREFIX_VEHICLE))
 				sys.exit()
 			else:
-				Logger.error("{}A {} exception occurred:".format(Constants.PRINT_PREFIX_VEHICLE, e.__class__.__name__))
+				Logger.error("{}A {} exception occurred:".format(constants.PRINT_PREFIX_VEHICLE, e.__class__.__name__))
 				Logger.exception(e)

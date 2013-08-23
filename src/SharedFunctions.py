@@ -10,7 +10,8 @@ or to the contrary avoid these call because of concurrent access to the TraCI re
 """
 
 import os
-import Constants
+import constants
+from logger import Logger
 
 """ Returns true if the edge belongs to a junction """
 def isJunction(edgeId):

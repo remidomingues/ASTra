@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 """
-@file    TrafficLights.py
+@file    trafficLights.py
 @author  Remi Domingues
 @date    24/06/2013
 
 (0) Traffic lights POSITIONS request: COO tllId1 ... tllIdN
         If no traffic light ID is specified, the geographic coordinates of every traffic light will be sent
 
-(1) Traffic lights POSITIONS response: COO tllId1 lon1 lat1 ... tllIdN lonN latN (N in [0-X] (See Constants for X value)
+(1) Traffic lights POSITIONS response: COO tllId1 lon1 lat1 ... tllIdN lonN latN (N in [0-X] (See constants for X value)
     These messages of followed by an end message: TLL END
 
 (2) Traffic lights DETAILS request: GET tmsLogin tllId zoom answerDetailsLevel
@@ -51,16 +51,16 @@
 
 import os, sys
 import socket
-import Constants
+import constants
 import traci
 import time
 import traceback
-from SharedFunctions import isJunction
-from SharedFunctions import getEdgeFromLane
-from SharedFunctions import getFirstLaneFromEdge
-from SharedFunctions import isDictionaryOutOfDate
-from SharedFunctions import sendAck
-from Logger import Logger
+from sharedFunctions import isJunction
+from sharedFunctions import getEdgeFromLane
+from sharedFunctions import getFirstLaneFromEdge
+from sharedFunctions import isDictionaryOutOfDate
+from sharedFunctions import sendAck
+from logger import Logger
 
 
 """
@@ -70,7 +70,7 @@ from Logger import Logger
 """
 """ Returns a dictionary as {Key=edgeId, Value=traffic light ID which is located at the end of the edge} """
 def buildTrafficLightsDictionary(mtraci):
-    Logger.info("{}Building traffic lights dictionary...".format(Constants.PRINT_PREFIX_TLL))
+    Logger.info("{}Building traffic lights dictionary...".format(constants.PRINT_PREFIX_TLL))
 
     previousEdge = ''
     tllDict = dict()
@@ -90,45 +90,45 @@ def buildTrafficLightsDictionary(mtraci):
                 tllDict[currentEdge] = tll
                 previousEdge = currentEdge
             
-    Logger.info("{}Done".format(Constants.PRINT_PREFIX_TLL))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_TLL))
     return tllDict
 
 
 """ Writes the traffic lights dictionary in an output file """
 def exportTrafficLightsDictionary(tllDict):
-    Logger.info("{}Exporting traffic lights dictionary...".format(Constants.PRINT_PREFIX_TLL))
-    file = open(Constants.SUMO_TLL_DICTIONARY_FILE, 'w')
+    Logger.info("{}Exporting traffic lights dictionary...".format(constants.PRINT_PREFIX_TLL))
+    file = open(constants.SUMO_TLL_DICTIONARY_FILE, 'w')
     
     for pair in tllDict.items():
         file.write(pair[0])
-        file.write(Constants.SEPARATOR)
+        file.write(constants.SEPARATOR)
         file.write(pair[1])
-        file.write(Constants.END_OF_LINE)
+        file.write(constants.END_OF_LINE)
         
     file.close()
-    Logger.info("{}Done".format(Constants.PRINT_PREFIX_TLL))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_TLL))
     
     
 """ Reads the traffic lights dictionary from an input file """
 def importTrafficLightsDictionary():
-    Logger.info("{}Importing traffic lights dictionary...".format(Constants.PRINT_PREFIX_TLL))
-    file = open(Constants.SUMO_TLL_DICTIONARY_FILE, 'r')
+    Logger.info("{}Importing traffic lights dictionary...".format(constants.PRINT_PREFIX_TLL))
+    file = open(constants.SUMO_TLL_DICTIONARY_FILE, 'r')
     tllDict = dict()
     
     line = file.readline()[0:-1]
     while line:
-        array = line.split(Constants.SEPARATOR)
+        array = line.split(constants.SEPARATOR)
         tllDict[array[0]] = array[1]
         line = file.readline()[0:-1]
     
     file.close()
-    Logger.info("{}Done".format(Constants.PRINT_PREFIX_TLL))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_TLL))
     return tllDict
 
 
 """ Returns the traffic lights dictionary(*). This one is obtained from a text file, updated if new map data are detected """
 def getTrafficLightsDictionary(mtraci):
-    if isDictionaryOutOfDate(Constants.SUMO_TLL_DICTIONARY_FILE, Constants.SUMO_NETWORK_FILE):
+    if isDictionaryOutOfDate(constants.SUMO_TLL_DICTIONARY_FILE, constants.SUMO_NETWORK_FILE):
         tllDict = buildTrafficLightsDictionary(mtraci)
         exportTrafficLightsDictionary(tllDict)
     else:
@@ -148,10 +148,10 @@ def getOrangeState(currentState, prioLaneIndex):
     for i in range(0, len(currentState)):
         if i == prioLaneIndex:
             orangeState.append(currentState[i])
-        elif currentState[i] == Constants.YELLOW:
-            orangeState.append(Constants.RED)
-        elif currentState[i] == Constants.GREEN or currentState[i] == Constants.GREEN_PRIO:
-            orangeState.append(Constants.YELLOW)
+        elif currentState[i] == constants.YELLOW:
+            orangeState.append(constants.RED)
+        elif currentState[i] == constants.GREEN or currentState[i] == constants.GREEN_PRIO:
+            orangeState.append(constants.YELLOW)
         else:
             orangeState.append(currentState[i])
     return ''.join(orangeState)
@@ -283,7 +283,7 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
     else:
         isOrange = False
         
-    if setState == Constants.SET_YELLOW and isOrange:
+    if setState == constants.SET_YELLOW and isOrange:
         return
     
     lanes = getUniqueInputLanes(mtraci, tllId)
@@ -297,7 +297,7 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
     mtraci.release()
 
     nextSwitchTime = nextSwitchTime - currentTime
-    nextSwitchStep = nextSwitchTime / 1000.0 / Constants.SUMO_SIMULATION_STEP_TIME
+    nextSwitchStep = nextSwitchTime / 1000.0 / constants.SUMO_SIMULATION_STEP_TIME
     phasesDetails = getPhasesDetails(completeDefinition)
     currentState = phasesDetails[currentPhaseIndex * 2]
     
@@ -306,8 +306,8 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
         return
     
     #The traffic light is gren for the priority lane, and the time but the time for the priority vehicle to reach the junction is unsufficient
-    if (setState == Constants.SET_YELLOW or setState == Constants.SET_GREEN) and not isOrange and ((currentState[hiddenLaneIndex] == 'g' or currentState[hiddenLaneIndex] == 'G')):
-        if nextSwitchStep - Constants.YELLOW_STEPS_ANTICIPATION < 0:
+    if (setState == constants.SET_YELLOW or setState == constants.SET_GREEN) and not isOrange and ((currentState[hiddenLaneIndex] == 'g' or currentState[hiddenLaneIndex] == 'G')):
+        if nextSwitchStep - constants.YELLOW_STEPS_ANTICIPATION < 0:
             #Logger.info(tllId + " is GREEN => reinitializing timer")
             #Reset the current phase timer
             mtraci.acquire()
@@ -316,7 +316,7 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
         #else:
         #    Logger.info(tllId + " is GREEN => nothing to do")
         
-    elif setState == Constants.SET_YELLOW:
+    elif setState == constants.SET_YELLOW:
         #Logger.info(tllId + " has been set to YELLOW temporary phase")
         #Saving the current phase state and duration
         yellowTllDict[tllId] = phasesDetails
@@ -324,13 +324,13 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
         
         orangePhasesDetails = list(phasesDetails)
         orangePhasesDetails[currentPhaseIndex * 2] = newState
-        orangePhasesDetails[currentPhaseIndex * 2 + 1] = Constants.YELLOW_STEPS_ANTICIPATION * 1000
+        orangePhasesDetails[currentPhaseIndex * 2 + 1] = constants.YELLOW_STEPS_ANTICIPATION * 1000
         
         #Setting a temporary current phase in order to prepare the junction for passing green the priority lane
         setCompletePhasesDefinition(tllId, orangePhasesDetails, currentPhaseIndex, mtraci)
         
     #We set the priority lane green only if (the associated traffic light is not green and the current state will change before the priority car crosses the junction) 
-    elif setState == Constants.SET_GREEN and not((currentState[hiddenLaneIndex] == 'g' or currentState[hiddenLaneIndex] == 'G') and nextSwitchStep - Constants.GREEN_STEPS_ANTICIPATION > 0):
+    elif setState == constants.SET_GREEN and not((currentState[hiddenLaneIndex] == 'g' or currentState[hiddenLaneIndex] == 'G') and nextSwitchStep - constants.GREEN_STEPS_ANTICIPATION > 0):
         #Logger.info(tllId + " has been set to GREEN")
         greenPhaseIndex = getGreenPhaseIndex(phasesDetails, hiddenLaneIndex)
 
@@ -388,18 +388,18 @@ def updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tl
             edgeIndex = currentEdgeIndex
 
             #Browsing the next edges the vehicleId will go to            
-            while remainingLength <= Constants.YELLOW_LENGTH_ANTICIPATION and edgeIndex < len(route) - 1:
+            while remainingLength <= constants.YELLOW_LENGTH_ANTICIPATION and edgeIndex < len(route) - 1:
                 #If the current edge (the vehicleId is not) ends with a traffic light
                 if edge in tllDict:
                     #If the car is close enough for the traffic light to become green
-                    if remainingLength <= Constants.GREEN_LENGTH_ANTICIPATION:
-                        setState = Constants.SET_GREEN
+                    if remainingLength <= constants.GREEN_LENGTH_ANTICIPATION:
+                        setState = constants.SET_GREEN
                     #If the car is close enough for the traffic light to prepare (temporary state) becoming green
                     elif not tllDict[edge] in yellowTllDict:
-                        setState = Constants.SET_YELLOW
+                        setState = constants.SET_YELLOW
                     else:
                         managedTlls.append(tllDict[edge])
-                        setState = Constants.IGNORE
+                        setState = constants.IGNORE
                     
                     #Calculating the next lane the vehicleId will go to
                     outEdge = route[edgeIndex + 1]
@@ -407,7 +407,7 @@ def updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tl
                     outLane = getOutLane(mtraci, lane, outEdge)
                     
                     #Calling for a traffic light change
-                    if outLane != -1 and setState != Constants.IGNORE:
+                    if outLane != -1 and setState != constants.IGNORE:
                         tllId = tllDict[edge]
                         managedTlls.append(tllId)
                         if (tllId in managedTllDict and managedTllDict[tllId][1] > remainingLength) or not tllId in managedTllDict:
@@ -445,7 +445,7 @@ def updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tl
 """
 """ Returns the absolute path of a traffic light screenshot from a tms login """
 def getScreenshotAbsolutePath(login):
-    return Constants.SCREEN_DIRECTORY + "/" + Constants.SCREENSHOT_FILE_NAME.format(login)
+    return constants.SCREEN_DIRECTORY + "/" + constants.SCREENSHOT_FILE_NAME.format(login)
 
 
 """ Returns the geographic coordinates of a traffic light from its SUMO ID """
@@ -509,8 +509,8 @@ def setCompletePhasesDefinition(tllId, phasesDetails, currentPhaseIndex, mtraci)
         i += 1
         duration = int(phasesDetails[i])
         
-        if duration < Constants.TLL_MIN_PHASE_DURATION:
-            return Constants.TLL_PHASE_DURATION_ERROR
+        if duration < constants.TLL_MIN_PHASE_DURATION:
+            return constants.TLL_PHASE_DURATION_ERROR
         
         i += 1
         mtraci.acquire()
@@ -526,67 +526,64 @@ def setCompletePhasesDefinition(tllId, phasesDetails, currentPhaseIndex, mtraci)
     traci.trafficlights.setPhaseDuration(tllId, phaseDuration)
     mtraci.release()
     
-    return Constants.ACK_OK
+    return constants.ACK_OK
     
 
 """ Sends traffic lights position messages(*) to the remote client using an output socket """
 def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket):
-    Logger.info("{}Transmitting traffic lights positions...".format(Constants.PRINT_PREFIX_TLL))
     trafficLightsNumber = 0
     trafficLightsPos = []
-    trafficLightsPos.append(Constants.TLL_COORDS_REQUEST_HEADER)
+    trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
     
     #Requires 32768 bytes buffer: sending traffic lights per packet of 500
     for trafficId in trafficLightsId:
         tllCoords = getTrafficLightCoordinates(trafficId, mtraci)
         
-        trafficLightsPos.append(Constants.SEPARATOR)
+        trafficLightsPos.append(constants.SEPARATOR)
         trafficLightsPos.append(trafficId)
-        trafficLightsPos.append(Constants.SEPARATOR)
+        trafficLightsPos.append(constants.SEPARATOR)
         trafficLightsPos.append(str(tllCoords[0]))
-        trafficLightsPos.append(Constants.SEPARATOR)
+        trafficLightsPos.append(constants.SEPARATOR)
         trafficLightsPos.append(str(tllCoords[1]))
         
         trafficLightsNumber += 1
         
-        if trafficLightsNumber == Constants.TLL_NUMBER_PER_MESSAGE:
-            trafficLightsPos.append(Constants.SEPARATOR)
-            trafficLightsPos.append(Constants.END_OF_MESSAGE)
+        if trafficLightsNumber == constants.TLL_NUMBER_PER_MESSAGE:
+            trafficLightsPos.append(constants.SEPARATOR)
+            trafficLightsPos.append(constants.END_OF_MESSAGE)
             strmsg = ''.join(trafficLightsPos)
             try:
                 outputSocket.send(strmsg.encode())
             except:
-                raise Constants.ClosedSocketException("The listening socket has been closed")
-            Logger.infoFile("{} Message sent: <{} traffic lights positions>".format(Constants.PRINT_PREFIX_TLL, Constants.TLL_NUMBER_PER_MESSAGE))
+                raise constants.ClosedSocketException("The listening socket has been closed")
+            Logger.infoFile("{} Message sent: <{} traffic lights positions>".format(constants.PRINT_PREFIX_TLL, constants.TLL_NUMBER_PER_MESSAGE))
             trafficLightsNumber = 0
             trafficLightsPos[:] = []
-            trafficLightsPos.append(Constants.TLL_COORDS_REQUEST_HEADER)
+            trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
     
     if trafficLightsNumber != 0:
-        trafficLightsPos.append(Constants.END_OF_MESSAGE)
+        trafficLightsPos.append(constants.END_OF_MESSAGE)
         
         strmsg = ''.join(trafficLightsPos)
         try:
             outputSocket.send(strmsg.encode())
         except:
-            raise Constants.ClosedSocketException("The listening socket has been closed")
-        Logger.infoFile("{} Message sent: <{} traffic lights positions>".format(Constants.PRINT_PREFIX_TLL, trafficLightsNumber))
+            raise constants.ClosedSocketException("The listening socket has been closed")
+        Logger.infoFile("{} Message sent: <{} traffic lights positions>".format(constants.PRINT_PREFIX_TLL, trafficLightsNumber))
 
     #Sending end of traffic lights position messages
     trafficLightsPos[:] = []
-    trafficLightsPos.append(Constants.TLL_COORDS_REQUEST_HEADER)
-    trafficLightsPos.append(Constants.SEPARATOR)
-    trafficLightsPos.append(Constants.TLL_POS_END)
-    trafficLightsPos.append(Constants.END_OF_MESSAGE)
+    trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
+    trafficLightsPos.append(constants.SEPARATOR)
+    trafficLightsPos.append(constants.TLL_POS_END)
+    trafficLightsPos.append(constants.END_OF_MESSAGE)
     
     strmsg = ''.join(trafficLightsPos)
     try:
         outputSocket.send(strmsg.encode())
     except:
-        raise Constants.ClosedSocketException("The listening socket has been closed")
-    Logger.infoFile("{} Message sent: {}".format(Constants.PRINT_PREFIX_TLL, strmsg))
-    
-    Logger.info("{}Done".format(Constants.PRINT_PREFIX_TLL))
+        raise constants.ClosedSocketException("The listening socket has been closed")
+    Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_TLL, strmsg))
     
     
 """ Saves a screenshot centered on the specified junction from SUMO GUI """
@@ -637,33 +634,33 @@ def sendTrafficLightsDetails(tllId, tmsLogin, screenshotPath, outputSocket, mtra
     phasesDetails = getPhasesDetails(completePhasesDefinition)
     
     details = []
-    details.append(Constants.TLL_GET_DETAILS_RESPONSE_HEADER)
-    details.append(Constants.SEPARATOR)
+    details.append(constants.TLL_GET_DETAILS_RESPONSE_HEADER)
+    details.append(constants.SEPARATOR)
     details.append(tmsLogin)
-    details.append(Constants.SEPARATOR)
+    details.append(constants.SEPARATOR)
     details.append(screenshotPath)
-    details.append(Constants.SEPARATOR)
+    details.append(constants.SEPARATOR)
     details.append(str(currentPhaseIndex))
-    details.append(Constants.SEPARATOR)
+    details.append(constants.SEPARATOR)
     details.append(str(nextSwitchTime))
     
     if detailsLevel == 1:
         i = 0
         while i < len(phasesDetails):
-            details.append(Constants.SEPARATOR)
+            details.append(constants.SEPARATOR)
             details.append(phasesDetails[i])
             i += 1
-            details.append(Constants.SEPARATOR)
+            details.append(constants.SEPARATOR)
             details.append(phasesDetails[i])
             i += 1
 
-    details.append(Constants.END_OF_MESSAGE)
+    details.append(constants.END_OF_MESSAGE)
     
     strmsg = ''.join(details)
     try:
         outputSocket.send(strmsg.encode())
     except:
-        raise Constants.ClosedSocketException("The listening socket has been closed")
+        raise constants.ClosedSocketException("The listening socket has been closed")
 
 
 """ Gets a traffic lights details information from SUMO, then sends them(***) to the remote client by an output socket """
@@ -678,7 +675,7 @@ def processGetDetailsRequest(tmsLogin, tllId, zoom, outputSocket, mtraci, detail
 """ Gets a traffic lights details from """
 def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
     #SET tllId currentPhaseIndex state0 duration0 ... stateN durationN
-    returnCode = Constants.ACK_OK
+    returnCode = constants.ACK_OK
     command.pop(0)
     tllId = command.pop(0)
     currentPhaseIndex = int(command.pop(0))
@@ -691,8 +688,8 @@ def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
     except:
         traci.trafficlights.setPhase(tllId, oldPhaseIndex)
         mtraci.release()
-        returnCode = Constants.TLL_PHASE_INDEX_ERROR
-        sendAck(Constants.PRINT_PREFIX_TLL, returnCode, outputSocket)
+        returnCode = constants.TLL_PHASE_INDEX_ERROR
+        sendAck(constants.PRINT_PREFIX_TLL, returnCode, outputSocket)
         raise
     mtraci.release()
     
@@ -707,10 +704,10 @@ def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
             oldPhasesDetails = getPhasesDetails(oldPhasesDefinition)
             setCompletePhasesDefinition(tllId, oldPhasesDetails, oldPhaseIndex, mtraci)
             mtraci.release()
-            returnCode = Constants.TLL_PHASE_STATE_ERROR
+            returnCode = constants.TLL_PHASE_STATE_ERROR
             
     #Sending ack
-    sendAck(Constants.PRINT_PREFIX_TLL, returnCode, outputSocket)
+    sendAck(constants.PRINT_PREFIX_TLL, returnCode, outputSocket)
     
     
 """ See file description """
@@ -719,7 +716,7 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eMana
     
     eTrafficLightsReady.set()
     while not eManagerReady.is_set():
-        time.sleep(Constants.SLEEP_SYNCHRONISATION)
+        time.sleep(constants.SLEEP_SYNCHRONISATION)
     
     while not eShutdown.is_set():
         try:
@@ -727,25 +724,26 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eMana
             try:
                 buff = inputSocket.recv(bufferSize)
             except:
-                raise Constants.ClosedSocketException("The listening socket has been closed")
+            	traceback.print_exc()
+                raise constants.ClosedSocketException("The listening socket has been closed")
             
             if len(buff) == 0:
-                    raise Constants.ClosedSocketException("The distant socket has been closed")
-                
-            listCommands = buff.decode().split(Constants.MESSAGES_SEPARATOR)
+                    raise constants.ClosedSocketException("The distant socket has been closed")
+            
+            listCommands = buff.decode().split(constants.MESSAGES_SEPARATOR)
             
             for cmd in listCommands:
                 if len(cmd) != 0:
-                    command = cmd.split(Constants.SEPARATOR)
+                    command = cmd.split(constants.SEPARATOR)
                     commandSize = len(command)
                     
                     for i in range(0, commandSize):
                         command[i] = str(command[i])
                     
-                    Logger.infoFile("{} Message received: {}".format(Constants.PRINT_PREFIX_TLL, cmd))
+                    Logger.infoFile("{} Message received: {}".format(constants.PRINT_PREFIX_TLL, cmd))
                     
                     # Send all traffic lights geographic coordinates to the client
-                    if commandSize == 1 and command[0] == Constants.ALL_TLL_COORDS_REQUEST_HEADER:
+                    if commandSize == 1 and command[0] == constants.ALL_TLL_COORDS_REQUEST_HEADER:
                         mtraci.acquire()
                         trafficLightsId = traci.trafficlights.getIDList()
                         mtraci.release()
@@ -753,31 +751,34 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eMana
                     
                     
                     # Send the requested traffic lights geographic coordinates to the client    
-                    elif commandSize > 1 and command[0] == Constants.TLL_COORDS_REQUEST_HEADER:
+                    elif commandSize > 1 and command[0] == constants.TLL_COORDS_REQUEST_HEADER:
                         command.pop(0)
                         sendTrafficLightsPosition(command, mtraci, outputSocket)
                         
                         
                     # Process a GET details request (**)
-                    if commandSize == 5 and command[0] == Constants.TLL_GET_DETAILS_REQUEST_HEADER:
+                    elif commandSize == 5 and command[0] == constants.TLL_GET_DETAILS_REQUEST_HEADER:
                         processGetDetailsRequest(command[1], command[2], int(command[3]), outputSocket, mtraci, int(command[4]))
                         
                         
                     # Process a SET details request (**)
-                    elif commandSize > 2 and command[0] == Constants.TLL_SET_DETAILS_REQUEST_HEADER:
+                    elif commandSize > 2 and command[0] == constants.TLL_SET_DETAILS_REQUEST_HEADER:
                         processSetDetailsRequest(command, commandSize, outputSocket, mtraci)
                     
                     
                     # Error
                     else:
-                        Logger.warning("{}Invalid command received: {}".format(Constants.PRINT_PREFIX_TLL, command))
-                        sendAck(Constants.PRINT_PREFIX_TLL, Constants.INVALID_MESSAGE, outputSocket)
+                        Logger.warning("{}Invalid command received: {}".format(constants.PRINT_PREFIX_TLL, command))
+                        print command[0]
+                        print constants.ALL_TLL_COORDS_REQUEST_HEADER
+                        print commandSize
+                        sendAck(constants.PRINT_PREFIX_TLL, constants.INVALID_MESSAGE, outputSocket)
 
         except Exception as e:
-            if e.__class__.__name__ == Constants.CLOSED_SOCKET_EXCEPTION or e.__class__.__name__ == Constants.TRACI_EXCEPTION:
-                Logger.info("{}Shutting down current thread".format(Constants.PRINT_PREFIX_TLL))
+            if e.__class__.__name__ == constants.CLOSED_SOCKET_EXCEPTION or e.__class__.__name__ == constants.TRACI_EXCEPTION:
+                Logger.info("{}Shutting down current thread".format(constants.PRINT_PREFIX_TLL))
                 Logger.exception(e)
                 sys.exit()
             else:
-                Logger.error("{}A {} exception occurred:".format(Constants.PRINT_PREFIX_TLL, e.__class__.__name__))
+                Logger.error("{}A {} exception occurred:".format(constants.PRINT_PREFIX_TLL, e.__class__.__name__))
                 Logger.exception(e)

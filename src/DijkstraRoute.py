@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-@file	DijkstraRoute.py
+@file	Dijkstraroute.py
 @author  Remi Domingues
 @date	23/07/2013
 
@@ -20,14 +20,14 @@ import socket
 import time
 import traceback
 import ctypes
-import Constants
+import constants
 import traci
-from SharedFunctions import getEdgeFromLane
-from SharedFunctions import getJunctionId
-from SharedFunctions import isJunction
-from SharedFunctions import correctRoute
-from Logger import Logger
-import Dijkstra
+from sharedFunctions import getEdgeFromLane
+from sharedFunctions import getJunctionId
+from sharedFunctions import isJunction
+from sharedFunctions import correctRoute
+from logger import Logger
+import dijkstra
 	
 
 """
@@ -35,7 +35,7 @@ import Dijkstra
 - Resolves the routing demand by using a Dijkstra algorithm
 - Sends the route (list of geographic coordinates) back to the client
 """
-def processRouteRequest(src, destinations, junctionsDict, graph, edgesDict):
+def processRouteRequest(src, destinations, junctionsDict, graphDict, edgesDict):
 	route = []
 	first = True
 	
@@ -47,20 +47,20 @@ def processRouteRequest(src, destinations, junctionsDict, graph, edgesDict):
 			dest = iter(junctionsDict[getJunctionId(dest)][1]).next()
 		
 		try:
-			tmpRoute = Dijkstra.shortestPath(graph, src, dest)
+			tmpRoute = dijkstra.shortestPath(graphDict, src, dest)
 		except Exception as e:
 			Logger.exception(e)
-			return Constants.ROUTE_ERROR_CONNECTION, None
+			return constants.ROUTE_ERROR_CONNECTION, None
 		
 		if isJunction(src):
 			try:
-				tmpRoute.pop(0)
+				tmproute.pop(0)
 			except:
 				pass
 			
 		if isJunction(dest):
 			try:
-				tmpRoute.pop()
+				tmproute.pop()
 			except:
 				pass
 			

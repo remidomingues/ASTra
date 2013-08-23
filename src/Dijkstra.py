@@ -9,7 +9,7 @@ Dijkstra's algorithm for shortest paths
 http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/117228 
 """
 
-from PriorityDictionary import PriorityDictionary
+from priorityDictionary import PriorityDictionary
 
 def Dijkstra(G,start,end=None):
     """

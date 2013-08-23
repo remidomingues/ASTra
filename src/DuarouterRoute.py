@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-@file	DuarouterRoute.py
+@file	Duarouterroute.py
 @author  Remi Domingues
 @date	07/06/2013
 
@@ -22,26 +22,26 @@ import socket
 import time
 import traceback
 import ctypes
-import Constants
+import constants
 import traci
 from xml.dom.minidom import parseString
 from xml.dom.minidom import Document
-from SharedFunctions import getEdgeFromLane
-from SharedFunctions import getJunctionId
-from SharedFunctions import getOppositeEdge
-from SharedFunctions import isJunction
-from SharedFunctions import correctRoute
+from sharedFunctions import getEdgeFromLane
+from sharedFunctions import getJunctionId
+from sharedFunctions import getOppositeEdge
+from sharedFunctions import isJunction
+from sharedFunctions import correctRoute
 
 
 def removeRoutingFiles():
-	if os.path.isfile(Constants.TRIPS_PATH):
-		os.remove(Constants.TRIPS_PATH)
+	if os.path.isfile(constants.TRIPS_PATH):
+		os.remove(constants.TRIPS_PATH)
 		
-	if os.path.isfile(Constants.ROUTES_OUTPUT_PATH):
-		os.remove(Constants.ROUTES_OUTPUT_PATH)
+	if os.path.isfile(constants.ROUTES_OUTPUT_PATH):
+		os.remove(constants.ROUTES_OUTPUT_PATH)
 		
-	if os.path.isfile(Constants.ROUTES_ALT_OUTPUT_PATH):
-		os.remove(Constants.ROUTES_ALT_OUTPUT_PATH)
+	if os.path.isfile(constants.ROUTES_ALT_OUTPUT_PATH):
+		os.remove(constants.ROUTES_ALT_OUTPUT_PATH)
 
 
 """ 
@@ -67,19 +67,19 @@ def getTrips(edgeSrc, edgeDest, junctionsDict):
 def writeTrips(trips):	
 	i = 0
 	doc = Document()
-	root = doc.createElement(Constants.XML_TRIPS_ELEMENT)
+	root = doc.createElement(constants.XML_TRIPS_ELEMENT)
 	doc.appendChild(root)
 	
 	while i < len(trips):
-		trip = doc.createElement(Constants.XML_TRIP_ELEMENT)
-		trip.setAttribute(Constants.XML_TRIP_ID_ATTRIBUTE, str(i))
-		trip.setAttribute(Constants.XML_TRIP_DEPART_ATTRIBUTE, str(0))
-		trip.setAttribute(Constants.XML_TRIP_FROM_ATTRIBUTE, trips[i])
-		trip.setAttribute(Constants.XML_TRIP_TO_ATTRIBUTE, trips[i + 1])
+		trip = doc.createElement(constants.XML_TRIP_ELEMENT)
+		trip.setAttribute(constants.XML_TRIP_ID_ATTRIBUTE, str(i))
+		trip.setAttribute(constants.XML_TRIP_DEPART_ATTRIBUTE, str(0))
+		trip.setAttribute(constants.XML_TRIP_FROM_ATTRIBUTE, trips[i])
+		trip.setAttribute(constants.XML_TRIP_TO_ATTRIBUTE, trips[i + 1])
 		root.appendChild(trip)
 		i += 2
 	
-	xmlFile = open(Constants.TRIPS_PATH, 'w')
+	xmlFile = open(constants.TRIPS_PATH, 'w')
 	doc.writexml(xmlFile, '\t', '\t' '\n')
 	doc.unlink()
 	xmlFile.close()
@@ -90,41 +90,41 @@ def runDuarouterRouteSolver():
 	runTime = 0
 	
 	try:
-		duarouterProcess = subprocess.Popen(Constants.DUAROUTER_START_COMMAND, shell=True, stdout=sys.stdout)
+		duarouterProcess = subprocess.Popen(constants.DUAROUTER_START_COMMAND, shell=True, stdout=sys.stdout)
 	except:
-		return Constants.DUAROUTER_ERROR_LAUNCH
+		return constants.DUAROUTER_ERROR_LAUNCH
 	
 	# Wait until process terminates
-	while duarouterProcess.poll() is None and runTime < Constants.DUAROUTER_MAX_SLEEP_TIME:
-		time.sleep(Constants.DUAROUTER_SLEEP_TIME)
-		runTime += Constants.DUAROUTER_SLEEP_TIME
+	while duarouterProcess.poll() is None and runTime < constants.DUAROUTER_MAX_SLEEP_TIME:
+		time.sleep(constants.DUAROUTER_SLEEP_TIME)
+		runTime += constants.DUAROUTER_SLEEP_TIME
 	
-	if runTime >= Constants.DUAROUTER_MAX_SLEEP_TIME:
-		return Constants.ROUTE_TIMEOUT_ERROR
+	if runTime >= constants.DUAROUTER_MAX_SLEEP_TIME:
+		return constants.ROUTE_TIMEOUT_ERROR
 	duarouterProcess.wait()
 	return 0
 	
 
 """ Parses an XML file and return the cheapest route (list of edges ID) """
 def getBestRouteFromXml():
-	xmlFile = open(Constants.ROUTES_ALT_OUTPUT_PATH, 'r')
+	xmlFile = open(constants.ROUTES_ALT_OUTPUT_PATH, 'r')
 	xmlData = xmlFile.read().encode("UTF-8")
 	dom = parseString(xmlData)
 	xmlFile.close()
-	xmlRoutes = dom.getElementsByTagName(Constants.XML_ROUTE_ELEMENT)
+	xmlRoutes = dom.getElementsByTagName(constants.XML_ROUTE_ELEMENT)
 	
 	if xmlRoutes:	
 		edges = ''
 		for node in xmlRoutes:
-			tmpCost = float(node.getAttribute(Constants.XML_COST_ATTRIBUTE))
+			tmpCost = float(node.getAttribute(constants.XML_COST_ATTRIBUTE))
 			if not(edges) or tmpCost < minCost:
-				edges = node.getAttribute(Constants.XML_EDGES_ATTRIBUTE)
+				edges = node.getAttribute(constants.XML_EDGES_ATTRIBUTE)
 				minCost = tmpCost
 		edges = str(edges)
-		route = edges.split(Constants.SEPARATOR)
+		route = edges.split(constants.SEPARATOR)
 		return 0, route
 	
-	return Constants.ROUTE_ERROR_CONNECTION, None
+	return constants.ROUTE_ERROR_CONNECTION, None
 
 
 """
@@ -152,7 +152,7 @@ def processRouteRequest(src, destinations, junctionsDict):
 		if first:
 			first = False
 		else:
-			tmpRoute.pop(0)
+			tmproute.pop(0)
 		
 		route.extend(tmpRoute)
 		if len(route) != 0:

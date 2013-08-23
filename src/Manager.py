@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-@file	Manager.py
+@file	manager.py
 @author  Remi Domingues
 @date	07/06/2013
 
@@ -30,37 +30,37 @@ try:
 	astraDirectory = os.path.dirname(currentDirectory)
 	sys.path.append(os.path.dirname(sys.argv[0]))
 except:
-	astraDirectory = os.path.abspath('C:/Temp/workspace/cardemo/src/main/app/astra/src')
-	sys.path.append(astraDirectory)
+	sys.path.append(os.path.abspath('../apps/cardemo/astra/src'))
+	sys.path.append(os.path.abspath('src/main/app/astra/src'))
 
-import Constants
-import DuarouterRoute
-import Simulation
-import Vehicle
-import TrafficLights
-import DijkstraRoute
-import Route
-import Graph
+import constants
+import duarouterRoute
+import simulation
+import vehicle
+import trafficLights
+import dijkstraRoute
+import route
+import graph
 from sumolib import checkBinary
 import traci
-from Logger import Logger
+from logger import Logger
 
 """ Returns a socket connected to the distant host / port given in parameter """
 def acceptConnection(host, port):
-	Logger.info("{}Waiting for connection on {}:{}...".format(Constants.PRINT_PREFIX_MANAGER, host, port))
+	Logger.info("{}Waiting for connection on {}:{}...".format(constants.PRINT_PREFIX_MANAGER, host, port))
 	vSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	vSocket.bind((host, port))
 	vSocket.listen(1)
 	conn, addr = vSocket.accept()
-	Logger.info("{}Connected".format(Constants.PRINT_PREFIX_MANAGER))
-	return vSocket
+	Logger.info("{}Connected".format(constants.PRINT_PREFIX_MANAGER))
+	return conn
 
 
 """ Starts a SUMO subprocess with the specified network """
 def startSUMO(sumoStartCommand):
-	Logger.info("{}Starting a SUMO instance using {} network...".format(Constants.PRINT_PREFIX_MANAGER, Constants.SUMO_CHOSEN_NETWORK))
+	Logger.info("{}Starting a SUMO instance using {} network...".format(constants.PRINT_PREFIX_MANAGER, constants.SUMO_CHOSEN_NETWORK))
 	sumoGuiProcess = subprocess.Popen(sumoStartCommand, shell=True, stdout=sys.stdout)
-	Logger.info("{}Done".format(Constants.PRINT_PREFIX_MANAGER))
+	Logger.info("{}Done".format(constants.PRINT_PREFIX_MANAGER))
 
 
 """ Initializes TraCI on the specified port """
@@ -68,13 +68,13 @@ def initTraciConnection(traciPort, maxRetry):
 	sleep = 1
 	step = 0
 	traciInit = False
-	Logger.info("{}Initializing TraCI on port {}...".format(Constants.PRINT_PREFIX_MANAGER, traciPort))
+	Logger.info("{}Initializing TraCI on port {}...".format(constants.PRINT_PREFIX_MANAGER, traciPort))
 	while not(traciInit) and step < maxRetry:
 		try:
 			traci.init(traciPort)
 			traciInit = True
 		except:
-			Logger.info("{}Traci initialisation on port {} failed. Retrying connection in {} seconds...".format(Constants.PRINT_PREFIX_MANAGER, traciPort, sleep))
+			Logger.info("{}Traci initialisation on port {} failed. Retrying connection in {} seconds...".format(constants.PRINT_PREFIX_MANAGER, traciPort, sleep))
 			time.sleep(sleep)
 			if sleep >= 4:
 				sleep = 5
@@ -83,64 +83,64 @@ def initTraciConnection(traciPort, maxRetry):
 			step += 1
 			
 	if not(traciInit):
-		Logger.error("{}Traci initialisation on port {} failed. Shutting down SUMO Manager".format(Constants.PRINT_PREFIX_MANAGER, traciPort))
+		Logger.error("{}Traci initialisation on port {} failed. Shutting down SUMO Manager".format(constants.PRINT_PREFIX_MANAGER, traciPort))
 		sys.stdout.flush()
 		sys.exit(0)
 		
-	Logger.info("{}Initialized".format(Constants.PRINT_PREFIX_MANAGER))
+	Logger.info("{}Initialized".format(constants.PRINT_PREFIX_MANAGER))
 
 
 """ Starts a SUMO subprocess, connects to TraCI then starts ASTra's threads """
-def deployThreads(mtraci, mRelaunch, mPriorityVehicle, eRouteReady, eGraphReady, eVehicleReady, eTrafficLightsReady, eSimulationReady, eShutdown, eManagerReady, priorityVehicle):
+def deployThreads(mtraci, mRelaunch, mPriorityVehicle, eRouteReady, eGraphReady, eVehicleReady, eTrafficLightsReady, eSimulationReady, eShutdown, eManagerReady, priorityVehicles, graphDict, junctionsDict, edgesDict, vehicles, mVehicles):
 	#Building sockets and starting threads
-	if Constants.GRAPH_ENABLED:
-		Logger.info("{}--------- Graph enabled --------".format(Constants.PRINT_PREFIX_MANAGER))
-		graphInputSocket = acceptConnection(Constants.HOST, Constants.GRAPH_INPUT_PORT)
-		graphOutputSocket = acceptConnection(Constants.HOST, Constants.GRAPH_OUTPUT_PORT)
-		graphThread = threading.Thread(None, Graph.run, "Graph", (mtraci, graphInputSocket, graphOutputSocket, eShutdown, eGraphReady, eManagerReady, graph, junctionsDict, edgesDict), {})
+	if constants.GRAPH_ENABLED:
+		Logger.info("{}--------- Graph enabled --------".format(constants.PRINT_PREFIX_MANAGER))
+		graphInputSocket = acceptConnection(constants.HOST, constants.GRAPH_INPUT_PORT)
+		graphOutputSocket = acceptConnection(constants.HOST, constants.GRAPH_OUTPUT_PORT)
+		graphThread = threading.Thread(None, graph.run, "Graph", (mtraci, graphInputSocket, graphOutputSocket, eShutdown, eGraphReady, eManagerReady, graphDict, junctionsDict, edgesDict), {})
 		graphThread.start()
 	else:
-		Logger.info("{}======== Graph disabled ========".format(Constants.PRINT_PREFIX_MANAGER))
+		Logger.info("{}======== Graph disabled ========".format(constants.PRINT_PREFIX_MANAGER))
 		eGraphReady.set()
 		
-	if Constants.ROUTING_ENABLED:
-		Logger.info("{}------- Routing enabled --------".format(Constants.PRINT_PREFIX_MANAGER))
-		routerInputSocket = acceptConnection(Constants.HOST, Constants.ROUTER_INPUT_PORT)
-		routerOutputSocket = acceptConnection(Constants.HOST, Constants.ROUTER_OUTPUT_PORT)
-		routerThread = threading.Thread(None, Route.run, "Route", (mtraci, routerInputSocket, routerOutputSocket, eShutdown, eRouteReady, eManagerReady, graph, junctionsDict, edgesDict), {})
+	if constants.ROUTING_ENABLED:
+		Logger.info("{}------- Routing enabled --------".format(constants.PRINT_PREFIX_MANAGER))
+		routerInputSocket = acceptConnection(constants.HOST, constants.ROUTER_INPUT_PORT)
+		routerOutputSocket = acceptConnection(constants.HOST, constants.ROUTER_OUTPUT_PORT)
+		routerThread = threading.Thread(None, route.run, "Route", (mtraci, routerInputSocket, routerOutputSocket, eShutdown, eRouteReady, eManagerReady, graphDict, junctionsDict, edgesDict), {})
 		routerThread.start()
 	else:
-		Logger.info("{}======= Routing disabled =======".format(Constants.PRINT_PREFIX_MANAGER))
+		Logger.info("{}======= Routing disabled =======".format(constants.PRINT_PREFIX_MANAGER))
 		eRouteReady.set()
 	
-	if Constants.ORDERS_ENABLED:
-		Logger.info("{}-------- Vehicles enabled --------".format(Constants.PRINT_PREFIX_MANAGER))
-		orderInputSocket = acceptConnection(Constants.HOST, Constants.ORDER_INPUT_PORT)
-		orderOutputSocket = acceptConnection(Constants.HOST, Constants.ORDER_OUTPUT_PORT)
-		orderThread = threading.Thread(None, Vehicle.run, "Vehicle", (mtraci, orderInputSocket, orderOutputSocket, eShutdown, priorityVehicle, mPriorityVehicle, eVehicleReady, eManagerReady), {})
+	if constants.VEHICLE_ENABLED:
+		Logger.info("{}-------- Vehicles enabled --------".format(constants.PRINT_PREFIX_MANAGER))
+		orderInputSocket = acceptConnection(constants.HOST, constants.VEHICLE_INPUT_PORT)
+		orderOutputSocket = acceptConnection(constants.HOST, constants.VEHICLE_OUTPUT_PORT)
+		orderThread = threading.Thread(None, vehicle.run, "Vehicle", (mtraci, orderInputSocket, orderOutputSocket, eShutdown, priorityVehicles, mPriorityVehicle, eVehicleReady, eManagerReady, vehicles, mVehicles), {})
 		orderThread.start()
 	else:
-		Logger.info("{}======= Vehicles disabled ========".format(Constants.PRINT_PREFIX_MANAGER))
+		Logger.info("{}======= Vehicles disabled ========".format(constants.PRINT_PREFIX_MANAGER))
 		eVehicleReady.set()
 	
-	if Constants.TLL_ENABLED:
-		Logger.info("{}---- Traffic lights enabled ----".format(Constants.PRINT_PREFIX_MANAGER))
-		tllInputSocket = acceptConnection(Constants.HOST, Constants.TLL_INPUT_PORT)
-		tllOutputSocket = acceptConnection(Constants.HOST, Constants.TLL_OUTPUT_PORT)
-		trafficLightsThread = threading.Thread(None, TrafficLights.run, "TrafficLights", (mtraci, tllInputSocket, tllOutputSocket, eShutdown, eTrafficLightsReady, eManagerReady), {})
+	if constants.TLL_ENABLED:
+		Logger.info("{}---- Traffic lights enabled ----".format(constants.PRINT_PREFIX_MANAGER))
+		tllInputSocket = acceptConnection(constants.HOST, constants.TLL_INPUT_PORT)
+		tllOutputSocket = acceptConnection(constants.HOST, constants.TLL_OUTPUT_PORT)
+		trafficLightsThread = threading.Thread(None, trafficLights.run, "TrafficLights", (mtraci, tllInputSocket, tllOutputSocket, eShutdown, eTrafficLightsReady, eManagerReady), {})
 		trafficLightsThread.start()
 	else:
-		Logger.info("{}=== Traffic lights disabled ====".format(Constants.PRINT_PREFIX_MANAGER))
+		Logger.info("{}=== Traffic lights disabled ====".format(constants.PRINT_PREFIX_MANAGER))
 		eTrafficLightsReady.set()
 	
-	if Constants.SIMULATION_ENABLED:
-		Logger.info("{}------ Simulation enabled -------".format(Constants.PRINT_PREFIX_MANAGER))
-		simulatorOutputSocket = acceptConnection(Constants.HOST, Constants.SIMULATOR_OUTPUT_PORT)
-		simulatorThread = threading.Thread(None, Simulation.run, "Simulation", (mtraci, simulatorOutputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVehicle, mPriorityVehicle, eManagerReady), {})
+	if constants.SIMULATION_ENABLED:
+		Logger.info("{}------ Simulation enabled -------".format(constants.PRINT_PREFIX_MANAGER))
+		simulatorOutputSocket = acceptConnection(constants.HOST, constants.SIMULATOR_OUTPUT_PORT)
+		simulatorThread = threading.Thread(None, simulation.run, "Simulation", (mtraci, simulatorOutputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVehicles, mPriorityVehicle, eManagerReady, vehicles, mVehicles), {})
 		simulatorThread.start()
 	else:
-		Logger.info("{}====== Simulation disabled ======".format(Constants.PRINT_PREFIX_MANAGER))
-		Logger.info("{}=== Automatic redeployment on error disabled ===".format(Constants.PRINT_PREFIX_MANAGER))
+		Logger.info("{}====== Simulation disabled ======".format(constants.PRINT_PREFIX_MANAGER))
+		Logger.info("{}=== Automatic redeployment on error disabled ===".format(constants.PRINT_PREFIX_MANAGER))
 		eSimulationReady.set()
 		
 	return graphThread, graphInputSocket, graphOutputSocket, routerThread, routerInputSocket, routerOutputSocket, orderThread, orderInputSocket, orderOutputSocket, trafficLightsThread, tllInputSocket, tllOutputSocket, simulatorThread, simulatorOutputSocket
@@ -151,22 +151,22 @@ def shutdownThreads(eShutdown, graphThread, graphInputSocket, graphOutputSocket,
 	eShutdown.set()
 	
 	#Closing sockets and waiting for the threads end
-	if Constants.SIMULATION_ENABLED:
+	if constants.SIMULATION_ENABLED:
 		simulatorOutputSocket.close()
 		simulatorThread.join()
-	if Constants.TLL_ENABLED:
+	if constants.TLL_ENABLED:
 		tllOutputSocket.close()
 		tllInputSocket.close()
 		trafficLightsThread.join()
-	if Constants.ORDERS_ENABLED:
+	if constants.VEHICLE_ENABLED:
 		orderOutputSocket.close()
 		orderInputSocket.close()
 		orderThread.join()
-	if Constants.ROUTING_ENABLED:
+	if constants.ROUTING_ENABLED:
 		routerOutputSocket.close()
 		routerInputSocket.close()
 		routerThread.join()
-	if Constants.GRAPH_ENABLED:
+	if constants.GRAPH_ENABLED:
 		graphOutputSocket.close()
 		graphInputSocket.close()
 		graphThread.join()
@@ -180,6 +180,7 @@ while True:
 	mtraci = Lock()
 	mRelaunch = Lock()
 	mPriorityVehicle = Lock()
+	mVehicles = Lock()
 	#Events
 	eRouteReady = threading.Event()
 	eGraphReady = threading.Event()
@@ -188,31 +189,38 @@ while True:
 	eSimulationReady = threading.Event()
 	eShutdown = threading.Event()
 	eManagerReady = threading.Event()
-	#Priority vehicles list
-	priorityVehicle = []
+	#Vehicles list
+	priorityVehicles = []
+	vehicles = []
 	
 	Logger.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
 			  + "+ Initializing app 'ASTra'                                 +\n"
 			  + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-	if Constants.POSIX_OS:
-		Logger.warning("You are running on a POSIX based operating system (See Constants).\nThe screenshot functionality has been disabled for the traffic lights management.")
+	if constants.POSIX_OS:
+		Logger.warning("You are running on a POSIX based operating system (See constants).\nThe screenshot functionality has been disabled for the traffic lights management.")
 	
 	#Starting SUMO
-	startSUMO(Constants.SUMO_GUI_START_COMMAND)
+	startSUMO(constants.SUMO_GUI_START_COMMAND)
 	
 	#Connecting to TraCI
-	initTraciConnection(Constants.TRACI_PORT, Constants.TRACI_CONNECT_MAX_STEPS)
+	initTraciConnection(constants.TRACI_PORT, constants.TRACI_CONNECT_MAX_STEPS)
 	
 	#Building dictionaries
-	if Constants.ROUTING_ENABLED or Constants.GRAPH_ENABLED:
-		graph, junctionsDict, edgesDict = Graph.getGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci)
+	if constants.ROUTING_ENABLED or constants.GRAPH_ENABLED:
+		graphDict, junctionsDict, edgesDict = graph.getGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci)
 		
-	graphThread, graphInputSocket, graphOutputSocket, routerThread, routerInputSocket, routerOutputSocket, orderThread, orderInputSocket, orderOutputSocket, trafficLightsThread, tllInputSocket, tllOutputSocket, simulatorThread, simulatorOutputSocket = deployThreads(mtraci, mRelaunch, mPriorityVehicle, eRouteReady, eGraphReady, eVehicleReady, eTrafficLightsReady, eSimulationReady, eShutdown, eManagerReady, priorityVehicle)
+	if constants.VEHICLE_ENABLED or constants.SIMULATION_ENABLED:
+		mtraci.acquire()
+		vehicles = traci.vehicle.getIDList()
+		mtraci.release()
+		vehicles = vehicle.getRegularVehicles(vehicles)
+		
+	graphThread, graphInputSocket, graphOutputSocket, routerThread, routerInputSocket, routerOutputSocket, orderThread, orderInputSocket, orderOutputSocket, trafficLightsThread, tllInputSocket, tllOutputSocket, simulatorThread, simulatorOutputSocket = deployThreads(mtraci, mRelaunch, mPriorityVehicle, eRouteReady, eGraphReady, eVehicleReady, eTrafficLightsReady, eSimulationReady, eShutdown, eManagerReady, priorityVehicles, graphDict, junctionsDict, edgesDict, vehicles, mVehicles)
 	
 	#Waiting for the threads to be ready
 	while not eGraphReady.is_set() or not eRouteReady.is_set() or not eVehicleReady.is_set() or not eTrafficLightsReady.is_set() or not eSimulationReady.is_set():
-		time.sleep(Constants.SLEEP_SYNCHRONISATION)
+		time.sleep(constants.SLEEP_SYNCHRONISATION)
 	
 	#Sending a ready message to the remote client
 	eManagerReady.set()
@@ -222,7 +230,7 @@ while True:
 			   + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 		
 	#Waiting for a TraCI exception
-	if Constants.SIMULATION_ENABLED:
+	if constants.SIMULATION_ENABLED:
 		mRelaunch.acquire()
 	else:
 		#No redeployment if an error occurs
@@ -230,7 +238,7 @@ while True:
 			time.sleep(65536)
 	
 	#Asking for the threads to shutdown
-	Logger.info("{}Shutting down all threads. Preparing for redeployment...".format(Constants.PRINT_PREFIX_MANAGER))
+	Logger.info("{}Shutting down all threads. Preparing for redeployment...".format(constants.PRINT_PREFIX_MANAGER))
 	
 	shutdownThreads(eShutdown, graphThread, graphInputSocket, graphOutputSocket, routerThread, routerInputSocket, routerOutputSocket, orderThread, orderInputSocket, orderOutputSocket, trafficLightsThread, tllInputSocket, tllOutputSocket, simulatorThread, simulatorOutputSocket)
 		
