@@ -34,6 +34,9 @@ from sharedFunctions import correctRoute
 
 
 def removeRoutingFiles():
+	"""
+	Removes the temporary files used for routing purposes
+	"""
 	if os.path.isfile(constants.TRIPS_PATH):
 		os.remove(constants.TRIPS_PATH)
 		
@@ -44,12 +47,12 @@ def removeRoutingFiles():
 		os.remove(constants.ROUTES_ALT_OUTPUT_PATH)
 
 
-""" 
-Returns a list of edges ID containing edges pairs.
-Each pair represent routing demand by a source and destination edge ID.
-This list is built from a source edge ID, a destination edge ID and a junction dictionary(*)
-"""
 def getTrips(edgeSrc, edgeDest, junctionsDict):
+	""" 
+	Returns a list of edges ID containing edges pairs.
+	Each pair represent routing demand by a source and destination edge ID.
+	This list is built from a source edge ID, a destination edge ID and a junction dictionary(*)
+	"""
 	if isJunction(edgeSrc):
 		src = list(junctionsDict[getJunctionId(edgeSrc)][0])[0]
 	else:
@@ -63,8 +66,10 @@ def getTrips(edgeSrc, edgeDest, junctionsDict):
 	return [src, dest]
 
 
-""" Writes a list of edges ID (associated by pair (source edge ID / destination edge ID) in an XML file """
 def writeTrips(trips):	
+	"""
+	Writes a list of edges ID (associated by pair (source edge ID / destination edge ID) in an XML file
+	"""
 	i = 0
 	doc = Document()
 	root = doc.createElement(constants.XML_TRIPS_ELEMENT)
@@ -85,8 +90,10 @@ def writeTrips(trips):
 	xmlFile.close()
 	
 
-""" Starts a DUAROUTER subprocess in charge of resolving shortest path demands and wait for it """
 def runDuarouterRouteSolver():
+	"""
+	Starts a DUAROUTER subprocess in charge of resolving shortest path demands and wait for it
+	"""
 	runTime = 0
 	
 	try:
@@ -105,8 +112,10 @@ def runDuarouterRouteSolver():
 	return 0
 	
 
-""" Parses an XML file and return the cheapest route (list of edges ID) """
 def getBestRouteFromXml():
+	"""
+	Parses an XML file and return the cheapest route (list of edges ID)
+	"""
 	xmlFile = open(constants.ROUTES_ALT_OUTPUT_PATH, 'r')
 	xmlData = xmlFile.read().encode("UTF-8")
 	dom = parseString(xmlData)
@@ -127,12 +136,12 @@ def getBestRouteFromXml():
 	return constants.ROUTE_ERROR_CONNECTION, None
 
 
-"""
-- Transforms the source and destination coordinates to SUMO edges ID
-- Resolves the routing demand by using DUAROUTER
-- Sends the route (list of geographic coordinates) back to the client
-"""
 def processRouteRequest(src, destinations, junctionsDict):
+	"""
+	- Transforms the source and destination coordinates to SUMO edges ID
+	- Resolves the routing demand by using DUAROUTER
+	- Sends the route (list of geographic coordinates) back to the client
+	"""
 	route = []
 	first = True
 

@@ -30,12 +30,12 @@ from logger import Logger
 import dijkstra
 	
 
-"""
-- Transforms the source and destination coordinates to SUMO junctions ID
-- Resolves the routing demand by using a Dijkstra algorithm
-- Sends the route (list of geographic coordinates) back to the client
-"""
 def processRouteRequest(src, destinations, junctionsDict, graphDict, edgesDict):
+	"""
+	- Transforms the source and destination coordinates to SUMO junctions ID
+	- Resolves the routing demand by using a Dijkstra algorithm
+	- Sends the route (list of geographic coordinates) back to the client
+	"""
 	route = []
 	first = True
 	
@@ -71,7 +71,5 @@ def processRouteRequest(src, destinations, junctionsDict, graphDict, edgesDict):
 			src = tmpRoute[-1]
 		else:
 			src = dest
-		
 	
-	#route = getRouteFromJunctions(junctionsRoute, junctionsDict)
 	return 0, route

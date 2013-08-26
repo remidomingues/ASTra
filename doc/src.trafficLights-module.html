@@ -1,0 +1,912 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>src.trafficLights</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="src-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="src-module.html">Package&nbsp;src</a> ::
+        Module&nbsp;trafficLights
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="src.trafficLights-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module trafficLights</h1><p class="nomargin-top"><span class="codelink"><a href="src.trafficLights-pysrc.html">source&nbsp;code</a></span></p>
+<pre class="literalblock">
+
+@file    trafficLights.py
+@author  Remi Domingues
+@date    24/06/2013
+
+(0) Traffic lights COORDINATES request: COO tllId1 ... tllIdN
+        If no traffic light ID is specified, the geographic coordinates of every traffic light will be sent
+
+(1) Traffic lights COORDINATES response: COO tllId1 lon1 lat1 ... tllIdN lonN latN (N in [0-X] if all traffic lights were requested (See constants for X value))
+        If ALL TRAFFIC LIGHTS were requested, these messages are followed by an end message (response): TLL END
+
+(2) Traffic lights DETAILS request: GET tmsLogin tllId zoom answerDetailsLevel
+        The zoom is an integer between 100 (min) and 100 000 (max). 100 means a 100% zoom, the entire map can fit in the screen.
+        answerDetailsLevel = 0 =&gt; (3)
+        answerDetailsLevel = 1 =&gt; (4)
+        
+(3) SHORT traffic lights DETAILS answer: DET tmsLogin screenshotPath currentPhaseIndex nextSwitchTime
+        The screenshotPath is an absolute path of a PNG file centered on a junction which has a traffic light
+        The current phase index is an integer between 0 and N
+        nextSwitchTime is a value in milliseconds. This one refers to the next traffic light state change
+        Note: if the operating system the server is running on is based on POSIX, the screenshotPath will be equal to null
+        
+(4) FULL traffic lights DETAILS answer: DET tmsLogin screenshotPath currentPhaseIndex nextSwitchTime state0 duration0 ... stateN durationN
+        See (3)
+        A phase is defined by a state and a duration. The phases order defines the traffic light behaviour
+            - State: string which is equals to the number of lanes the traffic light manage
+            - Duration: time in milliseconds for which a state will be displayed. The next state is then displayed
+        
+(5) SHORT SET traffic lights details request: SET tllId currentPhaseIndex
+        tllId: SUMO traffic light id
+        currentPhaseIndex: SUMO index corresponding to the current traffic light phase in the complete phases definition
+
+(6) FULL SET traffic lights details request: SET tllId currentPhaseIndex state0 duration0 ... stateN durationN
+        For detailed parameters pieces of information, see (5) and (4)
+        
+(7) ACKNOWLEDGE or ERROR response after a SET((5) or (6)) request: ACK returnCode
+        OK = 0
+        Invalid phase index = 1
+        Invalid phase state = 2
+        Invalid phase duration = 3
+        
+(8) ERROR response when an invalid request is received : ERR 40
+
+(9) Traffic lights dictionary:
+        - Key = SUMO edge ID
+        - Value = SUMO traffic light ID which is located at the end of the edge
+    Note: this dictionary does not contain every SUMO edges ID, but only the ones which end with a traffic light
+
+</pre>
+
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Functions</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Functions"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="buildTrafficLightsDictionary"></a><span class="summary-sig-name">buildTrafficLightsDictionary</span>(<span class="summary-sig-arg">mtraci</span>)</span><br />
+      Returns a dictionary as {Key=edgeId, Value=traffic light ID which is 
+      located at the end of the edge}</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#buildTrafficLightsDictionary">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="exportTrafficLightsDictionary"></a><span class="summary-sig-name">exportTrafficLightsDictionary</span>(<span class="summary-sig-arg">tllDict</span>)</span><br />
+      Writes the traffic lights dictionary in an output file</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#exportTrafficLightsDictionary">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="importTrafficLightsDictionary"></a><span class="summary-sig-name">importTrafficLightsDictionary</span>()</span><br />
+      Reads the traffic lights dictionary from an input file</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#importTrafficLightsDictionary">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#getTrafficLightsDictionary" class="summary-sig-name">getTrafficLightsDictionary</a>(<span class="summary-sig-arg">mtraci</span>)</span><br />
+      Returns the traffic lights dictionary(*).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getTrafficLightsDictionary">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#getOrangeState" class="summary-sig-name">getOrangeState</a>(<span class="summary-sig-arg">currentState</span>,
+        <span class="summary-sig-arg">prioLaneIndex</span>)</span><br />
+      Returns a traffic light state where green current states are passed 
+      to yellow and yellow to red.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getOrangeState">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#removeDoubles" class="summary-sig-name">removeDoubles</a>(<span class="summary-sig-arg">doubleList</span>)</span><br />
+      Returns a list containing each unique item of the list given in 
+      parameter.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#removeDoubles">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getUniqueInputLanes"></a><span class="summary-sig-name">getUniqueInputLanes</span>(<span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">tllId</span>)</span><br />
+      Returns the unique ordered (according to the hidden lane index 
+      calculated from this order) lanes controlled by the traffic light 
+      given in parameter</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getUniqueInputLanes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#getHiddenLaneIndex" class="summary-sig-name">getHiddenLaneIndex</a>(<span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">inputLanes</span>,
+        <span class="summary-sig-arg">inLane</span>,
+        <span class="summary-sig-arg">outLane</span>)</span><br />
+      Returns the index of the hidden lane defined by an inLane (going in 
+      the junction) and an outLane (leaving from the junction).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getHiddenLaneIndex">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#restorePreviousPhaseDefinition" class="summary-sig-name">restorePreviousPhaseDefinition</a>(<span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">yellowTllDict</span>,
+        <span class="summary-sig-arg">tllId</span>,
+        <span class="summary-sig-arg">greenPhaseIndex</span>)</span><br />
+      Restores the previous phase definition for a traffic light given in 
+      parameter.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#restorePreviousPhaseDefinition">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getGreenPhaseIndex"></a><span class="summary-sig-name">getGreenPhaseIndex</span>(<span class="summary-sig-arg">phasesDetails</span>,
+        <span class="summary-sig-arg">hiddenLaneIndex</span>)</span><br />
+      Returns the phase index matching with a green ('g' or 'G') state for 
+      the specified hidden lane</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getGreenPhaseIndex">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#getOutLane" class="summary-sig-name">getOutLane</a>(<span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">inLane</span>,
+        <span class="summary-sig-arg">outEdge</span>)</span><br />
+      Returns the (out) lane linked with the (in) lane which match with the
+      (out) edge received If no lane match, the algorithm will use as 
+      inLane the next lane on the inEdge.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getOutLane">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="changeState"></a><span class="summary-sig-name">changeState</span>(<span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">tllId</span>,
+        <span class="summary-sig-arg">inLane</span>,
+        <span class="summary-sig-arg">outLane</span>,
+        <span class="summary-sig-arg">setState</span>,
+        <span class="summary-sig-arg">yellowTllDict</span>)</span><br />
+      Changes a traffic light current phase index in order to set it green 
+      for the priority lane or sets a global before-green state (See 
+      getOrangeState()) The priority lane is the hidden lane linking the 
+      inLane and the outLane</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#changeState">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#updateTllForPriorityVehicles" class="summary-sig-name">updateTllForPriorityVehicles</a>(<span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">priorityVehicles</span>,
+        <span class="summary-sig-arg">mPriorityVehicles</span>,
+        <span class="summary-sig-arg">tllDict</span>,
+        <span class="summary-sig-arg">yellowTllDict</span>,
+        <span class="summary-sig-arg">managedTllDict</span>)</span><br />
+      Determines for each priority vehicle which are the next traffic lights and the distance to these ones.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#updateTllForPriorityVehicles">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getScreenshotAbsolutePath"></a><span class="summary-sig-name">getScreenshotAbsolutePath</span>(<span class="summary-sig-arg">login</span>)</span><br />
+      Returns the absolute path of a traffic light screenshot from a tms 
+      login</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getScreenshotAbsolutePath">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="calculateTrafficLightCoordinates"></a><span class="summary-sig-name">calculateTrafficLightCoordinates</span>(<span class="summary-sig-arg">trafficId</span>,
+        <span class="summary-sig-arg">mtraci</span>)</span><br />
+      Returns the calculated geographic coordinates of a traffic light from
+      its SUMO ID</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#calculateTrafficLightCoordinates">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getTrafficLightCoordinates"></a><span class="summary-sig-name">getTrafficLightCoordinates</span>(<span class="summary-sig-arg">trafficId</span>,
+        <span class="summary-sig-arg">mtraci</span>)</span><br />
+      Returns the geographic coordinates of a traffic light from its SUMO 
+      ID</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getTrafficLightCoordinates">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#getPhasesDetails" class="summary-sig-name">getPhasesDetails</a>(<span class="summary-sig-arg">completePhasesDefinition</span>)</span><br />
+      Returns a list according to the following pattern: state0 duration0 
+      state1 duration1 ...</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#getPhasesDetails">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="src.trafficLights-module.html#setCompletePhasesDefinition" class="summary-sig-name">setCompletePhasesDefinition</a>(<span class="summary-sig-arg">tllId</span>,
+        <span class="summary-sig-arg">phasesDetails</span>,
+        <span class="summary-sig-arg">currentPhaseIndex</span>,
+        <span class="summary-sig-arg">mtraci</span>)</span><br />
+      Returns a string matching with the SUMO complete phases definition.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#setCompletePhasesDefinition">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="sendTrafficLightsPosition"></a><span class="summary-sig-name">sendTrafficLightsPosition</span>(<span class="summary-sig-arg">trafficLightsId</span>,
+        <span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">outputSocket</span>,
+        <span class="summary-sig-arg">uniqueMsg</span>)</span><br />
+      Sends traffic lights position messages(*) to the remote client using 
+      an output socket</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#sendTrafficLightsPosition">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="saveTrafficLightScreenshot"></a><span class="summary-sig-name">saveTrafficLightScreenshot</span>(<span class="summary-sig-arg">login</span>,
+        <span class="summary-sig-arg">tllId</span>,
+        <span class="summary-sig-arg">zoom</span>,
+        <span class="summary-sig-arg">mtraci</span>)</span><br />
+      Saves a screenshot centered on the specified junction from SUMO GUI</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#saveTrafficLightScreenshot">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="sendTrafficLightsDetails"></a><span class="summary-sig-name">sendTrafficLightsDetails</span>(<span class="summary-sig-arg">tllId</span>,
+        <span class="summary-sig-arg">tmsLogin</span>,
+        <span class="summary-sig-arg">screenshotPath</span>,
+        <span class="summary-sig-arg">outputSocket</span>,
+        <span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">detailsLevel</span>)</span><br />
+      Sends a traffic lights details answer(***) to the remote client using
+      an output socket</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#sendTrafficLightsDetails">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="processGetDetailsRequest"></a><span class="summary-sig-name">processGetDetailsRequest</span>(<span class="summary-sig-arg">tmsLogin</span>,
+        <span class="summary-sig-arg">tllId</span>,
+        <span class="summary-sig-arg">zoom</span>,
+        <span class="summary-sig-arg">outputSocket</span>,
+        <span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">detailsLevel</span>)</span><br />
+      Gets a traffic lights details information from SUMO, then sends 
+      them(***) to the remote client by an output socket</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#processGetDetailsRequest">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="processSetDetailsRequest"></a><span class="summary-sig-name">processSetDetailsRequest</span>(<span class="summary-sig-arg">command</span>,
+        <span class="summary-sig-arg">commandSize</span>,
+        <span class="summary-sig-arg">outputSocket</span>,
+        <span class="summary-sig-arg">mtraci</span>)</span><br />
+      Gets a traffic lights details from</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#processSetDetailsRequest">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="run"></a><span class="summary-sig-name">run</span>(<span class="summary-sig-arg">mtraci</span>,
+        <span class="summary-sig-arg">inputSocket</span>,
+        <span class="summary-sig-arg">outputSocket</span>,
+        <span class="summary-sig-arg">eShutdown</span>,
+        <span class="summary-sig-arg">eTrafficLightsReady</span>,
+        <span class="summary-sig-arg">eManagerReady</span>)</span><br />
+      See file description</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="src.trafficLights-pysrc.html#run">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'src'"><code class="variable-quote">'</code><code class="variable-string">src</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="getTrafficLightsDictionary"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getTrafficLightsDictionary</span>(<span class="sig-arg">mtraci</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#getTrafficLightsDictionary">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns the traffic lights dictionary(*). This one is obtained from a 
+  text file, updated if new map data are detected</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getOrangeState"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getOrangeState</span>(<span class="sig-arg">currentState</span>,
+        <span class="sig-arg">prioLaneIndex</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#getOrangeState">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns a traffic light state where green current states are passed to
+  yellow and yellow to red. Priority lane state does not change</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="removeDoubles"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">removeDoubles</span>(<span class="sig-arg">doubleList</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#removeDoubles">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns a list containing each unique item of the list given in 
+  parameter. The order does not change</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getHiddenLaneIndex"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getHiddenLaneIndex</span>(<span class="sig-arg">mtraci</span>,
+        <span class="sig-arg">inputLanes</span>,
+        <span class="sig-arg">inLane</span>,
+        <span class="sig-arg">outLane</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#getHiddenLaneIndex">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns the index of the hidden lane defined by an inLane (going in 
+  the junction) and an outLane (leaving from the junction). The unique 
+  controlled (in) lanes list is used for this purpose</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="restorePreviousPhaseDefinition"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">restorePreviousPhaseDefinition</span>(<span class="sig-arg">mtraci</span>,
+        <span class="sig-arg">yellowTllDict</span>,
+        <span class="sig-arg">tllId</span>,
+        <span class="sig-arg">greenPhaseIndex</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#restorePreviousPhaseDefinition">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Restores the previous phase definition for a traffic light given in 
+  parameter. This phase definition must be stored in the yellowTllDict from
+  which it will be removed. The new current phase must also be 
+  specified</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getOutLane"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getOutLane</span>(<span class="sig-arg">mtraci</span>,
+        <span class="sig-arg">inLane</span>,
+        <span class="sig-arg">outEdge</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#getOutLane">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns the (out) lane linked with the (in) lane which match with the 
+  (out) edge received If no lane match, the algorithm will use as inLane 
+  the next lane on the inEdge. If no lane match and if there is no other 
+  lane available on the inEdge, -1 will be returned</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="updateTllForPriorityVehicles"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">updateTllForPriorityVehicles</span>(<span class="sig-arg">mtraci</span>,
+        <span class="sig-arg">priorityVehicles</span>,
+        <span class="sig-arg">mPriorityVehicles</span>,
+        <span class="sig-arg">tllDict</span>,
+        <span class="sig-arg">yellowTllDict</span>,
+        <span class="sig-arg">managedTllDict</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#updateTllForPriorityVehicles">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+
+Determines for each priority vehicle which are the next traffic lights and the distance to these ones.
+Regarding to the vehicle current speed and the time elapsed during a SUMO simulation step,
+the traffic light hidden lane the vehicle will cross is set to green or the junction to a temporary orange state
+if the vehicle is close enough and if the concurrent access between priority vehicles allows it.
+Note: the following algorithm could be highly improved by exploring every edges the vehicle will use
+    at the beginning, but then only explore the edges which are now in the vehicle scope because of
+    the last step progression. Two list, one for the orange look up and one for the green, would be used
+    for this purpose.
+Note 2: The main complexity of this algorithm resides in the lack of TraCI functionalities in order to get
+    retrieve the state of a hidden lane linking two lanes. This could also be highly improved by using a
+    dictionary built when starting the software.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getPhasesDetails"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getPhasesDetails</span>(<span class="sig-arg">completePhasesDefinition</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#getPhasesDetails">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns a list according to the following pattern: state0 duration0 
+  state1 duration1 ... stateN durationN from a complete phases 
+  definition</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="setCompletePhasesDefinition"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setCompletePhasesDefinition</span>(<span class="sig-arg">tllId</span>,
+        <span class="sig-arg">phasesDetails</span>,
+        <span class="sig-arg">currentPhaseIndex</span>,
+        <span class="sig-arg">mtraci</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="src.trafficLights-pysrc.html#setCompletePhasesDefinition">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns a string matching with the SUMO complete phases definition. A 
+  list according to the following pattern is required: state0 duration0 
+  state1 duration1 ... stateN durationN</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="src-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Mon Aug 26 11:27:11 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

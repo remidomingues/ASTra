@@ -49,13 +49,17 @@ from sharedFunctions import getEdgeFromLane
 from sharedFunctions import sendAck
 from logger import Logger
 
-""" Returns a route ID from a user vehicle ID """
 def getRouteIdFromVehicleId(vehicleId, cRouteId):
+	"""
+	Returns a route ID from a user vehicle ID
+	"""
 	return (vehicleId + str(cRouteId)).encode()
 
 
-""" Appends edgesNumber random following edges to the route given in parameter """
 def appendEdge(route, edgesNumber, mtraci):
+	"""
+	Appends edgesNumber random following edges to the route given in parameter
+	"""
 	for i in range(0, edgesNumber):
 		edge = route[len(route) - 1]
 		lane = edge + "_0"
@@ -73,8 +77,10 @@ def appendEdge(route, edgesNumber, mtraci):
 	return route
 
 
-""" Sends an acknowledge(2) message to the remote client using an output socket """
 def sendIdentifiedAck(vehicleId, errorCode, outputSocket):
+	"""
+	Sends an acknowledge(2) message to the remote client using an output socket
+	"""
 	errorMsg = []
 	errorMsg.append(constants.ACKNOWLEDGE_HEADER)
 	errorMsg.append(constants.SEPARATOR)
@@ -91,8 +97,10 @@ def sendIdentifiedAck(vehicleId, errorCode, outputSocket):
 	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_VEHICLE, strmsg))
 
 
-""" Return true if the given route is linked by SUMO lanes, false else """
 def isRouteValidForTraCI(mtraci, route):
+	"""
+	Returns true if the given route is linked by SUMO lanes, false else
+	"""
 	for i in range(0, len(route) - 1):
 		inEdge = route[i]
 		outEdge = route[i + 1]
@@ -125,8 +133,10 @@ def isRouteValidForTraCI(mtraci, route):
 	return True
 
 
-""" Return true if each edge contained by the route given is linked with the previous and next edge of the route """
 def isRouteValid(route, junctionsDict, edgesDict):
+	"""
+	Return true if each edge contained by the route given is linked with the previous and next edge of the route
+	"""
 	for i in range(0, len(route) - 1):
 		edge = route[i]
 		edgeSucc = route[i + 1]
@@ -136,8 +146,10 @@ def isRouteValid(route, junctionsDict, edgesDict):
 	return True
 	
 
-""" Adds a vehicle and its route to the SUMO simulation. An error may be sent to the remote client """
 def addRouteToSumo(vehicleId, routeId, route, mtraci, outputSocket):
+	"""
+	Adds a vehicle and its route to the SUMO simulation. An error may be sent to the remote client
+	"""
 	if not isRouteValidForTraCI(mtraci, route):
 		Logger.warning("{}Invalid route detected: {}".format(constants.PRINT_PREFIX_VEHICLE, route))
 		return constants.VEHICLE_INVALID_ROUTE
@@ -162,19 +174,22 @@ def addRouteToSumo(vehicleId, routeId, route, mtraci, outputSocket):
 	return constants.ACK_OK
 	
 	
-""" If the vehicle received is priority, this one is append in the priority vehicles shared list protected by a mutex """
 def savePriorityVehicles(mtraci, vehicleId, priority, priorityVehicles, mPriorityVehicles):
+	"""
+	If the vehicle received is priority, this one is append in the priority vehicles shared list protected by a mutex
+	"""
 	if priority == constants.PRIORITY_VEHICLE:
 		mPriorityVehicles.acquire()
 		priorityVehicles.append(vehicleId)
 		mPriorityVehicles.release()
 	
-"""
-- Transforms the coordinates to SUMO edges ID
-- Adds a vehicle and its route to the SUMO simulation
-- Saves this one as a priority vehicle if he is priority
-"""
+	
 def addVehicle(vehicleId, priority, route, mtraci, cRouteId, outputSocket, priorityVehicles, mPriorityVehicles, vehicles, mVehicles):
+	"""
+	- Transforms the coordinates to SUMO edges ID
+	- Adds a vehicle and its route to the SUMO simulation
+	- Saves this one as a priority vehicle if he is priority
+	"""
 	if not route:
 		return sendIdentifiedAck(vehicleId, constants.VEHICLE_EMPTY_ROUTE, outputSocket)
 	
@@ -191,26 +206,25 @@ def addVehicle(vehicleId, priority, route, mtraci, cRouteId, outputSocket, prior
 	sendIdentifiedAck(vehicleId, returnCode, outputSocket)	
 	
 
-""" Removes the specified vehicles from the simulation """
 def removeVehicles(vehiclesToDel, priorityVehicles, mPriorityVehicles, mtraci, outputSocket, vehicles, mVehicles):
+	""" Removes the specified vehicles from the simulation """
 	returnCode = constants.ACK_OK
 	
-	
 	mVehicles.acquire()
-	for vehicle in vehiclesToDel:
+	for vehicleToDel in vehiclesToDel:
 		mPriorityVehicles.acquire()
-		if vehicleId in priorityVehicles:
-			priorityVehicles.remove(vehicleId)
+		if vehicleToDel in priorityVehicles:
+			priorityVehicles.remove(vehicleToDel)
 		mPriorityVehicles.release()
 		
 		try:
-			vehicles.remove(vehicle)
+			vehicles.remove(vehicleToDel)
 		except:
 			pass
 		
 		try:
 			mtraci.acquire()
-			traci.vehicle.remove(vehicleId)
+			traci.vehicle.remove(vehicleToDel)
 		except:
 			returnCode = constants.VEHICLE_DELETE_FAILED_UNKNOWN
 		mtraci.release()
@@ -219,8 +233,10 @@ def removeVehicles(vehiclesToDel, priorityVehicles, mPriorityVehicles, mtraci, o
 	sendAck(constants.PRINT_PREFIX_VEHICLE, returnCode, outputSocket)
 	
 
-""" Adds vehiclesNumber vehicles to SUMO, linking each of these to a random route of routeSize edges """
 def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci, vehicles, mVehicles):
+	"""
+	Adds vehiclesNumber vehicles to SUMO, linking each of these to a random route of routeSize edges
+	"""
 	Logger.info("{}Adding {} vehicles to the simulation...".format(constants.PRINT_PREFIX_VEHICLE, vehiclesNumber))
 	i = 0
 	route = []
@@ -256,8 +272,10 @@ def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci, vehicl
 	sendAck(constants.PRINT_PREFIX_VEHICLE, returnCode, outputSocket)
 	
 
-""" Send the speed of the given vehicles to the distant client """
 def sendVehiclesSpeed(vehiclesId, outputSocket, mtraci, mVehicles):
+	"""
+	Sends the speed of the given vehicles to the distant client
+	"""
 	speedMsg = []
 	speedMsg.append(constants.VEHICLE_SPEED_RESPONSE_HEADER)
 	
@@ -286,8 +304,10 @@ def sendVehiclesSpeed(vehiclesId, outputSocket, mtraci, mVehicles):
 	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_VEHICLE, strmsg))
 	
 	
-""" Return a vehicle list without the ignored vehicles (See constants) """
 def getRegularVehicles(vehicles):
+	"""
+	Returns a vehicle list without the ignored vehicles (See constants)
+	"""
 	regularVehicles = []
 	for vehicle in vehicles:
 		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicle):
@@ -295,8 +315,10 @@ def getRegularVehicles(vehicles):
 	return regularVehicles
 	
 
-""" Gets every vehicles position from SUMO and send then these ones to the remote client by an output socket """
 def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket, mVehicles):
+	"""
+	Gets every vehicles position from SUMO and send then these ones to the remote client by an output socket
+	"""
 	#If the simulated vehicles number we have to take into account is not 0
 	vehiclesPos = []
 	vehiclesPos.append(constants.VEHICLE_COORDS_RESPONSE_HEADER)
@@ -331,8 +353,10 @@ def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket, mVehicles):
 		raise constants.ClosedSocketException("The listening socket has been closed")
 	
 
-""" Gets all arrived vehicles ID from SUMO and send them to the remote client by output socket """
 def sendArrivedVehicles(arrivedVehicles, mtraci, outputSocket):
+	"""
+	Gets all arrived vehicles ID from SUMO and send them to the remote client by output socket
+	"""
 	msgArrivedVehicles = []
 	msgArrivedVehicles.append(constants.VEHICLE_ARRIVED_RESPONSE_HEADER)
 	
@@ -349,8 +373,10 @@ def sendArrivedVehicles(arrivedVehicles, mtraci, outputSocket):
 	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_SIMULATOR, strmsg))
 	
 
-""" Reads an input socket connected to the remote client and process an add(1), delete(3) or stress(4) request when received """
 def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorityVehicles, eVehicleReady, eManagerReady, vehicles, mVehicles):
+	"""
+	See file description
+	"""
 	bufferSize = 32768
 	cRouteId = 0
 	

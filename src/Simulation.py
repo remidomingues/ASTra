@@ -36,15 +36,19 @@ from vehicle import sendVehiclesCoordinates
 from vehicle import getRegularVehicles
 from logger import Logger
 
-""" Runs one SUMO simulation step """
 def runSimulationStep(mtraci, outputSocket):
+	"""
+	Runs one SUMO simulation step
+	"""
 	mtraci.acquire()
 	traci.simulationStep()
 	mtraci.release()
 		
 	
-""" Removes every arrived vehicles from the priority vehicles shared list """
 def removeArrivedVehicles(arrivedVehicles, priorityVehicles, mPriorityVehicles, managedTllDict, vehicles):
+	"""
+	Removes every arrived vehicles from the priority vehicles shared list
+	"""
 	for vehicleId in arrivedVehicles:
 		
 		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicle):
@@ -60,8 +64,10 @@ def removeArrivedVehicles(arrivedVehicles, priorityVehicles, mPriorityVehicles, 
 					del managedTllDict[key]
 	
 
-""" Sends an arrived vehicles message (2) to the remote client and Remove every arrived vehicles from the priority vehicles shared list """
 def notifyAndUpdateArrivedVehicles(mtraci, outputSocket, priorityVehicles, mPriorityVehicles, managedTllDict, vehicles):
+	"""
+	Sends an arrived vehicles message (2) to the remote client and Remove every arrived vehicles from the priority vehicles shared list
+	"""
 	mtraci.acquire()
 	arrivedVehicles = traci.simulation.getArrivedIDList()
 	mtraci.release()
@@ -72,8 +78,10 @@ def notifyAndUpdateArrivedVehicles(mtraci, outputSocket, priorityVehicles, mPrio
 	removeArrivedVehicles(arrivedVehicles, priorityVehicles, mPriorityVehicles, managedTllDict, vehicles)
 	
 
-""" See file description """
 def run(mtraci, outputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVehicles, mPriorityVehicles, eManagerReady, vehicles, mVehicles):
+	"""
+	See file description
+	"""
 	yellowTllDict = dict()
 	managedTllDict = dict();
 	tllDict = getTrafficLightsDictionary(mtraci)

@@ -68,8 +68,10 @@ from logger import Logger
 ===                                                   TRAFFIC LIGHTS DICTIONARY MANAGEMENT (9)                                           ===
 ============================================================================================================================================
 """
-""" Returns a dictionary as {Key=edgeId, Value=traffic light ID which is located at the end of the edge} """
 def buildTrafficLightsDictionary(mtraci):
+    """
+    Returns a dictionary as {Key=edgeId, Value=traffic light ID which is located at the end of the edge}
+    """
     Logger.info("{}Building traffic lights dictionary...".format(constants.PRINT_PREFIX_TLL))
 
     previousEdge = ''
@@ -94,8 +96,10 @@ def buildTrafficLightsDictionary(mtraci):
     return tllDict
 
 
-""" Writes the traffic lights dictionary in an output file """
 def exportTrafficLightsDictionary(tllDict):
+    """
+    Writes the traffic lights dictionary in an output file 
+    """
     Logger.info("{}Exporting traffic lights dictionary...".format(constants.PRINT_PREFIX_TLL))
     file = open(constants.SUMO_TLL_DICTIONARY_FILE, 'w')
     
@@ -109,8 +113,10 @@ def exportTrafficLightsDictionary(tllDict):
     Logger.info("{}Done".format(constants.PRINT_PREFIX_TLL))
     
     
-""" Reads the traffic lights dictionary from an input file """
 def importTrafficLightsDictionary():
+    """
+    Reads the traffic lights dictionary from an input file
+    """
     Logger.info("{}Importing traffic lights dictionary...".format(constants.PRINT_PREFIX_TLL))
     file = open(constants.SUMO_TLL_DICTIONARY_FILE, 'r')
     tllDict = dict()
@@ -126,8 +132,10 @@ def importTrafficLightsDictionary():
     return tllDict
 
 
-""" Returns the traffic lights dictionary(*). This one is obtained from a text file, updated if new map data are detected """
 def getTrafficLightsDictionary(mtraci):
+    """
+    Returns the traffic lights dictionary(*). This one is obtained from a text file, updated if new map data are detected
+    """
     if isDictionaryOutOfDate(constants.SUMO_TLL_DICTIONARY_FILE, constants.SUMO_NETWORK_FILE):
         tllDict = buildTrafficLightsDictionary(mtraci)
         exportTrafficLightsDictionary(tllDict)
@@ -142,8 +150,10 @@ def getTrafficLightsDictionary(mtraci):
 ===                                               TRAFFIC LIGHTS MANAGEMENT FOR PRIORITY VEHICLES                                        ===
 ============================================================================================================================================
 """
-""" Returns a traffic light state where green current states are passed to yellow and yellow to red. Priority lane state does not change """
 def getOrangeState(currentState, prioLaneIndex):
+    """
+    Returns a traffic light state where green current states are passed to yellow and yellow to red. Priority lane state does not change
+    """
     orangeState = []
     for i in range(0, len(currentState)):
         if i == prioLaneIndex:
@@ -157,8 +167,10 @@ def getOrangeState(currentState, prioLaneIndex):
     return ''.join(orangeState)
 
 
-""" Returns a list containing each unique item of the list given in parameter. The order does not change """
 def removeDoubles(doubleList):
+    """
+    Returns a list containing each unique item of the list given in parameter. The order does not change
+    """
     uniqueList = []
     tmpItem = None
     for item in doubleList:
@@ -169,11 +181,11 @@ def removeDoubles(doubleList):
     return uniqueList
 
 
-"""
-Returns the unique ordered (according to the hidden lane index calculated from this order) lanes 
-controlled by the traffic light given in parameter
-"""
 def getUniqueInputLanes(mtraci, tllId):
+    """
+    Returns the unique ordered (according to the hidden lane index calculated from this order) lanes 
+    controlled by the traffic light given in parameter
+    """
     mtraci.acquire()
     inputLanes = traci.trafficlights.getControlledLanes(tllId)
     mtraci.release()
@@ -181,11 +193,11 @@ def getUniqueInputLanes(mtraci, tllId):
     return removeDoubles(inputLanes)
 
 
-"""
-Returns the index of the hidden lane defined by an inLane (going in the junction) and an outLane
-(leaving from the junction). The unique controlled (in) lanes list is used for this purpose
-"""
 def getHiddenLaneIndex(mtraci, inputLanes, inLane, outLane):
+    """
+    Returns the index of the hidden lane defined by an inLane (going in the junction) and an outLane
+    (leaving from the junction). The unique controlled (in) lanes list is used for this purpose
+    """
     i = 0
     hiddenLaneIndex = 0
     found = False
@@ -212,11 +224,12 @@ def getHiddenLaneIndex(mtraci, inputLanes, inLane, outLane):
     return hiddenLaneIndex
 
 
-"""
-Restores the previous phase definition for a traffic light given in parameter.
-This phase definition must be stored in the yellowTllDict from which it will be removed.
-The new current phase must also be specified """
 def restorePreviousPhaseDefinition(mtraci, yellowTllDict, tllId, greenPhaseIndex):
+    """
+    Restores the previous phase definition for a traffic light given in parameter.
+    This phase definition must be stored in the yellowTllDict from which it will be removed.
+    The new current phase must also be specified
+    """
     previousPhaseDetails = yellowTllDict[tllId]
             
     setCompletePhasesDefinition(tllId, previousPhaseDetails, greenPhaseIndex, mtraci)
@@ -224,8 +237,10 @@ def restorePreviousPhaseDefinition(mtraci, yellowTllDict, tllId, greenPhaseIndex
     del yellowTllDict[tllId]
                 
 
-""" Returns the phase index matching with a green ('g' or 'G') state for the specified hidden lane """
 def getGreenPhaseIndex(phasesDetails, hiddenLaneIndex):
+    """
+    Returns the phase index matching with a green ('g' or 'G') state for the specified hidden lane
+    """
     k = 0
     found = False
     while k < len(phasesDetails) and not found:
@@ -238,12 +253,12 @@ def getGreenPhaseIndex(phasesDetails, hiddenLaneIndex):
     return phaseIndex
 
 
-"""
-Returns the (out) lane linked with the (in) lane which match with the (out) edge received
-If no lane match, the algorithm will use as inLane the next lane on the inEdge.
-If no lane match and if there is no other lane available on the inEdge, -1 will be returned
-"""
 def getOutLane(mtraci, inLane, outEdge):
+    """
+    Returns the (out) lane linked with the (in) lane which match with the (out) edge received
+    If no lane match, the algorithm will use as inLane the next lane on the inEdge.
+    If no lane match and if there is no other lane available on the inEdge, -1 will be returned
+    """
     found = False
     laneIndex = 0
     laneOutIndex = 0
@@ -272,12 +287,12 @@ def getOutLane(mtraci, inLane, outEdge):
     return outLane
 
 
-"""
-Changes a traffic light current phase index in order to set it green for the priority lane
-or sets a global before-green state (See getOrangeState())
-The priority lane is the hidden lane linking the inLane and the outLane
-"""
 def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
+    """
+    Changes a traffic light current phase index in order to set it green for the priority lane
+    or sets a global before-green state (See getOrangeState())
+    The priority lane is the hidden lane linking the inLane and the outLane
+    """
     if tllId in yellowTllDict:
         isOrange = True
     else:
@@ -344,20 +359,20 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
     #    Logger.info(tllId + " is GREEN => nothing to do")
 
 
-"""
-Determines for each priority vehicle which are the next traffic lights and the distance to these ones.
-Regarding to the vehicle current speed and the time elapsed during a SUMO simulation step,
-the traffic light hidden lane the vehicle will cross is set to green or the junction to a temporary orange state
-if the vehicle is close enough and if the concurrent access between priority vehicles allows it.
-Note: the following algorithm could be highly improved by exploring every edges the vehicle will use
-    at the beginning, but then only explore the edges which are now in the vehicle scope because of
-    the last step progression. Two list, one for the orange look up and one for the green, would be used
-    for this purpose.
-Note 2: The main complexity of this algorithm resides in the lack of TraCI functionalities in order to get
-    retrieve the state of a hidden lane linking two lanes. This could also be highly improved by using a
-    dictionary built when starting the software.
-"""
 def updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tllDict, yellowTllDict, managedTllDict):
+    """
+    Determines for each priority vehicle which are the next traffic lights and the distance to these ones.
+    Regarding to the vehicle current speed and the time elapsed during a SUMO simulation step,
+    the traffic light hidden lane the vehicle will cross is set to green or the junction to a temporary orange state
+    if the vehicle is close enough and if the concurrent access between priority vehicles allows it.
+    Note: the following algorithm could be highly improved by exploring every edges the vehicle will use
+        at the beginning, but then only explore the edges which are now in the vehicle scope because of
+        the last step progression. Two list, one for the orange look up and one for the green, would be used
+        for this purpose.
+    Note 2: The main complexity of this algorithm resides in the lack of TraCI functionalities in order to get
+        retrieve the state of a hidden lane linking two lanes. This could also be highly improved by using a
+        dictionary built when starting the software.
+    """
     mPriorityVehicles.acquire()
     managedTlls = [];
     length = len(priorityVehicles)
@@ -443,23 +458,64 @@ def updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tl
 ===                                                   TRAFFIC LIGHTS DYNAMIC CONFIGURATION                                               ===
 ============================================================================================================================================
 """
-""" Returns the absolute path of a traffic light screenshot from a tms login """
 def getScreenshotAbsolutePath(login):
+    """
+    Returns the absolute path of a traffic light screenshot from a tms login
+    """
     return constants.SCREEN_DIRECTORY + "/" + constants.SCREENSHOT_FILE_NAME.format(login)
 
 
-""" Returns the geographic coordinates of a traffic light from its SUMO ID """
-def getTrafficLightCoordinates(trafficId, mtraci):
+def calculateTrafficLightCoordinates(trafficId, mtraci):
+    """
+    Returns the calculated geographic coordinates of a traffic light from its SUMO ID
+    """
+    coordsList = []
+
     mtraci.acquire()
-    coords = traci.junction.getPosition(trafficId)
-    coordsGeo = traci.simulation.convertGeo(coords[0], coords[1], False)
+    lanes = traci.trafficlights.getControlledLanes(trafficId)
     mtraci.release()
     
-    return coordsGeo
+    for lane in lanes:
+        edge = lane.split('_')[0]
+        mtraci.acquire()
+        coords = traci.simulation.convert2D(edge, traci.lane.getLength(lane), 0, True)
+        mtraci.release()
+        coordsList.append(coords)
+    
+    coordsListLen = len(coordsList)
+    tllCoords = [0.0, 0.0]
+    
+    for coords in coordsList:
+        tllCoords[0] += coords[0]
+        tllCoords[1] += coords[1]
+    
+    tllCoords[0] /= coordsListLen
+    tllCoords[1] /= coordsListLen
+    
+    return tllCoords
 
 
-""" Returns a list according to the following pattern: state0 duration0 state1 duration1 ... stateN durationN from a complete phases definition"""
+def getTrafficLightCoordinates(trafficId, mtraci):
+    """
+    Returns the geographic coordinates of a traffic light from its SUMO ID
+    """
+    try:
+        mtraci.acquire()
+        coords = traci.junction.getPosition(trafficId)
+        coordsGeo = traci.simulation.convertGeo(coords[0], coords[1], False)
+        mtraci.release()
+        
+        return coordsGeo
+    except:
+        mtraci.release()
+        return -1
+
+
 def getPhasesDetails(completePhasesDefinition):
+    """
+    Returns a list according to the following pattern: state0 duration0 state1 duration1 ... stateN durationN
+    from a complete phases definition
+    """
     i = 6
     fieldSeparator = '\n'
     keyValueSeparator = ':'
@@ -477,12 +533,12 @@ def getPhasesDetails(completePhasesDefinition):
     return phasesDetails
 
 
-"""
-Returns a string matching with the SUMO complete phases definition.
-A list according to the following pattern is required:
-state0 duration0 state1 duration1 ... stateN durationN
-"""
 def setCompletePhasesDefinition(tllId, phasesDetails, currentPhaseIndex, mtraci):
+    """
+    Returns a string matching with the SUMO complete phases definition.
+    A list according to the following pattern is required:
+    state0 duration0 state1 duration1 ... stateN durationN
+    """
     i = 0
     phasesDefinition = []
     
@@ -511,8 +567,10 @@ def setCompletePhasesDefinition(tllId, phasesDetails, currentPhaseIndex, mtraci)
     return constants.ACK_OK
     
 
-""" Sends traffic lights position messages(*) to the remote client using an output socket """
 def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket, uniqueMsg):
+    """
+    Sends traffic lights position messages(*) to the remote client using an output socket
+    """
     trafficLightsNumber = 0
     trafficLightsPos = []
     trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
@@ -520,6 +578,8 @@ def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket, uniqueMsg):
     #Requires 32768 bytes buffer: sending traffic lights per packet of 500
     for trafficId in trafficLightsId:
         tllCoords = getTrafficLightCoordinates(trafficId, mtraci)
+        if tllCoords == -1:
+            tllCoords = calculateTrafficLightCoordinates(trafficId, mtraci)
         
         trafficLightsPos.append(constants.SEPARATOR)
         trafficLightsPos.append(trafficId)
@@ -570,9 +630,13 @@ def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket, uniqueMsg):
         Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_TLL, strmsg))
     
     
-""" Saves a screenshot centered on the specified junction from SUMO GUI """
 def saveTrafficLightScreenshot(login, tllId, zoom, mtraci):
+    """
+    Saves a screenshot centered on the specified junction from SUMO GUI
+    """
     tllCoords = getTrafficLightCoordinates(tllId, mtraci)
+    if tllCoords == -1:
+        tllCoords = calculateTrafficLightCoordinates(tllId, mtraci)
     
     filePath = getScreenshotAbsolutePath(login)
     
@@ -600,8 +664,10 @@ def saveTrafficLightScreenshot(login, tllId, zoom, mtraci):
     return filePath
 
 
-""" Sends a traffic lights details answer(***) to the remote client using an output socket """
 def sendTrafficLightsDetails(tllId, tmsLogin, screenshotPath, outputSocket, mtraci, detailsLevel):
+    """
+    Sends a traffic lights details answer(***) to the remote client using an output socket
+    """
     #DTL tmsLogin screenshotPath currentPhaseIndex nextSwitchTime state0 duration0 ... stateN durationN
     mtraci.acquire()
     try:
@@ -647,8 +713,10 @@ def sendTrafficLightsDetails(tllId, tmsLogin, screenshotPath, outputSocket, mtra
         raise constants.ClosedSocketException("The listening socket has been closed")
 
 
-""" Gets a traffic lights details information from SUMO, then sends them(***) to the remote client by an output socket """
 def processGetDetailsRequest(tmsLogin, tllId, zoom, outputSocket, mtraci, detailsLevel):
+    """
+    Gets a traffic lights details information from SUMO, then sends them(***) to the remote client by an output socket
+    """
     if not constants.POSIX_OS:
         screenshotPath = saveTrafficLightScreenshot(tmsLogin, tllId, zoom, mtraci)
     else:
@@ -656,8 +724,10 @@ def processGetDetailsRequest(tmsLogin, tllId, zoom, outputSocket, mtraci, detail
     sendTrafficLightsDetails(tllId, tmsLogin, screenshotPath, outputSocket, mtraci, detailsLevel)
     
 
-""" Gets a traffic lights details from """
 def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
+    """
+    Gets a traffic lights details from
+    """
     #SET tllId currentPhaseIndex state0 duration0 ... stateN durationN
     returnCode = constants.ACK_OK
     command.pop(0)
@@ -694,8 +764,10 @@ def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
     sendAck(constants.PRINT_PREFIX_TLL, returnCode, outputSocket)
     
     
-""" See file description """
 def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eManagerReady):
+    """
+    See file description
+    """
     bufferSize = 1024
     
     mtraci.acquire()

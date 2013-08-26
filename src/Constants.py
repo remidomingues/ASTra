@@ -30,23 +30,20 @@ TLL_ENABLED = True
 SERVER = False
 
 
-""" Exception threw when the socket the process is trying to listen or write is closed """
 class ClosedSocketException(Exception):
+	"""
+	Exception threw when the socket the process is trying to listen or write is closed
+	"""
 	pass
 
 """ Main directories """
-if not SERVER:
-	#ASTRA_DIRECTORY = os.path.abspath('C:/Temp/workspace/cardemo/src/main/app/astra')
-	ASTRA_DIRECTORY = os.path.abspath('src/main/app/astra')
-else:
-	ASTRA_DIRECTORY = os.path.abspath("../apps/cardemo/astra")
+ASTRA_DIRECTORY = os.path.abspath('C:/Temp/workspace/cardemo/src/main/app/astra')
 SUMO_DIRECTORY = os.path.abspath(os.path.dirname(ASTRA_DIRECTORY) + '/sumo-0.16.0')
 CONFIG_DIRECTORY = ASTRA_DIRECTORY + "/config"
 DICT_DIRECTORY = ASTRA_DIRECTORY + "/dict"
 LOG_DIRECTORY = ASTRA_DIRECTORY + "/log"
 TMP_DIRECTORY = ASTRA_DIRECTORY + "/tmp"
-#SCREEN_DIRECTORY = ASTRA_DIRECTORY + "/screen"
-SCREEN_DIRECTORY = os.path.abspath(ASTRA_DIRECTORY + "/../html/img/screenshots")
+SCREEN_DIRECTORY = ASTRA_DIRECTORY + "/screen"
 
 """ Networks constants """
 """
@@ -62,8 +59,10 @@ SUMO_CONFIG_DICT = dict()
 CONFIG_FILE_KEY = "Config"
 NETWORK_FILE_KEY = "Network"
 
-""" Add a network linked with its configuration files to the sumo config dictionary """
 def addNetworkToConfigDict(networkId, configFile, networkFile):
+	"""
+	Add a network linked with its configuration files to the sumo config dictionary
+	"""
 	filesDict = dict()
 	filesDict[CONFIG_FILE_KEY] = configFile
 	filesDict[NETWORK_FILE_KEY] = networkFile
@@ -76,12 +75,6 @@ DUBLIN_NETWORK_ID = "Dublin"
 DUBLIN_CONFIG_FILE = CONFIG_DIRECTORY + "/Dublin.sumocfg"
 DUBLIN_NET_FILE = CONFIG_DIRECTORY + "/Dublin.net.xml"
 addNetworkToConfigDict(DUBLIN_NETWORK_ID, DUBLIN_CONFIG_FILE, DUBLIN_NET_FILE)
-
-""" Cologne """
-COLOGNE_NETWORK_ID = "Cologne"
-COLOGNE_CONFIG_FILE = CONFIG_DIRECTORY + "/Cologne.sumocfg"
-COLOGNE_NET_FILE = CONFIG_DIRECTORY + "/Cologne.net.xml"
-addNetworkToConfigDict(COLOGNE_NETWORK_ID, COLOGNE_CONFIG_FILE, COLOGNE_NET_FILE)
 
 """ Chosen network """
 SUMO_CHOSEN_NETWORK = DUBLIN_NETWORK_ID
@@ -119,6 +112,7 @@ ACK_OK = 0
 INVALID_MESSAGE = 40
 
 GRAPH_UNKNOWN_EDGE = 30
+GRAPH_INVALID_BLOCK_MSG = 31
 
 ROUTE_ERROR_CONNECTION = 1
 DUAROUTER_ERROR_LAUNCH = 2

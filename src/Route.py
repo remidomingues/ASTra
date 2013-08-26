@@ -56,11 +56,11 @@ from sharedFunctions import sendAck
 ===                                            		  	   ROUTING REQUESTS MANAGEMENT 	      	                                         ===
 ============================================================================================================================================
 """
-"""
-Sends a routing(2) message to Client using the outputSocket
-For this purpose, the route is converted to geographic coordinates by traci
-"""
 def sendRoute(route, outputSocket, mtraci):
+	"""
+	Sends a routing(2) message to Client using the outputSocket
+	For this purpose, the route is converted to geographic coordinates by traci
+	"""
 	routeMsg = []
 	routeMsg.append(constants.ROUTING_RESPONSE_HEADER)
 	
@@ -78,8 +78,10 @@ def sendRoute(route, outputSocket, mtraci):
 	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_ROUTER, strmsg))
 
 
-""" Sends an error(3) message to the remote client with an error code """
 def sendRoutingError(outputSocket, errorCode):
+	"""
+	Sends an error(3) message to the remote client with an error code
+	"""
 	errorMsg = []
 	errorMsg.append(constants.ERROR_HEADER)
 	errorMsg.append(constants.SEPARATOR)
@@ -94,8 +96,10 @@ def sendRoutingError(outputSocket, errorCode):
 	Logger.infoFile("{} Message sent: {}".format(constants.PRINT_PREFIX_ROUTER, strmsg))
 
 
-""" Return a list of edges from a list of continuous junctions """
 def getRouteFromJunctions(junctions, junctionsDict):
+	"""
+	Return a list of edges from a list of continuous junctions
+	"""
 	route = []
 	
 	for i in range(0, len(junctions) - 1):
@@ -105,8 +109,10 @@ def getRouteFromJunctions(junctions, junctionsDict):
 	return route
 
 
-""" Return a SUMO edge ID from geographic coordinates """
 def getEdgeFromCoords(lon, lat, mtraci):
+	"""
+	Return a SUMO edge ID from geographic coordinates
+	"""
 	mtraci.acquire()
 	try:
 		edge = traci.simulation.convertRoad(lat, lon, True)[0]
@@ -117,12 +123,12 @@ def getEdgeFromCoords(lon, lat, mtraci):
 	return edge
 
 
-"""
-- Transforms the source and destination coordinates to SUMO edges ID if geo is 1
-- Resolves the routing demand by the specified algorithm
-- Sends the route(2) back to Client
-"""
 def processRouteRequest(algorithm, geo, points, junctionsDict, graphDict, edgesDict, outputSocket, mtraci):
+	"""
+	- Transforms the source and destination coordinates to SUMO edges ID if geo is 1
+	- Resolves the routing demand by the specified algorithm
+	- Sends the route(2) back to Client
+	"""
 	if geo == constants.GEOGRAPHIC_COORDS:
 		edgesDest = []
 		edgeSrc = getEdgeFromCoords(float(points[0]), float(points[1]), mtraci)
@@ -151,8 +157,10 @@ def processRouteRequest(algorithm, geo, points, junctionsDict, graphDict, edgesD
 	sendRoute(route, outputSocket, mtraci)
 
 
-""" Reads an input socket connected to the remote client and process a GET(1) request when received. A ROUTE(2) or ERROR(3) response is then sent """
 def run(mtraci, inputSocket, outputSocket, eShutdown, eRouteReady, eManagerReady, graphDict, junctionsDict, edgesDict):
+	"""
+	See file description
+	"""
 	bufferSize = 1024
 	
 	eRouteReady.set()
