@@ -11,7 +11,7 @@ http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/117228
 
 from priorityDictionary import PriorityDictionary
 
-def Dijkstra(G,start,end=None):
+def Dijkstra(G, start, end=None):
     """
     Find shortest paths from the start vertex to all
     vertices nearer than or equal to the end.
@@ -54,9 +54,9 @@ def Dijkstra(G,start,end=None):
     a negative edge has caused it to make a mistake.
     """
 
-    D = {}    # dictionary of final distances
-    P = {}    # dictionary of predecessors
-    Q = PriorityDictionary()   # est.dist. of non-final vert.
+    D = {}  # dictionary of final distances
+    P = {}  # dictionary of predecessors
+    Q = PriorityDictionary()  # est.dist. of non-final vert.
     Q[start] = 0
     
     for v in Q:
@@ -76,9 +76,9 @@ def Dijkstra(G,start,end=None):
         except:
             pass
     
-    return (D,P)
+    return (D, P)
             
-def shortestPath(G,start,end):
+def shortestPath(G, start, end):
     """
     Find a single shortest path from the given start vertex
     to the given end vertex.
@@ -87,7 +87,7 @@ def shortestPath(G,start,end):
     the shortest path.
     """
 
-    D,P = Dijkstra(G,start,end)
+    D, P = Dijkstra(G, start, end)
     Path = []
     while 1:
         Path.append(end)

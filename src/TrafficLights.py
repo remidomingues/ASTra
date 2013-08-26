@@ -5,6 +5,9 @@
 @author  Remi Domingues
 @date    24/06/2013
 
+This script reads an input socket connected to the remote client and process an request when received.
+Requests must be sent on the port 180007, responses are sent on the port 18008.
+
 (0) Traffic lights COORDINATES request: COO tllId1 ... tllIdN
         If no traffic light ID is specified, the geographic coordinates of every traffic light will be sent
 
@@ -246,10 +249,10 @@ def getGreenPhaseIndex(phasesDetails, hiddenLaneIndex):
     while k < len(phasesDetails) and not found:
         state = phasesDetails[k]
         if state[hiddenLaneIndex] == 'g' or state[hiddenLaneIndex] == 'G':
-            phaseIndex = k/2
+            phaseIndex = k / 2
             found = True
         else:
-            k+=2
+            k += 2
     return phaseIndex
 
 
@@ -316,24 +319,24 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
     phasesDetails = getPhasesDetails(completeDefinition)
     currentState = phasesDetails[currentPhaseIndex * 2]
     
-    #If the traffic light the given edge which ends with does not contain a signal for the lane the vehicle will go to 
+    # If the traffic light the given edge which ends with does not contain a signal for the lane the vehicle will go to 
     if len(currentState) == hiddenLaneIndex:
         return
     
-    #The traffic light is gren for the priority lane, and the time but the time for the priority vehicle to reach the junction is unsufficient
+    # The traffic light is gren for the priority lane, and the time but the time for the priority vehicle to reach the junction is unsufficient
     if (setState == constants.SET_YELLOW or setState == constants.SET_GREEN) and not isOrange and ((currentState[hiddenLaneIndex] == 'g' or currentState[hiddenLaneIndex] == 'G')):
         if nextSwitchStep - constants.YELLOW_STEPS_ANTICIPATION < 0:
-            #Logger.info(tllId + " is GREEN => reinitializing timer")
-            #Reset the current phase timer
+            # Logger.info(tllId + " is GREEN => reinitializing timer")
+            # Reset the current phase timer
             mtraci.acquire()
             traci.trafficlights.setPhase(tllId, currentPhaseIndex)
             mtraci.release()
-        #else:
+        # else:
         #    Logger.info(tllId + " is GREEN => nothing to do")
         
     elif setState == constants.SET_YELLOW:
-        #Logger.info(tllId + " has been set to YELLOW temporary phase")
-        #Saving the current phase state and duration
+        # Logger.info(tllId + " has been set to YELLOW temporary phase")
+        # Saving the current phase state and duration
         yellowTllDict[tllId] = phasesDetails
         newState = getOrangeState(currentState, hiddenLaneIndex)
         
@@ -341,12 +344,12 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
         orangePhasesDetails[currentPhaseIndex * 2] = newState
         orangePhasesDetails[currentPhaseIndex * 2 + 1] = constants.YELLOW_STEPS_ANTICIPATION * 1000
         
-        #Setting a temporary current phase in order to prepare the junction for passing green the priority lane
+        # Setting a temporary current phase in order to prepare the junction for passing green the priority lane
         setCompletePhasesDefinition(tllId, orangePhasesDetails, currentPhaseIndex, mtraci)
         
-    #We set the priority lane green only if (the associated traffic light is not green and the current state will change before the priority car crosses the junction) 
+    # We set the priority lane green only if (the associated traffic light is not green and the current state will change before the priority car crosses the junction) 
     elif setState == constants.SET_GREEN and not((currentState[hiddenLaneIndex] == 'g' or currentState[hiddenLaneIndex] == 'G') and nextSwitchStep - constants.GREEN_STEPS_ANTICIPATION > 0):
-        #Logger.info(tllId + " has been set to GREEN")
+        # Logger.info(tllId + " has been set to GREEN")
         greenPhaseIndex = getGreenPhaseIndex(phasesDetails, hiddenLaneIndex)
 
         if isOrange:
@@ -355,7 +358,7 @@ def changeState(mtraci, tllId, inLane, outLane, setState, yellowTllDict):
             mtraci.acquire()
             traci.trafficlights.setPhase(tllId, greenPhaseIndex)
             mtraci.release()
-    #else:
+    # else:
     #    Logger.info(tllId + " is GREEN => nothing to do")
 
 
@@ -377,18 +380,18 @@ def updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tl
     managedTlls = [];
     length = len(priorityVehicles)
     
-    #Checking if the next traffic light has to be changed for each priority vehicleId in the simulation
+    # Checking if the next traffic light has to be changed for each priority vehicleId in the simulation
     for prioVehIndex in range(0, length):
         vehicleId = priorityVehicles[prioVehIndex]
         
-        #Getting route and position information for the current priority vehicleId
+        # Getting route and position information for the current priority vehicleId
         mtraci.acquire()
         route = traci.vehicle.getRoute(vehicleId)
         currentLane = traci.vehicle.getLaneID(vehicleId)
         mtraci.release()
         
         if currentLane != '' and not isJunction(currentLane):
-            #Getting speed information for space and time predictions
+            # Getting speed information for space and time predictions
             mtraci.acquire()
             lanePosition = traci.vehicle.getLanePosition(vehicleId)
             laneLength = traci.lane.getLength(currentLane)
@@ -402,26 +405,26 @@ def updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tl
             lane = currentLane
             edgeIndex = currentEdgeIndex
 
-            #Browsing the next edges the vehicleId will go to            
+            # Browsing the next edges the vehicleId will go to            
             while remainingLength <= constants.YELLOW_LENGTH_ANTICIPATION and edgeIndex < len(route) - 1:
-                #If the current edge (the vehicleId is not) ends with a traffic light
+                # If the current edge (the vehicleId is not) ends with a traffic light
                 if edge in tllDict:
-                    #If the car is close enough for the traffic light to become green
+                    # If the car is close enough for the traffic light to become green
                     if remainingLength <= constants.GREEN_LENGTH_ANTICIPATION:
                         setState = constants.SET_GREEN
-                    #If the car is close enough for the traffic light to prepare (temporary state) becoming green
+                    # If the car is close enough for the traffic light to prepare (temporary state) becoming green
                     elif not tllDict[edge] in yellowTllDict:
                         setState = constants.SET_YELLOW
                     else:
                         managedTlls.append(tllDict[edge])
                         setState = constants.IGNORE
                     
-                    #Calculating the next lane the vehicleId will go to
+                    # Calculating the next lane the vehicleId will go to
                     outEdge = route[edgeIndex + 1]
                     
                     outLane = getOutLane(mtraci, lane, outEdge)
                     
-                    #Calling for a traffic light change
+                    # Calling for a traffic light change
                     if outLane != -1 and setState != constants.IGNORE:
                         tllId = tllDict[edge]
                         managedTlls.append(tllId)
@@ -442,7 +445,7 @@ def updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tl
                     
                     remainingLength += laneLength
             
-            #Removing the tlls which have been crossed from the managedTllDict    
+            # Removing the tlls which have been crossed from the managedTllDict    
             for key in managedTllDict.keys():
                 if managedTllDict[key][0] == vehicleId and not key in managedTlls:
                     del managedTllDict[key]
@@ -526,7 +529,7 @@ def getPhasesDetails(completePhasesDefinition):
         duration = arrayDefinition[i].split(keyValueSeparator)[1][1:]
         i += 3
         state = arrayDefinition[i].split(keyValueSeparator)[1][1:]
-        i+= 2
+        i += 2
         phasesDetails.append(state)
         phasesDetails.append(duration)
         
@@ -575,7 +578,7 @@ def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket, uniqueMsg):
     trafficLightsPos = []
     trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
     
-    #Requires 32768 bytes buffer: sending traffic lights per packet of 500
+    # Requires 32768 bytes buffer: sending traffic lights per packet of 500
     for trafficId in trafficLightsId:
         tllCoords = getTrafficLightCoordinates(trafficId, mtraci)
         if tllCoords == -1:
@@ -615,7 +618,7 @@ def sendTrafficLightsPosition(trafficLightsId, mtraci, outputSocket, uniqueMsg):
     
 
     if not uniqueMsg:
-        #Sending end of traffic lights position messages
+        # Sending end of traffic lights position messages
         trafficLightsPos[:] = []
         trafficLightsPos.append(constants.TLL_COORDS_REQUEST_HEADER)
         trafficLightsPos.append(constants.SEPARATOR)
@@ -668,7 +671,7 @@ def sendTrafficLightsDetails(tllId, tmsLogin, screenshotPath, outputSocket, mtra
     """
     Sends a traffic lights details answer(***) to the remote client using an output socket
     """
-    #DTL tmsLogin screenshotPath currentPhaseIndex nextSwitchTime state0 duration0 ... stateN durationN
+    # DTL tmsLogin screenshotPath currentPhaseIndex nextSwitchTime state0 duration0 ... stateN durationN
     mtraci.acquire()
     try:
         currentPhaseIndex = traci.trafficlights.getPhase(tllId)
@@ -728,13 +731,13 @@ def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
     """
     Gets a traffic lights details from
     """
-    #SET tllId currentPhaseIndex state0 duration0 ... stateN durationN
+    # SET tllId currentPhaseIndex state0 duration0 ... stateN durationN
     returnCode = constants.ACK_OK
     command.pop(0)
     tllId = command.pop(0)
     currentPhaseIndex = int(command.pop(0))
 
-    #Setting current phase index
+    # Setting current phase index
     mtraci.acquire()
     oldPhaseIndex = traci.trafficlights.getPhase(tllId)
     try:
@@ -747,7 +750,7 @@ def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
         raise
     mtraci.release()
     
-    #Setting complete phases definition
+    # Setting complete phases definition
     if commandSize > 3:
         mtraci.acquire()
         oldPhasesDefinition = traci.trafficlights.getCompleteRedYellowGreenDefinition(tllId)
@@ -760,7 +763,7 @@ def processSetDetailsRequest(command, commandSize, outputSocket, mtraci):
             mtraci.release()
             returnCode = constants.TLL_PHASE_STATE_ERROR
             
-    #Sending ack
+    # Sending ack
     sendAck(constants.PRINT_PREFIX_TLL, returnCode, outputSocket)
     
     
@@ -826,9 +829,6 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eMana
                     # Error
                     else:
                         Logger.warning("{}Invalid command received: {}".format(constants.PRINT_PREFIX_TLL, command))
-                        print command[0]
-                        print constants.ALL_TLL_COORDS_REQUEST_HEADER
-                        print commandSize
                         sendAck(constants.PRINT_PREFIX_TLL, constants.INVALID_MESSAGE, outputSocket)
 
         except Exception as e:

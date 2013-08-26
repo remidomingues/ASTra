@@ -8,6 +8,7 @@
 This script reads an input socket connected to the remote client and process a GET(1) command when received. A ROUTE(2) or ERROR(3) answer is then sent
 The building/export or import of a graph (See Graph(10)) file is required for this purpose.
 Junctions (See Graph(8)) and edges (See Graph(9)) dictionaries are also required.
+Requests must be sent on the port 180003, responses are sent on the port 18004.
 
 Algorithm:
 while 1:
@@ -103,7 +104,7 @@ def getRouteFromJunctions(junctions, junctionsDict):
 	route = []
 	
 	for i in range(0, len(junctions) - 1):
-		edge = list(junctionsDict[junctions[i]][1] & junctionsDict[junctions[i+1]][0])
+		edge = list(junctionsDict[junctions[i]][1] & junctionsDict[junctions[i + 1]][0])
 		route.append(edge[0])
 		
 	return route
@@ -135,7 +136,7 @@ def processRouteRequest(algorithm, geo, points, junctionsDict, graphDict, edgesD
 		
 		i = 2
 		while i < len(points):
-			edgesDest.append(getEdgeFromCoords(float(points[i]), float(points[i+1]), mtraci))
+			edgesDest.append(getEdgeFromCoords(float(points[i]), float(points[i + 1]), mtraci))
 			i += 2
 	elif geo == constants.EDGES_ID:
 		edgeSrc = points[0]

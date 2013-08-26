@@ -12,6 +12,8 @@ While 1:
 	Sending the vehicles ID of each arrived vehicle (2) by an output socket
 	Changing the traffic lights phases if required for cleaning the road for priority vehicles
 	Sleeping Y seconds
+	
+The regular messages below are sent on the port 18009 and can be disabled.
 
 (1) Vehicles position message: COO vehicleId1 lon1 lat1 vehicleId2 lon2 lat2 ... vehicleIdN lonN latN
 
@@ -51,7 +53,7 @@ def removeArrivedVehicles(arrivedVehicles, priorityVehicles, mPriorityVehicles, 
 	"""
 	for vehicleId in arrivedVehicles:
 		
-		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicle):
+		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicleId):
 			vehicles.remove(vehicleId)
 		
 			mPriorityVehicles.acquire()
@@ -122,6 +124,6 @@ def run(mtraci, outputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVe
 		duration = endTime - startTime
 		sleepTime = constants.SIMULATOR_SLEEP - duration
 		
-		#Logger.info("{}Sleep time: {}".format(constants.PRINT_PREFIX_SIMULATOR, sleepTime))
+		# Logger.info("{}Sleep time: {}".format(constants.PRINT_PREFIX_SIMULATOR, sleepTime))
 		if sleepTime > 0:
 			time.sleep(sleepTime)

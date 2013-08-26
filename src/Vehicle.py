@@ -5,7 +5,8 @@
 @author  Remi Domingues
 @date	07/06/2013
 
-This script reads an input socket connected to the remote client and process an request when received
+This script reads an input socket connected to the remote client and process an request when received.
+Requests must be sent on the port 180005, responses are sent on the port 18006.
 		
 (1) Add request: ADD vehicleId priority lat1 lon1 lat2 lon2 ... latN lonN
 		priority = 0 (no priority) or 1 (priority vehicle)
@@ -233,11 +234,12 @@ def removeVehicles(vehiclesToDel, priorityVehicles, mPriorityVehicles, mtraci, o
 	sendAck(constants.PRINT_PREFIX_VEHICLE, returnCode, outputSocket)
 	
 
-def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci, vehicles, mVehicles):
+def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci, outputSocket, vehicles, mVehicles):
 	"""
 	Adds vehiclesNumber vehicles to SUMO, linking each of these to a random route of routeSize edges
 	"""
 	Logger.info("{}Adding {} vehicles to the simulation...".format(constants.PRINT_PREFIX_VEHICLE, vehiclesNumber))
+	returnCode = constants.ACK_OK
 	i = 0
 	route = []
 	mtraci.acquire()
@@ -249,18 +251,18 @@ def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci, vehicl
 		vehicleId = vehicleIdPrefix + str(i)
 		routeId = getRouteIdFromVehicleId(vehicleIdPrefix, i)
 		
-		#Building random route
+		# Building random route
 		edgeSrc = edges[randint(0, edgesNumber)]
 		route.append(edgeSrc)
 		route = appendEdge(route, routeSize, mtraci)
 		
 		if route != -1:
-			#Adding route and vehicle to SUMO
+			# Adding route and vehicle to SUMO
 			mVehicles.acquire()
 			vehicles.append(vehicleId)
 			mtraci.acquire()
 			traci.route.add(routeId, route)
-			traci.vehicle.add(vehicleId,routeId,-2,0,0,0,"DEFAULT_VEHTYPE")
+			traci.vehicle.add(vehicleId, routeId, -2, 0, 0, 0, "DEFAULT_VEHTYPE")
 			mtraci.release()
 			mVehicles.release()
 			route[:] = []
@@ -319,7 +321,7 @@ def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket, mVehicles):
 	"""
 	Gets every vehicles position from SUMO and send then these ones to the remote client by an output socket
 	"""
-	#If the simulated vehicles number we have to take into account is not 0
+	# If the simulated vehicles number we have to take into account is not 0
 	vehiclesPos = []
 	vehiclesPos.append(constants.VEHICLE_COORDS_RESPONSE_HEADER)
 	
@@ -331,7 +333,7 @@ def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket, mVehicles):
 			coordsGeo = traci.simulation.convertGeo(coords[0], coords[1], False)
 			mtraci.release()
 	
-			#Build the message to send by the output socket
+			# Build the message to send by the output socket
 			vehiclesPos.append(constants.SEPARATOR)
 			vehiclesPos.append(vehicleId)
 			vehiclesPos.append(constants.SEPARATOR)
@@ -343,7 +345,7 @@ def sendVehiclesCoordinates(vehiclesId, mtraci, outputSocket, mVehicles):
 		
 	mVehicles.release()
 	
-	#Send the position of each vehicle by the output socket
+	# Send the position of each vehicle by the output socket
 	vehiclesPos.append(constants.END_OF_MESSAGE)
 	strmsg = ''.join(vehiclesPos)
 	
@@ -422,7 +424,7 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
 						cRouteId += 1
 						
 						
-					#Remove the specified vehicles from the simulation
+					# Remove the specified vehicles from the simulation
 					elif commandSize >= 1 and command[0] == constants.VEHICLE_DELETE_REQUEST_HEADER:
 						if commandSize == 1:
 							removeVehicles(list(vehicles), priorityVehicles, mPriorityVehicles, mtraci, outputSocket, vehicles, mVehicles)
@@ -431,7 +433,7 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
 							removeVehicles(command, priorityVehicles, mPriorityVehicles, mtraci, outputSocket, vehicles, mVehicles)
 						
 						
-					#Stress test, add random vehicles to the simulation
+					# Stress test, add random vehicles to the simulation
 					elif commandSize == 4 and command[0] == constants.VEHICLE_ADD_RAND_REQUEST_HEADER:
 						try:
 							addRandomVehicles(command[1], int(command[2]), int(command[3]), mtraci, outputSocket, vehicles, mVehicles)
@@ -440,7 +442,7 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
 							raise
 						
 						
-					#Send vehicles speed to the remote client
+					# Send vehicles speed to the remote client
 					elif commandSize >= 1 and command[0] == constants.VEHICLE_SPEED_REQUEST_HEADER:
 						if commandSize == 1:
 							sendVehiclesSpeed(vehicles, outputSocket, mtraci, mVehicles)
@@ -449,7 +451,7 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
 							sendVehiclesSpeed(command, outputSocket, mtraci, mVehicles)
 						
 						
-					#Send vehicles geographic coordinates to the remote client
+					# Send vehicles geographic coordinates to the remote client
 					elif commandSize >= 1 and command[0] == constants.VEHICLE_COORDS_REQUEST_HEADER:
 						if commandSize == 1:
 							sendVehiclesCoordinates(vehicles, mtraci, outputSocket, mVehicles)
@@ -458,7 +460,7 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
 							sendVehiclesCoordinates(command, mtraci, outputSocket, mVehicles)
 						
 						
-					#Send arrived vehicles ID to the remote client
+					# Send arrived vehicles ID to the remote client
 					elif commandSize == 1 and command[0] == constants.VEHICLE_ARRIVED_REQUEST_HEADER:
 						mtraci.acquire()
 						arrivedVehicles = traci.simulation.getArrivedIDList()

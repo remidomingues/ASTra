@@ -5,7 +5,8 @@
 @author  Remi Domingues
 @date	13/08/2013
 
-This script reads an input socket connected to the remote client and process a request when received
+This script reads an input socket connected to the remote client and process a request when received.
+Requests must be sent on the port 180001, responses are sent on the port 18002. 
 		
 Socket messages:
 EDGES COORDINATES
@@ -254,7 +255,7 @@ def importGraph():
 		i = 1
 		while i < len(lineArray):
 			junctionSuccessor = lineArray[i]
-			edgeLength = lineArray[i+1]
+			edgeLength = lineArray[i + 1]
 			graphDict[junctionNode][junctionSuccessor] = float(edgeLength)
 			i += 2
 
@@ -294,20 +295,20 @@ class NetworkHandler(xml.sax.ContentHandler):
 				self.junctionFrom = str(attrs.get(constants.XML_EDGE_FROM_JUNCTION))
 				self.junctionTo = str(attrs.get(constants.XML_EDGE_TO_JUNCTION))
 				
-				#Junctions dictionary
+				# Junctions dictionary
 				if not self.junctionFrom in self.junctionsDict:
 					self.junctionsDict[self.junctionFrom] = [set(), set()]
 			
 				if not self.junctionTo in self.junctionsDict:
-					self.junctionsDict[self.junctionTo]= [set(), set()]
+					self.junctionsDict[self.junctionTo] = [set(), set()]
 			
 				self.junctionsDict[self.junctionTo][0].add(self.edgeId)
 				self.junctionsDict[self.junctionFrom][1].add(self.edgeId)
 				
-				#Edges dictionary
+				# Edges dictionary
 				self.edgesDict[self.edgeId] = [self.junctionFrom, self.junctionTo]
 			
-				#Graph
+				# Graph
 				if not self.edgeId in self.graphDict:
 					self.graphDict[self.edgeId] = dict()
 					
@@ -339,12 +340,12 @@ def buildGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci):
 	"""
 	Logger.info("{}Building graph, junctions dictionary and edges dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
 	
-	#Initializing variables
+	# Initializing variables
 	graphDict = dict()
 	junctionsDict = dict()
 	edgesDict = dict()
 		
-	#Parsing XML network file
+	# Parsing XML network file
 	parser = xml.sax.make_parser()
 	parser.setContentHandler(NetworkHandler(graphDict, junctionsDict, edgesDict, mtraci))
 	parser.parse(constants.SUMO_NETWORK_FILE)
@@ -431,7 +432,7 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, u
 	Send information messages to Client, followed by and end message.
 	The dictionary must be the edgesDictionary if an edges coordinates () request is specified
 	The dictionary must be the graphDictionary if a graph () or successors () request is specified
-	"""
+	"""	
 	edgesNumber = 0
 	edgesMsg = []
 	
@@ -440,7 +441,7 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, u
 	edgeListSeparator = getEdgeListSeparator(informationType)
 	maximumEdgesPerMsg = getMaximumEdgesPerMessage(informationType)
 	
-	#Adding specified header
+	# Adding specified header
 	edgesMsg.append(informationHeader)
 	
 	for edge in edges:
@@ -449,12 +450,12 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, u
 			edgesMsg.append(edge)
 			edgesMsg.append(constants.SEPARATOR)
 			
-			#EDGES COORDINATES
+			# EDGES COORDINATES
 			if(informationType == constants.EDGES_COORDS):
-				#Getting the two junctions ID linked with the current edge
+				# Getting the two junctions ID linked with the current edge
 				edgesJunctions = dictionary[edge]
 				
-				#Getting geographic coordinates of the two junctions center
+				# Getting geographic coordinates of the two junctions center
 				mtraci.acquire()
 				predecessorCoords = traci.junction.getPosition(edgesJunctions[0])
 				predecessorCoordsGeo = traci.simulation.convertGeo(predecessorCoords[0], predecessorCoords[1], False)
@@ -462,7 +463,7 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, u
 				successorCoordsGeo = traci.simulation.convertGeo(successorCoords[0], successorCoords[1], False)
 				mtraci.release()
 	
-				#Adding to the current message
+				# Adding to the current message
 				edgesMsg.append(str(predecessorCoordsGeo[0]))
 				edgesMsg.append(constants.SEPARATOR)
 				edgesMsg.append(str(predecessorCoordsGeo[1]))
@@ -471,31 +472,30 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, u
 				edgesMsg.append(constants.SEPARATOR)
 				edgesMsg.append(str(successorCoordsGeo[1]))
 			
-			#EDGES LENGTH
+			# EDGES LENGTH
 			elif(informationType == constants.EDGES_LENGTH):
 				lane = edge + '_0'
 				
-				#Getting edge length
+				# Getting edge length
 				mtraci.acquire()
 				length = traci.lane.getLength(lane)
 				mtraci.release()
 				
-				#Adding to the current message
+				# Adding to the current message
 				edgesMsg.append(str(length))
 			
-			#EDGES CONGESTION
+			# EDGES CONGESTION
 			elif(informationType == constants.EDGES_CONGESTION):
-				lane = edge + '_0'
-				
+			
 				#Calculating congestion
 				mtraci.acquire()
 				congestion = traci.edge.getLastStepOccupancy(edge)
 				mtraci.release()
 				
-				#Adding to the current message
+				# Adding to the current message
 				edgesMsg.append(str(congestion))
 			
-			#EDGES SUCCESSORS (GRAPH)
+			# EDGES SUCCESSORS (GRAPH)
 			elif(informationType == constants.EDGES_SUCCESSORS):
 				for edgeSucc in dictionary[edge]:
 					edgesMsg.append(edgeSucc)
@@ -504,7 +504,7 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, u
 			
 			edgesNumber += 1
 			
-			#Sending the message if this one has reached the maximum edges number per message
+			# Sending the message if this one has reached the maximum edges number per message
 			if not uniqueMsg and edgesNumber == maximumEdgesPerMsg:
 				edgesMsg.append(constants.END_OF_MESSAGE)
 				strmsg = ''.join(edgesMsg)
@@ -517,7 +517,7 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, u
 				edgesNumber = 0
 				edgesMsg[:] = []
 				
-				#Adding specified header
+				# Adding specified header
 				edgesMsg.append(informationHeader)
 		
 		
@@ -532,14 +532,14 @@ def sendEdgesDetails(edges, outputSocket, mtraci, informationType, dictionary, u
 		
 	
 	if not uniqueMsg: 
-		#Sending end of edges information messages
+		# Sending end of edges information messages
 		edgesMsg[:] = []
 	
-		#Adding specified header
+		# Adding specified header
 		edgesMsg.append(informationHeader)
 		edgesMsg.append(edgeListSeparator)
 	
-		#Adding specified ending
+		# Adding specified ending
 		edgesMsg.append(informationEnd)
 		edgesMsg.append(constants.END_OF_MESSAGE)
 		
@@ -578,30 +578,32 @@ def blockEdges(mtraci, edgesBlocked, idCpt, outputSocket):
 			mtraci.acquire()
 			traci.route.add(routeId, route)
 			mtraci.release()
-		    
-			while laneIndex < nbLanesBlocked:
-				vehicleId = constants.BLOCKED_VEHICLE_ID_PREFIX + str(idCpt + cpt)
-				#TODO: improve, we can use the lane number by adding it to a dictionary when parsing the network
-				try:
-				    mtraci.acquire()
-				    laneLength = traci.lane.getLength(laneBlocked)
-				    mtraci.release()
-				except:
-					mtraci.release()
-					break
-				   
-				laneLength /= 2.0
-		
-				mtraci.acquire()
-				traci.vehicle.add(vehicleId, routeId, -2, 0, 0, 0, constants.DEFAULT_VEHICLE_TYPE)
-				traci.vehicle.setStop(vehicleId, edgeBlocked, laneLength, laneIndex, 2147483646)
-				mtraci.release()
-				
-				cpt += 1
-				laneIndex += 1
-				laneBlocked = laneBlocked[:-1] + str(laneIndex)
 		except:
-			returnCode = GRAPH_UNKNOWN_EDGE
+			mtraci.release()
+			sendAck(constants.PRINT_PREFIX_GRAPH, constants.GRAPH_UNKNOWN_EDGE, outputSocket)
+			return cpt
+		    
+		while laneIndex != nbLanesBlocked - 1:
+			vehicleId = constants.BLOCKED_VEHICLE_ID_PREFIX + str(idCpt + cpt)
+			# TODO: improve, we can use the lane number by adding it to a dictionary when parsing the network
+			try:
+			    mtraci.acquire()
+			    laneLength = traci.lane.getLength(laneBlocked)
+			    mtraci.release()
+			except:
+				mtraci.release()
+				break
+			   
+			laneLength /= 2.0
+	
+			mtraci.acquire()
+			traci.vehicle.add(vehicleId, routeId, -2, 0, 0, 0, constants.DEFAULT_VEHICLE_TYPE)
+			traci.vehicle.setStop(vehicleId, edgeBlocked, laneLength, laneIndex, 2147483646)
+			mtraci.release()
+			
+			cpt += 1
+			laneIndex += 1
+			laneBlocked = laneBlocked[:-1] + str(laneIndex)
 			
 	sendAck(constants.PRINT_PREFIX_GRAPH, returnCode, outputSocket)
 	return cpt
@@ -618,16 +620,16 @@ def unblockEdges(mtraci, edgesBlocked, outputSocket):
 			mtraci.acquire()
 			blockedVehicles = traci.edge.getLastStepVehicleIDs(edgeBlocked)
 			mtraci.release()
-			
-			for blockedVehicle in blockedVehicles:
-				if blockedvehicle.startswith(constants.BLOCKED_VEHICLE_ID_PREFIX):
-					mtraci.acquire()
-					traci.vehicle.remove(vehicleId)
-					mtraci.release()
 		except:
 			mtraci.release()
-			returnCode = constants.GRAPH_UNKNOWN_EDGE
-		
+			sendAck(constants.PRINT_PREFIX_GRAPH, constants.GRAPH_UNKNOWN_EDGE, outputSocket)
+			return
+			
+		for blockedVehicle in blockedVehicles:
+			if blockedVehicle.startswith(constants.BLOCKED_VEHICLE_ID_PREFIX):
+				mtraci.acquire()
+				traci.vehicle.remove(blockedVehicle)
+				mtraci.release()
 				
 	sendAck(constants.PRINT_PREFIX_GRAPH, returnCode, outputSocket)
 	

@@ -20,7 +20,6 @@ src.constants.ROUTE_ID_PREFIX	src.constants-module.html#ROUTE_ID_PREFIX
 src.constants.SUMO_CONFIG_DICT	src.constants-module.html#SUMO_CONFIG_DICT
 src.constants.addNetworkToConfigDict	src.constants-module.html#addNetworkToConfigDict
 src.constants.ROUTE_TIMEOUT_ERROR	src.constants-module.html#ROUTE_TIMEOUT_ERROR
-src.constants.MANAGER_OUTPUT_PORT	src.constants-module.html#MANAGER_OUTPUT_PORT
 src.constants.TLL_NUMBER_PER_MESSAGE	src.constants-module.html#TLL_NUMBER_PER_MESSAGE
 src.constants.ACKNOWLEDGE_HEADER	src.constants-module.html#ACKNOWLEDGE_HEADER
 src.constants.SUMO_DIRECTORY	src.constants-module.html#SUMO_DIRECTORY
@@ -46,19 +45,17 @@ src.constants.VEHICLE_DELETE_FAILED_UNKNOWN	src.constants-module.html#VEHICLE_DE
 src.constants.TRACI_EXCEPTION	src.constants-module.html#TRACI_EXCEPTION
 src.constants.SUMO_TOOLS_DIRECTORY	src.constants-module.html#SUMO_TOOLS_DIRECTORY
 src.constants.TLL_OUTPUT_PORT	src.constants-module.html#TLL_OUTPUT_PORT
-src.constants.SERVER	src.constants-module.html#SERVER
 src.constants.SUMO_GRAPH_FILE	src.constants-module.html#SUMO_GRAPH_FILE
 src.constants.INVALID_MESSAGE	src.constants-module.html#INVALID_MESSAGE
 src.constants.EDGE_ID_RESPONSE_HEADER	src.constants-module.html#EDGE_ID_RESPONSE_HEADER
 src.constants.VEHICLE_MOCK_FAILED	src.constants-module.html#VEHICLE_MOCK_FAILED
-src.constants.COLOGNE_CONFIG_FILE	src.constants-module.html#COLOGNE_CONFIG_FILE
 src.constants.GRAPH_ENABLED	src.constants-module.html#GRAPH_ENABLED
 src.constants.PRIORITY_VEHICLE	src.constants-module.html#PRIORITY_VEHICLE
 src.constants.DUBLIN_CONFIG_FILE	src.constants-module.html#DUBLIN_CONFIG_FILE
 src.constants.GEOGRAPHIC_COORDS	src.constants-module.html#GEOGRAPHIC_COORDS
 src.constants.UNBLOCK_EDGE_REQUEST_HEADER	src.constants-module.html#UNBLOCK_EDGE_REQUEST_HEADER
 src.constants.XML_TRIPS_ELEMENT	src.constants-module.html#XML_TRIPS_ELEMENT
-src.constants.GRAPH_INVALID_BLOCK_MSG	src.constants-module.html#GRAPH_INVALID_BLOCK_MSG
+src.constants.PRIORITY_VEHICLE_KM_PER_HOUR_SPEED	src.constants-module.html#PRIORITY_VEHICLE_KM_PER_HOUR_SPEED
 src.constants.ROUTER_OUTPUT_PORT	src.constants-module.html#ROUTER_OUTPUT_PORT
 src.constants.END_OF_LINE	src.constants-module.html#END_OF_LINE
 src.constants.TLL_INPUT_PORT	src.constants-module.html#TLL_INPUT_PORT
@@ -142,8 +139,7 @@ src.constants.EDGES_CONGESTION_RESPONSE_HEADER	src.constants-module.html#EDGES_C
 src.constants.IGNORE	src.constants-module.html#IGNORE
 src.constants.SUMO_GUI_START_COMMAND	src.constants-module.html#SUMO_GUI_START_COMMAND
 src.constants.PRINT_PREFIX_DUAROUTER	src.constants-module.html#PRINT_PREFIX_DUAROUTER
-src.constants.PRIORITY_VEHICLE_KM_PER_HOUR_SPEED	src.constants-module.html#PRIORITY_VEHICLE_KM_PER_HOUR_SPEED
-src.constants.COLOGNE_NET_FILE	src.constants-module.html#COLOGNE_NET_FILE
+src.constants.GRAPH_INVALID_BLOCK_MSG	src.constants-module.html#GRAPH_INVALID_BLOCK_MSG
 src.constants.XML_COST_ATTRIBUTE	src.constants-module.html#XML_COST_ATTRIBUTE
 src.constants.XML_EDGE_FROM_JUNCTION	src.constants-module.html#XML_EDGE_FROM_JUNCTION
 src.constants.LOGGER_ID	src.constants-module.html#LOGGER_ID
@@ -188,7 +184,6 @@ src.constants.TLL_PHASE_STATE_ERROR	src.constants-module.html#TLL_PHASE_STATE_ER
 src.constants.ROUTER_INPUT_PORT	src.constants-module.html#ROUTER_INPUT_PORT
 src.constants.XML_LANE_ELEMENT	src.constants-module.html#XML_LANE_ELEMENT
 src.constants.SUMO_GUI_SETTINGS_FILE	src.constants-module.html#SUMO_GUI_SETTINGS_FILE
-src.constants.COLOGNE_NETWORK_ID	src.constants-module.html#COLOGNE_NETWORK_ID
 src.constants.BLOCKED_VEHICLE_ID_PREFIX	src.constants-module.html#BLOCKED_VEHICLE_ID_PREFIX
 src.constants.DUBLIN_NET_FILE	src.constants-module.html#DUBLIN_NET_FILE
 src.constants.ROUTING_REQUEST_HEADER	src.constants-module.html#ROUTING_REQUEST_HEADER

@@ -80,7 +80,7 @@ def initTraciConnection(traciPort, maxRetry):
 			traci.init(traciPort)
 			traciInit = True
 		except:
-			Logger.info("{}Traci initialisation on port {} failed. Retrying connection in {} seconds...".format(constants.PRINT_PREFIX_MANAGER, traciPort, sleep))
+			Logger.info("{}Traci initialization on port {} failed. Retrying connection in {} seconds...".format(constants.PRINT_PREFIX_MANAGER, traciPort, sleep))
 			time.sleep(sleep)
 			if sleep >= 4:
 				sleep = 5
@@ -89,7 +89,7 @@ def initTraciConnection(traciPort, maxRetry):
 			step += 1
 			
 	if not(traciInit):
-		Logger.error("{}Traci initialisation on port {} failed. Shutting down SUMO Manager".format(constants.PRINT_PREFIX_MANAGER, traciPort))
+		Logger.error("{}Traci initialization on port {} failed. Shutting down SUMO Manager".format(constants.PRINT_PREFIX_MANAGER, traciPort))
 		sys.stdout.flush()
 		sys.exit(0)
 		
@@ -100,7 +100,7 @@ def deployThreads(mtraci, mRelaunch, mPriorityVehicle, eRouteReady, eGraphReady,
 	"""
 	Starts a SUMO subprocess, connects to TraCI then starts ASTra's threads
 	"""
-	#Building sockets and starting threads
+	# Building sockets and starting threads
 	if constants.GRAPH_ENABLED:
 		Logger.info("{}--------- Graph enabled --------".format(constants.PRINT_PREFIX_MANAGER))
 		graphInputSocket = acceptConnection(constants.HOST, constants.GRAPH_INPUT_PORT)
@@ -160,7 +160,7 @@ def shutdownThreads(eShutdown, graphThread, graphInputSocket, graphOutputSocket,
 	"""
 	eShutdown.set()
 	
-	#Closing sockets and waiting for the threads end
+	# Closing sockets and waiting for the threads end
 	if constants.SIMULATION_ENABLED:
 		simulatorOutputSocket.close()
 		simulatorThread.join()
@@ -187,15 +187,15 @@ def main():
 	"""
 	Logger.initLogger()
 	
-	#Automatic restart is the remote sockets are closed or if TraCI or SUMO crash
+	# Automatic restart is the remote sockets are closed or if TraCI or SUMO crash
 	while True:
-		#Variables
-		#Mutex
+		# Variables
+		# Mutex
 		mtraci = Lock()
 		mRelaunch = Lock()
 		mPriorityVehicle = Lock()
 		mVehicles = Lock()
-		#Events
+		# Events
 		eRouteReady = threading.Event()
 		eGraphReady = threading.Event()
 		eVehicleReady = threading.Event()
@@ -203,7 +203,7 @@ def main():
 		eSimulationReady = threading.Event()
 		eShutdown = threading.Event()
 		eManagerReady = threading.Event()
-		#Vehicles list
+		# Vehicles list
 		priorityVehicles = []
 		vehicles = []
 		
@@ -214,13 +214,13 @@ def main():
 		if constants.POSIX_OS:
 			Logger.warning("You are running on a POSIX based operating system (See constants).\nThe screenshot functionality has been disabled for the traffic lights management.")
 		
-		#Starting SUMO
+		# Starting SUMO
 		startSUMO(constants.SUMO_GUI_START_COMMAND)
 		
-		#Connecting to TraCI
+		# Connecting to TraCI
 		initTraciConnection(constants.TRACI_PORT, constants.TRACI_CONNECT_MAX_STEPS)
 		
-		#Building dictionaries
+		# Building dictionaries
 		if constants.ROUTING_ENABLED or constants.GRAPH_ENABLED:
 			graphDict, junctionsDict, edgesDict = graph.getGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci)
 			
@@ -232,26 +232,26 @@ def main():
 			
 		graphThread, graphInputSocket, graphOutputSocket, routerThread, routerInputSocket, routerOutputSocket, orderThread, orderInputSocket, orderOutputSocket, trafficLightsThread, tllInputSocket, tllOutputSocket, simulatorThread, simulatorOutputSocket = deployThreads(mtraci, mRelaunch, mPriorityVehicle, eRouteReady, eGraphReady, eVehicleReady, eTrafficLightsReady, eSimulationReady, eShutdown, eManagerReady, priorityVehicles, graphDict, junctionsDict, edgesDict, vehicles, mVehicles)
 		
-		#Waiting for the threads to be ready
+		# Waiting for the threads to be ready
 		while not eGraphReady.is_set() or not eRouteReady.is_set() or not eVehicleReady.is_set() or not eTrafficLightsReady.is_set() or not eSimulationReady.is_set():
 			time.sleep(constants.SLEEP_SYNCHRONISATION)
 		
-		#Sending a ready message to the remote client
+		# Sending a ready message to the remote client
 		eManagerReady.set()
 		
 		Logger.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-				   + "+ Started app 'ASTra'                                     +\n"
-				   + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+				   +"+ Started app 'ASTra'                                      +\n"
+				   +"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 			
-		#Waiting for a TraCI exception
+		# Waiting for a TraCI exception
 		if constants.SIMULATION_ENABLED:
 			mRelaunch.acquire()
 		else:
-			#No redeployment if an error occurs
+			# No redeployment if an error occurs
 			while(True):
 				time.sleep(65536)
 		
-		#Asking for the threads to shutdown
+		# Asking for the threads to shutdown
 		Logger.info("{}Shutting down all threads. Preparing for redeployment...".format(constants.PRINT_PREFIX_MANAGER))
 		
 		shutdownThreads(eShutdown, graphThread, graphInputSocket, graphOutputSocket, routerThread, routerInputSocket, routerOutputSocket, orderThread, orderInputSocket, orderOutputSocket, trafficLightsThread, tllInputSocket, tllOutputSocket, simulatorThread, simulatorOutputSocket)

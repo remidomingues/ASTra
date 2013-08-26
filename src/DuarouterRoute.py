@@ -154,7 +154,7 @@ def processRouteRequest(src, destinations, junctionsDict):
 			return returnCode, None
 		
 		returnCode, tmpRoute = getBestRouteFromXml()
-		if returnCode !=0:
+		if returnCode != 0:
 			return returnCode, None
 		tmpRoute = correctRoute(src, dest, tmpRoute)
 
