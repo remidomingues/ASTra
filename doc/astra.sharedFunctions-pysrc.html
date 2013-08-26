@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>astra.sharedFunctions</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="astra-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="astra-module.html">Package&nbsp;astra</a> ::
+        Module&nbsp;sharedFunctions
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="astra.sharedFunctions-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="astra.sharedFunctions-module.html">Module astra.sharedFunctions</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment">#!/usr/bin/env python</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-docstring">@file    SUMOFunctions.py</tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-docstring">@author  Remi Domingues</tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-docstring">@date    27/07/2013</tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-docstring">This script contains some functions used in order to overcome some lack in TraCI functions,</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-docstring">or to the contrary avoid these call because of concurrent access to the TraCI resource.</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">os</tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Module astra.constants=astra.constants-module.html"><a title="astra.constants" class="py-name" href="#" onclick="return doclink('link-0', 'constants', 'link-0');">constants</a></tt> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-1" class="py-name" targets="Module astra.logger=astra.logger-module.html,Variable astra.logger.Logger.logger=astra.logger.Logger-class.html#logger"><a title="astra.logger
+astra.logger.Logger.logger" class="py-name" href="#" onclick="return doclink('link-1', 'logger', 'link-1');">logger</a></tt> <tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Class astra.logger.Logger=astra.logger.Logger-class.html"><a title="astra.logger.Logger" class="py-name" href="#" onclick="return doclink('link-2', 'Logger', 'link-2');">Logger</a></tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"> </tt>
+<a name="isJunction"></a><div id="isJunction-def"><a name="L16"></a><tt class="py-lineno">16</tt> <a class="py-toggle" href="#" id="isJunction-toggle" onclick="return toggle('isJunction');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="astra.sharedFunctions-module.html#isJunction">isJunction</a><tt class="py-op">(</tt><tt class="py-param">edgeId</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="isJunction-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="isJunction-expanded"><a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-docstring">    Returns true if the edge belongs to a junction</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">edgeId</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">==</tt> <tt class="py-string">':'</tt> </tt>
+</div><a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line"> </tt>
+<a name="getJunctionId"></a><div id="getJunctionId-def"><a name="L23"></a><tt class="py-lineno">23</tt> <a class="py-toggle" href="#" id="getJunctionId-toggle" onclick="return toggle('getJunctionId');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="astra.sharedFunctions-module.html#getJunctionId">getJunctionId</a><tt class="py-op">(</tt><tt class="py-param">junctionEdgeId</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="getJunctionId-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="getJunctionId-expanded"><a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line"><tt class="py-docstring">    Returns a junction ID from a hidden lane ID</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">junctionEdgeId</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">:</tt><tt class="py-name">junctionEdgeId</tt><tt class="py-op">.</tt><tt class="py-name">index</tt><tt class="py-op">(</tt><tt class="py-string">'_'</tt><tt class="py-op">)</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line"> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"> </tt>
+<a name="getEdgeFromLane"></a><div id="getEdgeFromLane-def"><a name="L30"></a><tt class="py-lineno">30</tt> <a class="py-toggle" href="#" id="getEdgeFromLane-toggle" onclick="return toggle('getEdgeFromLane');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="astra.sharedFunctions-module.html#getEdgeFromLane">getEdgeFromLane</a><tt class="py-op">(</tt><tt class="py-param">lane</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="getEdgeFromLane-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="getEdgeFromLane-expanded"><a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line"><tt class="py-docstring">    Returns the edge of the received lane</tt> </tt>
+<a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">lane</tt><tt class="py-op">.</tt><tt class="py-name">split</tt><tt class="py-op">(</tt><tt class="py-string">'_'</tt><tt class="py-op">)</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line"> </tt>
+<a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line"> </tt>
+<a name="getFirstLaneFromEdge"></a><div id="getFirstLaneFromEdge-def"><a name="L37"></a><tt class="py-lineno">37</tt> <a class="py-toggle" href="#" id="getFirstLaneFromEdge-toggle" onclick="return toggle('getFirstLaneFromEdge');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="astra.sharedFunctions-module.html#getFirstLaneFromEdge">getFirstLaneFromEdge</a><tt class="py-op">(</tt><tt class="py-param">edgeId</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="getFirstLaneFromEdge-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="getFirstLaneFromEdge-expanded"><a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line"><tt class="py-docstring">    Returns the first lane ID from and edge ID given in parameter</tt> </tt>
+<a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">edgeId</tt> <tt class="py-op">+</tt> <tt class="py-string">"_0"</tt> </tt>
+</div><a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line"> </tt>
+<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line"> </tt>
+<a name="getOppositeEdge"></a><div id="getOppositeEdge-def"><a name="L44"></a><tt class="py-lineno">44</tt> <a class="py-toggle" href="#" id="getOppositeEdge-toggle" onclick="return toggle('getOppositeEdge');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="astra.sharedFunctions-module.html#getOppositeEdge">getOppositeEdge</a><tt class="py-op">(</tt><tt class="py-param">edge</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="getOppositeEdge-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="getOppositeEdge-expanded"><a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line"><tt class="py-docstring">    Returns the opposite edge ID of the edge ID given in parameter</tt> </tt>
+<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">edge</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">==</tt> <tt class="py-string">'-'</tt><tt class="py-op">:</tt> </tt>
+<a name="L49"></a><tt class="py-lineno">49</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">edge</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">:</tt><tt class="py-op">]</tt> </tt>
+<a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-string">'-'</tt> <tt class="py-op">+</tt> <tt class="py-name">edge</tt> </tt>
+</div><a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line"> </tt>
+<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line"> </tt>
+<a name="isDictionaryOutOfDate"></a><div id="isDictionaryOutOfDate-def"><a name="L53"></a><tt class="py-lineno">53</tt> <a class="py-toggle" href="#" id="isDictionaryOutOfDate-toggle" onclick="return toggle('isDictionaryOutOfDate');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="astra.sharedFunctions-module.html#isDictionaryOutOfDate">isDictionaryOutOfDate</a><tt class="py-op">(</tt><tt class="py-param">dictionaryFile</tt><tt class="py-op">,</tt> <tt class="py-param">networkFile</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="isDictionaryOutOfDate-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="isDictionaryOutOfDate-expanded"><a name="L54"></a><tt class="py-lineno">54</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L55"></a><tt class="py-lineno">55</tt>  <tt class="py-line"><tt class="py-docstring">    Returns true if the dictionary file doesn't exist or is older than the network file the dictionary is based on</tt> </tt>
+<a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L57"></a><tt class="py-lineno">57</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">isfile</tt><tt class="py-op">(</tt><tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">abspath</tt><tt class="py-op">(</tt><tt class="py-name">dictionaryFile</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L58"></a><tt class="py-lineno">58</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">getmtime</tt><tt class="py-op">(</tt><tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">abspath</tt><tt class="py-op">(</tt><tt class="py-name">networkFile</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">getmtime</tt><tt class="py-op">(</tt><tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">abspath</tt><tt class="py-op">(</tt><tt class="py-name">dictionaryFile</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L59"></a><tt class="py-lineno">59</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+</div><a name="L60"></a><tt class="py-lineno">60</tt>  <tt class="py-line"> </tt>
+<a name="L61"></a><tt class="py-lineno">61</tt>  <tt class="py-line"> </tt>
+<a name="correctRoute"></a><div id="correctRoute-def"><a name="L62"></a><tt class="py-lineno">62</tt> <a class="py-toggle" href="#" id="correctRoute-toggle" onclick="return toggle('correctRoute');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="astra.sharedFunctions-module.html#correctRoute">correctRoute</a><tt class="py-op">(</tt><tt class="py-param">edgeSrc</tt><tt class="py-op">,</tt> <tt class="py-param">edgeDest</tt><tt class="py-op">,</tt> <tt class="py-param">route</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="correctRoute-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="correctRoute-expanded"><a name="L63"></a><tt class="py-lineno">63</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L64"></a><tt class="py-lineno">64</tt>  <tt class="py-line"><tt class="py-docstring">    Removes opposite edges in a route given in parameter, thanks to its source and destination edge ID</tt> </tt>
+<a name="L65"></a><tt class="py-lineno">65</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L66"></a><tt class="py-lineno">66</tt>  <tt class="py-line">    <tt class="py-comment"># Delete the first route element if this one is the opposite of the second</tt> </tt>
+<a name="L67"></a><tt class="py-lineno">67</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt id="link-3" class="py-name" targets="Module astra.route=astra.route-module.html"><a title="astra.route" class="py-name" href="#" onclick="return doclink('link-3', 'route', 'link-3');">route</a></tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">1</tt> <tt class="py-keyword">and</tt> <tt class="py-op">(</tt><tt class="py-keyword">not</tt><tt class="py-op">(</tt><tt id="link-4" class="py-name" targets="Function astra.sharedFunctions.isJunction()=astra.sharedFunctions-module.html#isJunction"><a title="astra.sharedFunctions.isJunction" class="py-name" href="#" onclick="return doclink('link-4', 'isJunction', 'link-4');">isJunction</a></tt><tt class="py-op">(</tt><tt class="py-name">edgeSrc</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-keyword">and</tt> <tt id="link-5" class="py-name"><a title="astra.route" class="py-name" href="#" onclick="return doclink('link-5', 'route', 'link-3');">route</a></tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt> <tt class="py-op">==</tt> <tt id="link-6" class="py-name" targets="Function astra.sharedFunctions.getOppositeEdge()=astra.sharedFunctions-module.html#getOppositeEdge"><a title="astra.sharedFunctions.getOppositeEdge" class="py-name" href="#" onclick="return doclink('link-6', 'getOppositeEdge', 'link-6');">getOppositeEdge</a></tt><tt class="py-op">(</tt><tt class="py-name">edgeSrc</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt id="link-7" class="py-name"><a title="astra.sharedFunctions.isJunction" class="py-name" href="#" onclick="return doclink('link-7', 'isJunction', 'link-4');">isJunction</a></tt><tt class="py-op">(</tt><tt class="py-name">edgeSrc</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L68"></a><tt class="py-lineno">68</tt>  <tt class="py-line">        <tt id="link-8" class="py-name"><a title="astra.route" class="py-name" href="#" onclick="return doclink('link-8', 'route', 'link-3');">route</a></tt><tt class="py-op">.</tt><tt class="py-name">pop</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L69"></a><tt class="py-lineno">69</tt>  <tt class="py-line">         </tt>
+<a name="L70"></a><tt class="py-lineno">70</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt id="link-9" class="py-name"><a title="astra.route" class="py-name" href="#" onclick="return doclink('link-9', 'route', 'link-3');">route</a></tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">1</tt> <tt class="py-keyword">and</tt> <tt id="link-10" class="py-name"><a title="astra.sharedFunctions.isJunction" class="py-name" href="#" onclick="return doclink('link-10', 'isJunction', 'link-4');">isJunction</a></tt><tt class="py-op">(</tt><tt class="py-name">edgeDest</tt><tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt id="link-11" class="py-name"><a title="astra.route" class="py-name" href="#" onclick="return doclink('link-11', 'route', 'link-3');">route</a></tt><tt class="py-op">[</tt><tt class="py-op">-</tt><tt class="py-number">2</tt><tt class="py-op">]</tt> <tt class="py-op">==</tt> <tt id="link-12" class="py-name"><a title="astra.sharedFunctions.getOppositeEdge" class="py-name" href="#" onclick="return doclink('link-12', 'getOppositeEdge', 'link-6');">getOppositeEdge</a></tt><tt class="py-op">(</tt><tt class="py-name">edgeDest</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L71"></a><tt class="py-lineno">71</tt>  <tt class="py-line">            <tt id="link-13" class="py-name"><a title="astra.route" class="py-name" href="#" onclick="return doclink('link-13', 'route', 'link-3');">route</a></tt><tt class="py-op">.</tt><tt class="py-name">pop</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L72"></a><tt class="py-lineno">72</tt>  <tt class="py-line">         </tt>
+<a name="L73"></a><tt class="py-lineno">73</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt id="link-14" class="py-name"><a title="astra.route" class="py-name" href="#" onclick="return doclink('link-14', 'route', 'link-3');">route</a></tt> </tt>
+</div><a name="L74"></a><tt class="py-lineno">74</tt>  <tt class="py-line"> </tt>
+<a name="L75"></a><tt class="py-lineno">75</tt>  <tt class="py-line"> </tt>
+<a name="sendAck"></a><div id="sendAck-def"><a name="L76"></a><tt class="py-lineno">76</tt> <a class="py-toggle" href="#" id="sendAck-toggle" onclick="return toggle('sendAck');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="astra.sharedFunctions-module.html#sendAck">sendAck</a><tt class="py-op">(</tt><tt class="py-param">printPrefix</tt><tt class="py-op">,</tt> <tt class="py-param">code</tt><tt class="py-op">,</tt> <tt class="py-param">outputSocket</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="sendAck-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="sendAck-expanded"><a name="L77"></a><tt class="py-lineno">77</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L78"></a><tt class="py-lineno">78</tt>  <tt class="py-line"><tt class="py-docstring">    Send an acknowledge with a return code to the remote client</tt> </tt>
+<a name="L79"></a><tt class="py-lineno">79</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L80"></a><tt class="py-lineno">80</tt>  <tt class="py-line">    <tt class="py-name">ack</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L81"></a><tt class="py-lineno">81</tt>  <tt class="py-line">    <tt class="py-name">ack</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-15" class="py-name"><a title="astra.constants" class="py-name" href="#" onclick="return doclink('link-15', 'constants', 'link-0');">constants</a></tt><tt class="py-op">.</tt><tt id="link-16" class="py-name" targets="Variable astra.constants.ACKNOWLEDGE_HEADER=astra.constants-module.html#ACKNOWLEDGE_HEADER"><a title="astra.constants.ACKNOWLEDGE_HEADER" class="py-name" href="#" onclick="return doclink('link-16', 'ACKNOWLEDGE_HEADER', 'link-16');">ACKNOWLEDGE_HEADER</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L82"></a><tt class="py-lineno">82</tt>  <tt class="py-line">    <tt class="py-name">ack</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-17" class="py-name"><a title="astra.constants" class="py-name" href="#" onclick="return doclink('link-17', 'constants', 'link-0');">constants</a></tt><tt class="py-op">.</tt><tt id="link-18" class="py-name" targets="Variable astra.constants.SEPARATOR=astra.constants-module.html#SEPARATOR"><a title="astra.constants.SEPARATOR" class="py-name" href="#" onclick="return doclink('link-18', 'SEPARATOR', 'link-18');">SEPARATOR</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L83"></a><tt class="py-lineno">83</tt>  <tt class="py-line">    <tt class="py-name">ack</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">code</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L84"></a><tt class="py-lineno">84</tt>  <tt class="py-line">    <tt class="py-name">ack</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-19" class="py-name"><a title="astra.constants" class="py-name" href="#" onclick="return doclink('link-19', 'constants', 'link-0');">constants</a></tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="astra.constants.SEPARATOR" class="py-name" href="#" onclick="return doclink('link-20', 'SEPARATOR', 'link-18');">SEPARATOR</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L85"></a><tt class="py-lineno">85</tt>  <tt class="py-line">    <tt class="py-name">ack</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-21" class="py-name"><a title="astra.constants" class="py-name" href="#" onclick="return doclink('link-21', 'constants', 'link-0');">constants</a></tt><tt class="py-op">.</tt><tt id="link-22" class="py-name" targets="Variable astra.constants.END_OF_MESSAGE=astra.constants-module.html#END_OF_MESSAGE"><a title="astra.constants.END_OF_MESSAGE" class="py-name" href="#" onclick="return doclink('link-22', 'END_OF_MESSAGE', 'link-22');">END_OF_MESSAGE</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L86"></a><tt class="py-lineno">86</tt>  <tt class="py-line">         </tt>
+<a name="L87"></a><tt class="py-lineno">87</tt>  <tt class="py-line">    <tt class="py-name">strmsg</tt> <tt class="py-op">=</tt> <tt class="py-string">''</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-name">ack</tt><tt class="py-op">)</tt> </tt>
+<a name="L88"></a><tt class="py-lineno">88</tt>  <tt class="py-line">    <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L89"></a><tt class="py-lineno">89</tt>  <tt class="py-line">        <tt class="py-name">outputSocket</tt><tt class="py-op">.</tt><tt class="py-name">send</tt><tt class="py-op">(</tt><tt class="py-name">strmsg</tt><tt class="py-op">.</tt><tt class="py-name">encode</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L90"></a><tt class="py-lineno">90</tt>  <tt class="py-line">    <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L91"></a><tt class="py-lineno">91</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt id="link-23" class="py-name"><a title="astra.constants" class="py-name" href="#" onclick="return doclink('link-23', 'constants', 'link-0');">constants</a></tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Class astra.constants.ClosedSocketException=astra.constants.ClosedSocketException-class.html"><a title="astra.constants.ClosedSocketException" class="py-name" href="#" onclick="return doclink('link-24', 'ClosedSocketException', 'link-24');">ClosedSocketException</a></tt><tt class="py-op">(</tt><tt class="py-string">"The listening socket has been closed"</tt><tt class="py-op">)</tt> </tt>
+<a name="L92"></a><tt class="py-lineno">92</tt>  <tt class="py-line">    <tt id="link-25" class="py-name"><a title="astra.logger.Logger" class="py-name" href="#" onclick="return doclink('link-25', 'Logger', 'link-2');">Logger</a></tt><tt class="py-op">.</tt><tt id="link-26" class="py-name" targets="Static Method astra.logger.Logger.infoFile()=astra.logger.Logger-class.html#infoFile"><a title="astra.logger.Logger.infoFile" class="py-name" href="#" onclick="return doclink('link-26', 'infoFile', 'link-26');">infoFile</a></tt><tt class="py-op">(</tt><tt class="py-string">"{} Message sent: {}"</tt><tt class="py-op">.</tt><tt class="py-name">format</tt><tt class="py-op">(</tt><tt class="py-name">printPrefix</tt><tt class="py-op">,</tt> <tt class="py-name">strmsg</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L93"></a><tt class="py-lineno">93</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="astra-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Mon Aug 26 21:31:35 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

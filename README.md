@@ -23,11 +23,11 @@ bugs and extending functionalities.
 
 
 
-Using ASTra
-===========
-This library is compatible with Python 2.7.2 and has been tested on Ubuntu 13.04 
-(3.8.0-27 linux kernel), Linux Mint 14 (3.5.0-36 linux kernel), Linux Mint 15
-(3.8.0-26 linux kernel), Windows 7 and Windows 8. SUMO 0.16.0 is required.
+Requirements
+============
+This library is compatible with Python 2.7 and SUMO 0.16.0. It has been tested on
+Ubuntu 13.04  (3.8.0-27 linux kernel), Linux Mint 14 (3.5.0-36 linux kernel),
+Linux Mint 15 (3.8.0-26 linux kernel), Windows 7 and Windows 8.
 
 The default network loaded by ASTra is the Dublin one.
 Before starting ASTra, please modify the following constants in the constants.py file:
@@ -35,11 +35,16 @@ Before starting ASTra, please modify the following constants in the constants.py
 	POSIX_OS = {True,False}
 	ASTRA_DIRECTORY = <ASTRA_ABSOLUTE_DIRECTORY>
 	SUMO_DIRECTORY = <SUMO_INSTALLATION_DIRECTORY>
+	
+Make sure to have Python 2.7 and SUMO 0.16.0 (or higher but untested) installed.
+Your python installation directory must also be added to your PATH environment
+variable.
 
 
 
-For starting the application, please install Python 2.7.2 and SUMO 0.16.0 then execute
-the following command in a shell:
+Using ASTra
+===========
+Execute the command below in a shell for starting ASTra:
 
 	python <ASTRA_MANAGER_FILE_PATH>
 
@@ -49,10 +54,17 @@ code lines:
 	FileInputStream pythonScript = new FileInputStream(new File(<ASTRA_MANAGER_FILE_PATH>));
 	interpreter.execfile(pythonScript);
 
+ASTra will then wait for connections on ports 18001 to 18009. Less connections can be
+made if disabling functionalities. The connections are done in the port ascending order.
+Check files description for more information about socket messages.
+
 	
-For adding a network to simulate to ASTra, you must add your network file, (.net.xml)
-and you configuration file (.sumocfg) in the config folder. You can also use any SUMO
-compatible file and specify them in your .sumocfg file, they will be loaded when
+	
+Managing the SUMO networks
+==========================
+If you want to simulate a SUMO compatible network, you must add your network file,
+(.net.xml) and your configuration file (.sumocfg) in the config folder. You can also use
+any SUMO compatible file and specify them in your .sumocfg file, they will be loaded when
 starting SUMO. Please make sure the TRACI_PORT constant is the same than the one
 specified in the .sumocfg file. Then, add the following lines in the constants.py file:
 
@@ -61,16 +73,10 @@ specified in the .sumocfg file. Then, add the following lines in the constants.p
 	MY_NETWORK_NET_FILE = CONFIG_DIRECTORY + "/myNetwork.net.xml"
 	addNetworkToConfigDict(MY_NETWORK_NETWORK_ID, MY_NETWORK_ID, MY_NETWORK_NET_FILE)
 
-
 This will add your network to ASTra's networks directory. If you want to use this
 network, modify the following constant value:
 
 	SUMO_CHOSEN_NETWORK = MY_NETWORK_ID
-
-	
-ASTra will then wait for connections on ports 18001 to 18009. Less connections can be
-made if disabling functionalities. The connections are done in the port ascending order.
-Check files descriptions for socket messages.
 	
 
 
