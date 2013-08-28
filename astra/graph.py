@@ -101,7 +101,7 @@ def exportJunctionsDictionary(junctionsDict):
     """
     Writes the junctions dictionary in an output file
     """
-    Logger.info("{}Exporting junctions dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Exporting junctions dictionary...".format(constants.PRINT_PREFIX_GRAPH))
     junctionsFile = open(constants.SUMO_JUNCTIONS_DICTIONARY_FILE, 'w')
     
     for pair in junctionsDict.items():
@@ -127,14 +127,14 @@ def exportJunctionsDictionary(junctionsDict):
         junctionsFile.write(constants.END_OF_LINE)
         
     junctionsFile.close()
-    Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_GRAPH))
     
     
 def importJunctionsDictionary():
     """
     Reads the junctions dictionary from an input file
     """
-    Logger.info("{}Importing junctions dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Importing junctions dictionary...".format(constants.PRINT_PREFIX_GRAPH))
     junctionsFile = open(constants.SUMO_JUNCTIONS_DICTIONARY_FILE, 'r')
     junctionsDict = dict()
     
@@ -156,7 +156,7 @@ def importJunctionsDictionary():
         key = junctionsFile.readline()[0:-1]
     
     junctionsFile.close()
-    Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_GRAPH))
     return junctionsDict
 
 
@@ -170,7 +170,7 @@ def exportEdgesDictionary(edgesDict):
     """
     Writes the edges dictionary in an output edgesFile
     """
-    Logger.info("{}Exporting edges dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Exporting edges dictionary...".format(constants.PRINT_PREFIX_GRAPH))
     edgesFile = open(constants.SUMO_EDGES_DICTIONARY_FILE, 'w')
     
     for pair in edgesDict.items():
@@ -182,14 +182,14 @@ def exportEdgesDictionary(edgesDict):
         edgesFile.write(constants.END_OF_LINE)
 
     edgesFile.close()
-    Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_GRAPH))
     
     
 def importEdgesDictionary():
     """
     Reads the edges dictionary from an input edgesFile
     """
-    Logger.info("{}Importing edges dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Importing edges dictionary...".format(constants.PRINT_PREFIX_GRAPH))
     edgesFile = open(constants.SUMO_EDGES_DICTIONARY_FILE, 'r')
     edgesDict = dict()
     
@@ -200,7 +200,7 @@ def importEdgesDictionary():
         line = edgesFile.readline()[0:-1]
         
     edgesFile.close()
-    Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_GRAPH))
     return edgesDict
 
 
@@ -214,7 +214,7 @@ def exportGraph(graphDict):
     """
     Writes the graph in an output file
     """
-    Logger.info("{}Exporting graph...".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Exporting graph...".format(constants.PRINT_PREFIX_GRAPH))
     graphFile = open(constants.SUMO_GRAPH_FILE, 'w')
     
     for pair in graphDict.items():
@@ -229,14 +229,14 @@ def exportGraph(graphDict):
         graphFile.write(constants.END_OF_LINE)
         
     graphFile.close()
-    Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_GRAPH))
     
     
 def importGraph():
     """
     Reads the network graph from an input graphFile
     """
-    Logger.info("{}Importing graph...".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Importing graph...".format(constants.PRINT_PREFIX_GRAPH))
     graphFile = open(constants.SUMO_GRAPH_FILE, 'r')
     graphDict = dict()
     
@@ -256,7 +256,7 @@ def importGraph():
         line = graphFile.readline()[0:-1]
     
     graphFile.close()
-    Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_GRAPH))
     return graphDict
 
 
@@ -332,7 +332,7 @@ def buildGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci):
     - A junctions dictionary as {Key=junctionId, Value=[Set(edgesId predecessors of the junction), Set(edgesId successors of the junction)]
     - An edges dictionary as {Key=edgeId, Value=[junction predecessor, junction successor]
     """
-    Logger.info("{}Building graph, junctions dictionary and edges dictionary...".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Building graph, junctions dictionary and edges dictionary...".format(constants.PRINT_PREFIX_GRAPH))
     
     # Initializing variables
     graphDict = dict()
@@ -344,7 +344,7 @@ def buildGraphAndJunctionsDictionaryAndEdgesDictionary(mtraci):
     parser.setContentHandler(NetworkHandler(graphDict, junctionsDict, edgesDict, mtraci))
     parser.parse(constants.SUMO_NETWORK_FILE)
         
-    Logger.info("{}Done".format(constants.PRINT_PREFIX_DIJKSTRA))
+    Logger.info("{}Done".format(constants.PRINT_PREFIX_GRAPH))
     return graphDict, junctionsDict, edgesDict
 
 
@@ -678,6 +678,12 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eGraphReady, eManagerReady
             
             for cmd in listCommands:
                 if len(cmd) != 0:
+                    if cmd[-1] == constants.END_OF_LINE or cmd[-1] == '\r':
+                        cmd = cmd[:-1]
+                        
+                    if len(cmd) != 0 and (cmd[-1] == constants.END_OF_LINE or cmd[-1] == '\r'):
+                        cmd = cmd[:-1]
+                        
                     command = cmd.split(constants.SEPARATOR)
                     commandSize = len(command)
                     

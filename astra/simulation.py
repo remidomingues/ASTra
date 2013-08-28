@@ -88,18 +88,14 @@ def run(mtraci, outputSocket, mRelaunch, eShutdown, eSimulationReady, priorityVe
 
     while not eShutdown.is_set():
         startTime = time.clock()
-        
         try:
             mVehicles.acquire()
             runSimulationStep(mtraci)
-            
             notifyAndUpdateArrivedVehicles(mtraci, outputSocket, priorityVehicles, mPriorityVehicles, managedTllDict, vehicles)
             mVehicles.release()
-            
             if constants.SEND_VEHICLES_COORDS and (constants.SEND_MSG_EVEN_IF_EMPTY or (not constants.SEND_MSG_EVEN_IF_EMPTY and vehicles)):
                 sendVehiclesCoordinates(vehicles, mtraci, outputSocket, mVehicles)
                 
-            
             updateTllForPriorityVehicles(mtraci, priorityVehicles, mPriorityVehicles, tllDict, yellowTllDict, managedTllDict)
 
         except Exception as e:

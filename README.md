@@ -34,7 +34,9 @@ Before starting ASTra, please modify the following constants in the constants.py
 
 	POSIX_OS = {True,False}
 	ASTRA_DIRECTORY = <ASTRA_ABSOLUTE_DIRECTORY>
-	SUMO_DIRECTORY = <SUMO_INSTALLATION_DIRECTORY>
+	SUMO_TOOLS_DIRECTORY = <SUMO_TOOLS_DIRECTORY>
+	SUMO_BINARY = <SUMO_BINARY_FILE_PATH>
+	DUAROUTER_BINARY = <DUAROUTER_BINARY_FILE_PATH>
 	
 Make sure to have Python 2.7 and SUMO 0.16.0 (or higher but untested) installed.
 Your python installation directory must also be added to your PATH environment
@@ -71,7 +73,9 @@ specified in the .sumocfg file. Then, add the following lines in the constants.p
 	MY_NETWORK_ID = "myNetwork"
 	MY_NETWORK_CONFIG_FILE = CONFIG_DIRECTORY + "/myNetwork.sumocfg"
 	MY_NETWORK_NET_FILE = CONFIG_DIRECTORY + "/myNetwork.net.xml"
-	addNetworkToConfigDict(MY_NETWORK_NETWORK_ID, MY_NETWORK_ID, MY_NETWORK_NET_FILE)
+	SUMO_CONFIG_DICT[MY_NETWORK_NETWORK_ID] = 
+		getNetworkFilesDict(MY_NETWORK_NETWORK_ID, MY_NETWORK_CONFIG_FILE, 
+			MY_NETWORK_NET_FILE)
 
 This will add your network to ASTra's networks directory. If you want to use this
 network, modify the following constant value:

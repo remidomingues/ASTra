@@ -107,13 +107,13 @@ def getEdgeFromCoords(lon, lat, mtraci):
     """
     Return a SUMO edge ID from geographic coordinates
     """
-    mtraci.acquire()
     try:
+        mtraci.acquire()
         edge = traci.simulation.convertRoad(lat, lon, True)[0]
+        mtraci.release()
     except:
         mtraci.release()
         raise
-    mtraci.release()
     return edge
 
 
@@ -176,6 +176,12 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eRouteReady, eManagerReady
             
             for cmd in listCommands:
                 if len(cmd) != 0:
+                    if cmd[-1] == constants.END_OF_LINE or cmd[-1] == '\r':
+                        cmd = cmd[:-1]
+                        
+                    if len(cmd) != 0 and (cmd[-1] == constants.END_OF_LINE or cmd[-1] == '\r'):
+                        cmd = cmd[:-1]
+                        
                     command = cmd.split(constants.SEPARATOR)
                     commandSize = len(command)
                     

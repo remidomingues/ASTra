@@ -29,8 +29,8 @@ try:
     astraDirectory = os.path.dirname(currentDirectory)
     sys.path.append(os.path.dirname(sys.argv[0]))
 except:
-    sys.path.append(os.path.abspath('../apps/cardemo/astra/src'))
-    sys.path.append(os.path.abspath('src/main/app/astra/src'))
+    sys.path.append(os.path.abspath('../apps/cardemo/astra/astra'))
+    sys.path.append(os.path.abspath('src/main/app/astra/astra'))
 
 import constants
 import simulation
@@ -229,9 +229,9 @@ def main():
             vehicles = traci.vehicle.getIDList()
             mtraci.release()
             vehicles = vehicle.getRegularVehicles(vehicles)
-            
-        graphThread, graphInputSocket, graphOutputSocket, routerThread, routerInputSocket, routerOutputSocket, orderThread, orderInputSocket, orderOutputSocket, trafficLightsThread, tllInputSocket, tllOutputSocket, simulatorThread, simulatorOutputSocket = deployThreads(mtraci, mRelaunch, mPriorityVehicle, eRouteReady, eGraphReady, eVehicleReady, eTrafficLightsReady, eSimulationReady, eShutdown, eManagerReady, priorityVehicles, graphDict, junctionsDict, edgesDict, vehicles, mVehicles)
         
+        graphThread, graphInputSocket, graphOutputSocket, routerThread, routerInputSocket, routerOutputSocket, orderThread, orderInputSocket, orderOutputSocket, trafficLightsThread, tllInputSocket, tllOutputSocket, simulatorThread, simulatorOutputSocket = deployThreads(mtraci, mRelaunch, mPriorityVehicle, eRouteReady, eGraphReady, eVehicleReady, eTrafficLightsReady, eSimulationReady, eShutdown, eManagerReady, priorityVehicles, graphDict, junctionsDict, edgesDict, vehicles, mVehicles)
+
         # Waiting for the threads to be ready
         while not eGraphReady.is_set() or not eRouteReady.is_set() or not eVehicleReady.is_set() or not eTrafficLightsReady.is_set() or not eSimulationReady.is_set():
             time.sleep(constants.SLEEP_SYNCHRONISATION)

@@ -69,6 +69,13 @@ class Logger:
         Write an info message in the log file
         """
         Logger.logFile(logging.INFO, message)
+        
+    @staticmethod
+    def exceptionFile(e):
+        """
+        Write an exception stacktrace in the log file
+        """
+        Logger.logger.exception(e)
 
     @staticmethod
     def logFile(level, message):

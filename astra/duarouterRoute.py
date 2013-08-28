@@ -25,6 +25,7 @@ from xml.dom.minidom import Document
 from sharedFunctions import getJunctionId
 from sharedFunctions import isJunction
 from sharedFunctions import correctRoute
+from sharedFunctions import getOppositeEdge
 
 
 def removeRoutingFiles():
@@ -138,28 +139,62 @@ def processRouteRequest(src, destinations, junctionsDict):
     """
     route = []
     first = True
+    
+    if isJunction(src):
+        #src become an edge predecessor of the src junction
+        src = iter(junctionsDict[getJunctionId(src)][0]).next()
+        srcJunction = True
+    else:
+        srcJunction = False
 
     for dest in destinations:
+        if isJunction(dest):
+            #dest become an edge successor of the dest junction
+            dest = iter(junctionsDict[getJunctionId(dest)][1]).next()
+            destJunction = True
+        else:
+            destJunction = False
+        
+        #Removing temporary routing files
         removeRoutingFiles()
-        trips = getTrips(src, dest, junctionsDict)
-        writeTrips(trips)
+        #Writing them in an XML file
+        writeTrips([src, dest])
+        #Running Duarouter
         returnCode = runDuarouterRouteSolver()
         if returnCode != 0:
             return returnCode, None
         
+        #Getting the best route from the XML result file
         returnCode, tmpRoute = getBestRouteFromXml()
-        if returnCode != 0:
+        if returnCode !=0:
             return returnCode, None
-        tmpRoute = correctRoute(src, dest, tmpRoute)
-
-        if first:
-            first = False
-        else:
-            tmpRoute.pop(0)
         
+        #Removing the first edge if it's the first routing and we find recurrence
+        if first and srcJunction and tmpRoute:
+            tmpRoute.pop(0)
+        elif first and len(tmpRoute) > 1 and tmpRoute[1] == getOppositeEdge(tmpRoute[0]):
+            tmpRoute.pop(0)
+            
+        #Removing the last edge if it was a junctions from start
+        if destJunction and tmpRoute:
+            tmpRoute.pop()
+
+        #Removing the first edge of routings with via points in order to avoid two identical edges when extending road
+        if not first:
+            tmpRoute.pop(0)
+            
+        #Adding the calculated routing to the main routing
         route.extend(tmpRoute)
-        if len(tmpRoute) != 0:
+        first = False
+        
+        #Updating source edge for the next routing
+        if tmpRoute:
             src = tmpRoute[-1]
+        else:
+            src = dest
+        
     
+    if len(route) > 1 and route[-2] == getOppositeEdge(route[-1]):
+        route.pop()
     
     return 0, route

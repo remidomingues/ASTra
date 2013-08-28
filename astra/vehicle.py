@@ -221,9 +221,10 @@ def removeVehicles(vehiclesToDel, priorityVehicles, mPriorityVehicles, mtraci, o
         try:
             mtraci.acquire()
             traci.vehicle.remove(vehicleToDel)
+            mtraci.release()
         except:
+            mtraci.release()
             returnCode = constants.VEHICLE_DELETE_FAILED_UNKNOWN
-        mtraci.release()
     mVehicles.release()
     
     sendAck(constants.PRINT_PREFIX_VEHICLE, returnCode, outputSocket)
@@ -396,6 +397,12 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, priorityVehicles, mPriorit
             
             for cmd in listCommands:
                 if len(cmd) != 0:
+                    if cmd[-1] == constants.END_OF_LINE or cmd[-1] == '\r':
+                        cmd = cmd[:-1]
+                        
+                    if len(cmd) != 0 and (cmd[-1] == constants.END_OF_LINE or cmd[-1] == '\r'):
+                        cmd = cmd[:-1]
+                        
                     command = cmd.split(constants.SEPARATOR)
                     commandSize = len(command)
                     

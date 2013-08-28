@@ -639,26 +639,26 @@ def saveTrafficLightScreenshot(login, tllId, zoom, mtraci):
     
     filePath = getScreenshotAbsolutePath(login)
     
-    mtraci.acquire()
     try:
+        mtraci.acquire()
         tll2DCoords = traci.simulation.convertGeo(tllCoords[0], tllCoords[1], True)
         viewList = traci.gui.getIDList()
+        mtraci.release()
     except:
         mtraci.release()
         raise
-    mtraci.release()
     
     viewId = viewList[len(viewList) - 1]
     
-    mtraci.acquire()
     try:
+        mtraci.acquire()
         traci.gui.setOffset(viewId, tll2DCoords[0], tll2DCoords[1])
         traci.gui.setZoom(viewId, zoom)
         traci.gui.screenshot(viewId, filePath)
+        mtraci.release()
     except:
         mtraci.release()
         raise
-    mtraci.release()
     
     return filePath
 
@@ -668,16 +668,16 @@ def sendTrafficLightsDetails(tllId, tmsLogin, screenshotPath, outputSocket, mtra
     Sends a traffic lights details answer(***) to the remote client using an output socket
     """
     # DTL tmsLogin screenshotPath currentPhaseIndex nextSwitchTime state0 duration0 ... stateN durationN
-    mtraci.acquire()
     try:
+        mtraci.acquire()
         currentPhaseIndex = traci.trafficlights.getPhase(tllId)
         currentTime = traci.simulation.getCurrentTime()
         nextSwitchTime = traci.trafficlights.getNextSwitch(tllId)
         completePhasesDefinition = traci.trafficlights.getCompleteRedYellowGreenDefinition(tllId)
+        mtraci.release()
     except:
         mtraci.release()
         raise
-    mtraci.release()
     
     nextSwitchTime = nextSwitchTime - currentTime
     phasesDetails = getPhasesDetails(completePhasesDefinition)
@@ -776,7 +776,7 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eMana
     eTrafficLightsReady.set()
     while not eManagerReady.is_set():
         time.sleep(constants.SLEEP_SYNCHRONISATION)
-    
+        
     while not eShutdown.is_set():
         try:
             # Read the message from the input socket (blocked until a message is read)
@@ -792,7 +792,13 @@ def run(mtraci, inputSocket, outputSocket, eShutdown, eTrafficLightsReady, eMana
             listCommands = buff.decode().split(constants.MESSAGES_SEPARATOR)
             
             for cmd in listCommands:
-                if len(cmd) != 0:
+                if len(cmd) != 0:    
+                    if cmd[-1] == constants.END_OF_LINE or cmd[-1] == '\r':
+                        cmd = cmd[:-1]
+                        
+                    if len(cmd) != 0 and (cmd[-1] == constants.END_OF_LINE or cmd[-1] == '\r'):
+                        cmd = cmd[:-1]
+                        
                     command = cmd.split(constants.SEPARATOR)
                     commandSize = len(command)
                     

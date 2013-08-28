@@ -57,7 +57,7 @@
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module constants</h1><p class="nomargin-top"><span class="codelink"><a href="astra.constants-pysrc.html">source&nbsp;code</a></span></p>
 <p>@file    Constants.py @author  Remi Domingues @date    18/06/2013</p>
-  <p>String constants used by ASTra Python scripts</p>
+  <p>Constants used by ASTra Python scripts</p>
 
 <!-- ==================== CLASSES ==================== -->
 <a name="section-Classes"></a>
@@ -109,13 +109,12 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="addNetworkToConfigDict"></a><span class="summary-sig-name">addNetworkToConfigDict</span>(<span class="summary-sig-arg">networkId</span>,
+          <td><span class="summary-sig"><a name="getNetworkFilesDict"></a><span class="summary-sig-name">getNetworkFilesDict</span>(<span class="summary-sig-arg">networkId</span>,
         <span class="summary-sig-arg">configFile</span>,
         <span class="summary-sig-arg">networkFile</span>)</span><br />
-      Add a network linked with its configuration files to the sumo config 
-      dictionary</td>
+      Returns a network linked with its configuration files</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="astra.constants-pysrc.html#addNetworkToConfigDict">source&nbsp;code</a></span>
+            <span class="codelink"><a href="astra.constants-pysrc.html#getNetworkFilesDict">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -145,8 +144,37 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="astra.constants-module.html#SUMO_CONFIG_DICT" class="summary-name">SUMO_CONFIG_DICT</a> = <code title="{'Dublin': {'Config': 'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\a\
+stra/config/Dublin.sumocfg',
+            'Network': 'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\\
+astra/config/Dublin.net.xml'}}"><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">Dublin</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">Config</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="CONFIG_FILE_KEY"></a><span class="summary-name">CONFIG_FILE_KEY</span> = <code title="'Config'"><code class="variable-quote">'</code><code class="variable-string">Config</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="NETWORK_FILE_KEY"></a><span class="summary-name">NETWORK_FILE_KEY</span> = <code title="'Network'"><code class="variable-quote">'</code><code class="variable-string">Network</code><code class="variable-quote">'</code></code><br />
+      ============================================================================================================================================
+      ===                                                               
+      USER CONSTANTS
+      === 
+      ============================================================================================================================================
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="POSIX_OS"></a><span class="summary-name">POSIX_OS</span> = <code title="False">False</code><br />
-      Functionalities
+      ===== ENABLE/DISABLE FUNCTIONALITIES =====
     </td>
   </tr>
 <tr>
@@ -181,81 +209,73 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="TLL_ENABLED"></a><span class="summary-name">TLL_ENABLED</span> = <code title="True">True</code>
+        <a name="TLL_ENABLED"></a><span class="summary-name">TLL_ENABLED</span> = <code title="True">True</code><br />
+      ===== MAIN PATHS =====
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="ASTRA_DIRECTORY"></a><span class="summary-name">ASTRA_DIRECTORY</span> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra</code><code class="variable-quote">'</code></code>
+        <a href="astra.constants-module.html#ASTRA_DIRECTORY" class="summary-name">ASTRA_DIRECTORY</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\ap</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="SUMO_DIRECTORY"></a><span class="summary-name">SUMO_DIRECTORY</span> = <code title="'C:\\Users\\Deeper\\Downloads\\sumo-0.17.1'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.17.1</code><code class="variable-quote">'</code></code>
+        <a name="SUMO_TOOLS_DIRECTORY"></a><span class="summary-name">SUMO_TOOLS_DIRECTORY</span> = <code title="'C:\\Temp\\sumo-0.17.1\\tools'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\sumo-0.17.1\\tools</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#CONFIG_DIRECTORY" class="summary-name">CONFIG_DIRECTORY</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra</code><code class="variable-ellipsis">...</code></code>
+        <a name="SUMO_BINARY"></a><span class="summary-name">SUMO_BINARY</span> = <code title="'C:\\Temp\\sumo-0.17.1\\bin\\sumo-gui'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\sumo-0.17.1\\bin\\sumo-gui</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#DICT_DIRECTORY" class="summary-name">DICT_DIRECTORY</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/d</code><code class="variable-ellipsis">...</code></code>
+        <a name="DUAROUTER_BINARY"></a><span class="summary-name">DUAROUTER_BINARY</span> = <code title="'C:\\Temp\\sumo-0.17.1\\bin\\duarouter.exe'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\sumo-0.17.1\\bin\\duarouter.exe</code><code class="variable-quote">'</code></code><br />
+      ===== ASTRA MAIN DIRECTORIES (DO NOT MODIFY) =====
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="LOG_DIRECTORY"></a><span class="summary-name">LOG_DIRECTORY</span> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/log'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/log</code><code class="variable-quote">'</code></code>
+        <a href="astra.constants-module.html#CONFIG_DIRECTORY" class="summary-name">CONFIG_DIRECTORY</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\a</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="TMP_DIRECTORY"></a><span class="summary-name">TMP_DIRECTORY</span> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp</code><code class="variable-quote">'</code></code>
+        <a href="astra.constants-module.html#DICT_DIRECTORY" class="summary-name">DICT_DIRECTORY</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SCREEN_DIRECTORY" class="summary-name">SCREEN_DIRECTORY</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/screen'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra</code><code class="variable-ellipsis">...</code></code><br />
-      Networks constants
+        <a href="astra.constants-module.html#LOG_DIRECTORY" class="summary-name">LOG_DIRECTORY</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/log'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_CONFIG_DICT" class="summary-name">SUMO_CONFIG_DICT</a> = <code title="{'Dublin': {'Config': 'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/conf\
-ig/Dublin.sumocfg',
-            'Network': 'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/con\
-fig/Dublin.net.xml'}}"><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">Dublin</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">Config</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\D</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#TMP_DIRECTORY" class="summary-name">TMP_DIRECTORY</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="CONFIG_FILE_KEY"></a><span class="summary-name">CONFIG_FILE_KEY</span> = <code title="'Config'"><code class="variable-quote">'</code><code class="variable-string">Config</code><code class="variable-quote">'</code></code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="NETWORK_FILE_KEY"></a><span class="summary-name">NETWORK_FILE_KEY</span> = <code title="'Network'"><code class="variable-quote">'</code><code class="variable-string">Network</code><code class="variable-quote">'</code></code>
+        <a href="astra.constants-module.html#SCREEN_DIRECTORY" class="summary-name">SCREEN_DIRECTORY</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/screen'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\a</code><code class="variable-ellipsis">...</code></code><br />
+      ===== NETWORKS CONFIGURATION =====
     </td>
   </tr>
 <tr>
@@ -269,97 +289,232 @@ fig/Dublin.net.xml'}}"><code class="variable-group">{</code><code class="variabl
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#DUBLIN_CONFIG_FILE" class="summary-name">DUBLIN_CONFIG_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.sumocfg'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\AST</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#DUBLIN_CONFIG_FILE" class="summary-name">DUBLIN_CONFIG_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Dublin.sum\
+ocfg'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#DUBLIN_NET_FILE" class="summary-name">DUBLIN_NET_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.net.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#DUBLIN_NET_FILE" class="summary-name">DUBLIN_NET_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Dublin.net\
+.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\ap</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="SUMO_CHOSEN_NETWORK"></a><span class="summary-name">SUMO_CHOSEN_NETWORK</span> = <code title="'Dublin'"><code class="variable-quote">'</code><code class="variable-string">Dublin</code><code class="variable-quote">'</code></code><br />
-      Config file
+        <a href="astra.constants-module.html#SUMO_CHOSEN_NETWORK" class="summary-name">SUMO_CHOSEN_NETWORK</a> = <code title="'Dublin'"><code class="variable-quote">'</code><code class="variable-string">Dublin</code><code class="variable-quote">'</code></code><br />
+      Duration of a SUMO step : This duration is the one which will be 
+      taken into account when calling the traci simulationStep function.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_BINARY" class="summary-name">SUMO_BINARY</a> = <code title="'C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\\sumo-gui'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#SUMO_SIMULATION_STEP_TIME" class="summary-name">SUMO_SIMULATION_STEP_TIME</a> = <code title="1">1</code><br />
+      Time the simulation thread will sleep between each step iteration.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#DUAROUTER_BINARY" class="summary-name">DUAROUTER_BINARY</a> = <code title="'C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\\duarouter.exe'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\</code><code class="variable-ellipsis">...</code></code>
+        <a name="SIMULATOR_SLEEP"></a><span class="summary-name">SIMULATOR_SLEEP</span> = <code title="1">1</code><br />
+      The following constant must contain a regular expression which will 
+      be evaluated for every vehicle when requested for all vehicles 
+      information (delete / coordinates / speed / arrived messages) If you 
+      want access the information of a vehicle you ignore, you must specify
+      the corresponding vehicle ID in one of the previous messages =&gt; 
+      These vehicles are ignored ONLY with messages about ALL VEHICLES 
+      =&gt; These ones cannot be priority
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_TOOLS_DIRECTORY" class="summary-name">SUMO_TOOLS_DIRECTORY</a> = <code title="'C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\tools'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.1</code><code class="variable-ellipsis">...</code></code>
+        <a name="IGNORED_VEHICLES"></a><span class="summary-name">IGNORED_VEHICLES</span> = <code title="'^(MOC*)$'"><code class="variable-quote">'</code><code class="variable-string">^(MOC*)$</code><code class="variable-quote">'</code></code><br />
+      ===== SIMULATION REGULAR MESSAGES =====
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_NETWORK_FILE" class="summary-name">SUMO_NETWORK_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.net.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTr</code><code class="variable-ellipsis">...</code></code>
+        <a name="SEND_MSG_EVEN_IF_EMPTY"></a><span class="summary-name">SEND_MSG_EVEN_IF_EMPTY</span> = <code title="False">False</code><br />
+      Send regular messages containing vehicles coordinates ?
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_CONFIG_FILE" class="summary-name">SUMO_CONFIG_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.sumocfg'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra</code><code class="variable-ellipsis">...</code></code>
+        <a name="SEND_VEHICLES_COORDS"></a><span class="summary-name">SEND_VEHICLES_COORDS</span> = <code title="True">True</code><br />
+      Send regular messages containing arrived vehicles ID ?
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_GUI_SETTINGS_FILE" class="summary-name">SUMO_GUI_SETTINGS_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/sumo-gui-settings.x\
-ml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\</code><code class="variable-ellipsis">...</code></code>
+        <a name="SEND_ARRIVED_VEHICLES"></a><span class="summary-name">SEND_ARRIVED_VEHICLES</span> = <code title="True">True</code><br />
+      ===== TRAFFIC LIGHTS FOR PRIORITY VEHICLES =====
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_JUNCTIONS_DICTIONARY_FILE" class="summary-name">SUMO_JUNCTIONS_DICTIONARY_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict/DublinJunctionsDictio\
-nary'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads</code><code class="variable-ellipsis">...</code></code>
+        <a name="GREEN_LENGTH_ANTICIPATION"></a><span class="summary-name">GREEN_LENGTH_ANTICIPATION</span> = <code title="50">50</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_EDGES_DICTIONARY_FILE" class="summary-name">SUMO_EDGES_DICTIONARY_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict/DublinEdgesDictionary\
-'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\as</code><code class="variable-ellipsis">...</code></code>
+        <a name="YELLOW_LENGTH_ANTICIPATION"></a><span class="summary-name">YELLOW_LENGTH_ANTICIPATION</span> = <code title="100">100</code><br />
+      ============================================================================================================================================
+      ===                                                              
+      SYSTEM CONSTANTS
+      === 
+      ============================================================================================================================================
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_TLL_DICTIONARY_FILE" class="summary-name">SUMO_TLL_DICTIONARY_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict/DublinTrafficLightsDi\
-ctionary'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astr</code><code class="variable-ellipsis">...</code></code>
+        <a name="TRACI_PORT"></a><span class="summary-name">TRACI_PORT</span> = <code title="8813">8813</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_GRAPH_FILE" class="summary-name">SUMO_GRAPH_FILE</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict/DublinGraphDictionary\
-'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/</code><code class="variable-ellipsis">...</code></code><br />
+        <a name="HOST"></a><span class="summary-name">HOST</span> = <code title="'127.0.0.1'"><code class="variable-quote">'</code><code class="variable-string">127.0.0.1</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="GRAPH_INPUT_PORT"></a><span class="summary-name">GRAPH_INPUT_PORT</span> = <code title="18001">18001</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="GRAPH_OUTPUT_PORT"></a><span class="summary-name">GRAPH_OUTPUT_PORT</span> = <code title="18002">18002</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="ROUTER_INPUT_PORT"></a><span class="summary-name">ROUTER_INPUT_PORT</span> = <code title="18003">18003</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="ROUTER_OUTPUT_PORT"></a><span class="summary-name">ROUTER_OUTPUT_PORT</span> = <code title="18004">18004</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="VEHICLE_INPUT_PORT"></a><span class="summary-name">VEHICLE_INPUT_PORT</span> = <code title="18005">18005</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="VEHICLE_OUTPUT_PORT"></a><span class="summary-name">VEHICLE_OUTPUT_PORT</span> = <code title="18006">18006</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="TLL_INPUT_PORT"></a><span class="summary-name">TLL_INPUT_PORT</span> = <code title="18007">18007</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="TLL_OUTPUT_PORT"></a><span class="summary-name">TLL_OUTPUT_PORT</span> = <code title="18008">18008</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="SIMULATOR_OUTPUT_PORT"></a><span class="summary-name">SIMULATOR_OUTPUT_PORT</span> = <code title="18009">18009</code><br />
+      Config files
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="astra.constants-module.html#SUMO_NETWORK_FILE" class="summary-name">SUMO_NETWORK_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Dublin.net\
+.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="astra.constants-module.html#SUMO_CONFIG_FILE" class="summary-name">SUMO_CONFIG_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Dublin.sum\
+ocfg'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\a</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="astra.constants-module.html#SUMO_GUI_SETTINGS_FILE" class="summary-name">SUMO_GUI_SETTINGS_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/sumo-gui-s\
+ettings.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\m</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="astra.constants-module.html#SUMO_JUNCTIONS_DICTIONARY_FILE" class="summary-name">SUMO_JUNCTIONS_DICTIONARY_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict/DublinJuncti\
+onsDictionary'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="astra.constants-module.html#SUMO_EDGES_DICTIONARY_FILE" class="summary-name">SUMO_EDGES_DICTIONARY_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict/DublinEdgesD\
+ictionary'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\sr</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="astra.constants-module.html#SUMO_TLL_DICTIONARY_FILE" class="summary-name">SUMO_TLL_DICTIONARY_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict/DublinTraffi\
+cLightsDictionary'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="astra.constants-module.html#SUMO_GRAPH_FILE" class="summary-name">SUMO_GRAPH_FILE</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict/DublinGraphD\
+ictionary'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\ap</code><code class="variable-ellipsis">...</code></code><br />
       Shared constants
     </td>
   </tr>
@@ -374,8 +529,8 @@ ctionary'"><code class="variable-quote">'</code><code class="variable-string">C:
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="MESSAGES_SEPARATOR"></a><span class="summary-name">MESSAGES_SEPARATOR</span> = <code title="'''\r
-'''"><code class="variable-quote">'</code><code class="variable-string">\r\n</code><code class="variable-quote">'</code></code>
+        <a name="MESSAGES_SEPARATOR"></a><span class="summary-name">MESSAGES_SEPARATOR</span> = <code title="'''
+'''"><code class="variable-quote">'</code><code class="variable-string">\n</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 <tr>
@@ -547,84 +702,6 @@ ctionary'"><code class="variable-quote">'</code><code class="variable-string">C:
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="TLL_PHASE_DURATION_ERROR"></a><span class="summary-name">TLL_PHASE_DURATION_ERROR</span> = <code title="23">23</code><br />
-      Socket configuration
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="TRACI_PORT"></a><span class="summary-name">TRACI_PORT</span> = <code title="8813">8813</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="HOST"></a><span class="summary-name">HOST</span> = <code title="'127.0.0.1'"><code class="variable-quote">'</code><code class="variable-string">127.0.0.1</code><code class="variable-quote">'</code></code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="GRAPH_INPUT_PORT"></a><span class="summary-name">GRAPH_INPUT_PORT</span> = <code title="18001">18001</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="GRAPH_OUTPUT_PORT"></a><span class="summary-name">GRAPH_OUTPUT_PORT</span> = <code title="18002">18002</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="ROUTER_INPUT_PORT"></a><span class="summary-name">ROUTER_INPUT_PORT</span> = <code title="18003">18003</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="ROUTER_OUTPUT_PORT"></a><span class="summary-name">ROUTER_OUTPUT_PORT</span> = <code title="18004">18004</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="VEHICLE_INPUT_PORT"></a><span class="summary-name">VEHICLE_INPUT_PORT</span> = <code title="18005">18005</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="VEHICLE_OUTPUT_PORT"></a><span class="summary-name">VEHICLE_OUTPUT_PORT</span> = <code title="18006">18006</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="TLL_INPUT_PORT"></a><span class="summary-name">TLL_INPUT_PORT</span> = <code title="18007">18007</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="TLL_OUTPUT_PORT"></a><span class="summary-name">TLL_OUTPUT_PORT</span> = <code title="18008">18008</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="SIMULATOR_OUTPUT_PORT"></a><span class="summary-name">SIMULATOR_OUTPUT_PORT</span> = <code title="18009">18009</code><br />
       Logger
     </td>
   </tr>
@@ -653,15 +730,15 @@ ctionary'"><code class="variable-quote">'</code><code class="variable-string">C:
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="NOW"></a><span class="summary-name">NOW</span> = <code title="datetime.datetime(2013, 8, 26, 21, 31, 35, 142000)">datetime.datetime(2013, 8, 26, 21, 31, 35, 142000)</code>
+        <a name="NOW"></a><span class="summary-name">NOW</span> = <code title="datetime.datetime(2013, 8, 28, 14, 2, 28, 515000)">datetime.datetime(2013, 8, 28, 14, 2, 28, 515000)</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#LOG_FILE_PATH" class="summary-name">LOG_FILE_PATH</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/log/sumo.log.26-08-2013_21\
-h31m35s.log'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/lo</code><code class="variable-ellipsis">...</code></code><br />
+        <a href="astra.constants-module.html#LOG_FILE_PATH" class="summary-name">LOG_FILE_PATH</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/log/sumo.log.28-0\
+8-2013_14h02m28s.log'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\</code><code class="variable-ellipsis">...</code></code><br />
       Manager
     </td>
   </tr>
@@ -677,13 +754,6 @@ h31m35s.log'"><code class="variable-quote">'</code><code class="variable-string"
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="TRACI_CONNECT_MAX_STEPS"></a><span class="summary-name">TRACI_CONNECT_MAX_STEPS</span> = <code title="20">20</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="SUMO_SIMULATION_STEP_TIME"></a><span class="summary-name">SUMO_SIMULATION_STEP_TIME</span> = <code title="1">1</code>
     </td>
   </tr>
 <tr>
@@ -711,10 +781,10 @@ h31m35s.log'"><code class="variable-quote">'</code><code class="variable-string"
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#SUMO_GUI_START_COMMAND" class="summary-name">SUMO_GUI_START_COMMAND</a> = <code title="'C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\\sumo-gui -c C:\\Users\
-\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.sumocfg --gui-settings\
--file C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/sumo-gui-setti\
-ngs.xml --step-length 1 --quit-on-end true --game false --start true'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#SUMO_GUI_START_COMMAND" class="summary-name">SUMO_GUI_START_COMMAND</a> = <code title="'C:\\Temp\\sumo-0.17.1\\bin\\sumo-gui -c C:\\Temp\\workspace\\cardemo\\
+\src\\main\\app\\astra/config/Dublin.sumocfg --gui-settings-file C:\\T\
+emp\\workspace\\cardemo\\src\\main\\app\\astra/config/sumo-gui-setting\
+s.xml --step-length 1 --quit-on-end true --game false --start true'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\sumo-0.17.1\\bin\\sumo-gui</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -1145,21 +1215,23 @@ ngs.xml --step-length 1 --quit-on-end true --game false --start true'"><code cla
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#TRIPS_PATH" class="summary-name">TRIPS_PATH</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/trips.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/t</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#TRIPS_PATH" class="summary-name">TRIPS_PATH</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp/trips.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\as</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#ROUTES_OUTPUT_PATH" class="summary-name">ROUTES_OUTPUT_PATH</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\AST</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#ROUTES_OUTPUT_PATH" class="summary-name">ROUTES_OUTPUT_PATH</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp/result.rou.xm\
+l'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#ROUTES_ALT_OUTPUT_PATH" class="summary-name">ROUTES_ALT_OUTPUT_PATH</a> = <code title="'C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/result.rou.alt.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#ROUTES_ALT_OUTPUT_PATH" class="summary-name">ROUTES_ALT_OUTPUT_PATH</a> = <code title="'C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp/result.rou.al\
+t.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\m</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -1173,11 +1245,11 @@ ngs.xml --step-length 1 --quit-on-end true --game false --start true'"><code cla
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="astra.constants-module.html#DUAROUTER_START_COMMAND" class="summary-name">DUAROUTER_START_COMMAND</a> = <code title="'C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\\duarouter.exe --ignor\
-e-errors --trip-files C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/t\
-rips.xml --net-file C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/\
-Dublin.net.xml --output-file C:\\Users\\Deeper\\Downloads\\astra\\ASTr\
-a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-</code><code class="variable-ellipsis">...</code></code>
+        <a href="astra.constants-module.html#DUAROUTER_START_COMMAND" class="summary-name">DUAROUTER_START_COMMAND</a> = <code title="'C:\\Temp\\sumo-0.17.1\\bin\\duarouter.exe --ignore-errors --trip-file\
+s C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp/trips.xml --\
+net-file C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Du\
+blin.net.xml --output-file C:\\Temp\\workspace\\cardemo\\src\\main\\ap\
+p\\astra/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\sumo-0.17.1\\bin\\duarout</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -1199,28 +1271,14 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="PRINT_PREFIX_VEHICLE"></a><span class="summary-name">PRINT_PREFIX_VEHICLE</span> = <code title="'Vehicle &gt;&gt;&gt; '"><code class="variable-quote">'</code><code class="variable-string">Vehicle &gt;&gt;&gt; </code><code class="variable-quote">'</code></code><br />
-      The following constant must contain a regular expression which will 
-      be evaluated for every vehicle when requested for all vehicles 
-      information (delete / coordinates / speed / arrived messages) If you 
-      want access the information of a vehicle you ignore, you must specify
-      the corresponding vehicle ID in one of the previous messages =&gt; 
-      These vehicles are ignored ONLY with messages about ALL VEHICLES 
-      =&gt; These ones cannot be priority
+        <a name="PRINT_PREFIX_VEHICLE"></a><span class="summary-name">PRINT_PREFIX_VEHICLE</span> = <code title="'Vehicle &gt;&gt;&gt; '"><code class="variable-quote">'</code><code class="variable-string">Vehicle &gt;&gt;&gt; </code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="IGNORED_VEHICLES"></a><span class="summary-name">IGNORED_VEHICLES</span> = <code title="'^(COL*)|(MOC*)$'"><code class="variable-quote">'</code><code class="variable-string">^(COL*)|(MOC*)$</code><code class="variable-quote">'</code></code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="IGNORED_VEHICLES_REGEXP"></a><span class="summary-name">IGNORED_VEHICLES_REGEXP</span> = <code title="re.compile(r'^(COL*)|(MOC*)$')">re.compile(r'^<code class="re-group">(</code>COL<code class="re-op">*</code><code class="re-group">)</code><code class="re-op">|</code><code class="re-group">(</code>MOC<code class="re-op">*</code><code class="re-group">)</code>$')</code>
+        <a name="IGNORED_VEHICLES_REGEXP"></a><span class="summary-name">IGNORED_VEHICLES_REGEXP</span> = <code title="re.compile(r'^(MOC*)$')">re.compile(r'^<code class="re-group">(</code>MOC<code class="re-op">*</code><code class="re-group">)</code>$')</code>
     </td>
   </tr>
 <tr>
@@ -1291,20 +1349,6 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="DEFAULT_VEHICLE_TYPE"></a><span class="summary-name">DEFAULT_VEHICLE_TYPE</span> = <code title="'DEFAULT_VEHTYPE'"><code class="variable-quote">'</code><code class="variable-string">DEFAULT_VEHTYPE</code><code class="variable-quote">'</code></code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="ROUTE_ID_PREFIX"></a><span class="summary-name">ROUTE_ID_PREFIX</span> = <code title="'R'"><code class="variable-quote">'</code><code class="variable-string">R</code><code class="variable-quote">'</code></code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="VEHICLE_ID_PREFIX"></a><span class="summary-name">VEHICLE_ID_PREFIX</span> = <code title="'V'"><code class="variable-quote">'</code><code class="variable-string">V</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 <tr>
@@ -1445,20 +1489,6 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="GREEN_LENGTH_ANTICIPATION"></a><span class="summary-name">GREEN_LENGTH_ANTICIPATION</span> = <code title="50">50</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="YELLOW_LENGTH_ANTICIPATION"></a><span class="summary-name">YELLOW_LENGTH_ANTICIPATION</span> = <code title="100">100</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
         <a name="PRIORITY_VEHICLE_KM_PER_HOUR_SPEED"></a><span class="summary-name">PRIORITY_VEHICLE_KM_PER_HOUR_SPEED</span> = <code title="50">50</code>
     </td>
   </tr>
@@ -1495,34 +1525,6 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="SIMULATOR_SLEEP"></a><span class="summary-name">SIMULATOR_SLEEP</span> = <code title="1">1</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="SEND_MSG_EVEN_IF_EMPTY"></a><span class="summary-name">SEND_MSG_EVEN_IF_EMPTY</span> = <code title="False">False</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="SEND_VEHICLES_COORDS"></a><span class="summary-name">SEND_VEHICLES_COORDS</span> = <code title="True">True</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="SEND_ARRIVED_VEHICLES"></a><span class="summary-name">SEND_ARRIVED_VEHICLES</span> = <code title="True">True</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
         <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'astra'"><code class="variable-quote">'</code><code class="variable-string">astra</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
@@ -1545,6 +1547,45 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   </td>
 </tr>
 </table>
+<a name="SUMO_CONFIG_DICT"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">SUMO_CONFIG_DICT</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">Dublin</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">Config</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\a</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">stra/config/Dublin.sumocfg</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+            <code class="variable-quote">'</code><code class="variable-string">Network</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">astra/config/Dublin.net.xml</code><code class="variable-quote">'</code><code class="variable-group">}</code><code class="variable-group">}</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="ASTRA_DIRECTORY"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">ASTRA_DIRECTORY</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra</code><code class="variable-quote">'</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="CONFIG_DIRECTORY"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1557,7 +1598,7 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1575,7 +1616,43 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict</code><code class="variable-quote">'</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="LOG_DIRECTORY"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">LOG_DIRECTORY</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/log</code><code class="variable-quote">'</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="TMP_DIRECTORY"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">TMP_DIRECTORY</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1587,34 +1664,13 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <h3 class="epydoc">SCREEN_DIRECTORY</h3>
-  <p>Networks constants</p>
+  <p>===== NETWORKS CONFIGURATION =====</p>
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/screen</code><code class="variable-quote">'</code>
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="SUMO_CONFIG_DICT"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">SUMO_CONFIG_DICT</h3>
-  
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">Dublin</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">Config</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/conf</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">ig/Dublin.sumocfg</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-            <code class="variable-quote">'</code><code class="variable-string">Network</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/con</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">fig/Dublin.net.xml</code><code class="variable-quote">'</code><code class="variable-group">}</code><code class="variable-group">}</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/screen</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1632,7 +1688,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.sumocfg</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Dublin.sum</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ocfg</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1650,61 +1707,49 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.net.xml</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Dublin.net</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">.xml</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
 </td></tr></table>
 </div>
-<a name="SUMO_BINARY"></a>
+<a name="SUMO_CHOSEN_NETWORK"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">SUMO_BINARY</h3>
-  
+  <h3 class="epydoc">SUMO_CHOSEN_NETWORK</h3>
+  <p>Duration of a SUMO step : This duration is the one which will be taken
+  into account when calling the traci simulationStep function. It is not 
+  linked to the processing time of a simulation step, but to the simulated 
+  time between a step and an other.</p>
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\\sumo-gui</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">Dublin</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
 </td></tr></table>
 </div>
-<a name="DUAROUTER_BINARY"></a>
+<a name="SUMO_SIMULATION_STEP_TIME"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">DUAROUTER_BINARY</h3>
-  
+  <h3 class="epydoc">SUMO_SIMULATION_STEP_TIME</h3>
+  <p>Time the simulation thread will sleep between each step iteration. The
+  real time the thread will wait will be this time minus the computation 
+  time of the previous simulation step</p>
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\\duarouter.exe</code><code class="variable-quote">'</code>
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="SUMO_TOOLS_DIRECTORY"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">SUMO_TOOLS_DIRECTORY</h3>
-  
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\tools</code><code class="variable-quote">'</code>
+1
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1722,7 +1767,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.net.xml</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Dublin.net</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">.xml</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1740,7 +1786,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.sumocfg</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Dublin.sum</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ocfg</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1758,8 +1805,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/sumo-gui-settings.x</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">ml</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/sumo-gui-s</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ettings.xml</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1777,8 +1824,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict/DublinJunctionsDictio</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">nary</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict/DublinJuncti</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">onsDictionary</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1796,8 +1843,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict/DublinEdgesDictionary</code><code class="variable-quote"></code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict/DublinEdgesD</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ictionary</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1815,8 +1862,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict/DublinTrafficLightsDi</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">ctionary</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict/DublinTraffi</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">cLightsDictionary</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1834,8 +1881,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/dict/DublinGraphDictionary</code><code class="variable-quote"></code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/dict/DublinGraphD</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ictionary</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1853,8 +1900,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/log/sumo.log.26-08-2013_21</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">h31m35s.log</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/log/sumo.log.28-0</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">8-2013_14h02m28s.log</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1872,10 +1919,10 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\\sumo-gui -c C:\\Users</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">\\Deeper\\Downloads\\astra\\ASTra/config/Dublin.sumocfg --gui-settings</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">-file C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/sumo-gui-setti</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">ngs.xml --step-length 1 --quit-on-end true --game false --start true</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\sumo-0.17.1\\bin\\sumo-gui -c C:\\Temp\\workspace\\cardemo\</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">\src\\main\\app\\astra/config/Dublin.sumocfg --gui-settings-file C:\\T</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">emp\\workspace\\cardemo\\src\\main\\app\\astra/config/sumo-gui-setting</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">s.xml --step-length 1 --quit-on-end true --game false --start true</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1893,7 +1940,7 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/trips.xml</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp/trips.xml</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1911,7 +1958,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/result.rou.xml</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp/result.rou.xm</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">l</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1929,7 +1977,8 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/result.rou.alt.xml</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp/result.rou.al</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">t.xml</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1965,11 +2014,11 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'</code><code class="variable-string">C:\\Users\\Deeper\\Downloads\\sumo-0.17.1\\bin\\duarouter.exe --ignor</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">e-errors --trip-files C:\\Users\\Deeper\\Downloads\\astra\\ASTra/tmp/t</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">rips.xml --net-file C:\\Users\\Deeper\\Downloads\\astra\\ASTra/config/</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">Dublin.net.xml --output-file C:\\Users\\Deeper\\Downloads\\astra\\ASTr</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-string">a/tmp/result.rou.xml</code><code class="variable-quote">'</code>
+<code class="variable-quote">'</code><code class="variable-string">C:\\Temp\\sumo-0.17.1\\bin\\duarouter.exe --ignore-errors --trip-file</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">s C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/tmp/trips.xml --</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">net-file C:\\Temp\\workspace\\cardemo\\src\\main\\app\\astra/config/Du</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">blin.net.xml --output-file C:\\Temp\\workspace\\cardemo\\src\\main\\ap</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">p\\astra/tmp/result.rou.xml</code><code class="variable-quote">'</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -2002,7 +2051,7 @@ a/tmp/result.rou.xml'"><code class="variable-quote">'</code><code class="variabl
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Aug 26 21:31:35 2013
+    Generated by Epydoc 3.0.1 on Wed Aug 28 14:02:29 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

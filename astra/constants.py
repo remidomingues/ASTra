@@ -5,7 +5,7 @@
 @author  Remi Domingues
 @date    18/06/2013
 
-String constants used by ASTra Python scripts
+Constants used by ASTra Python scripts
 """
 
 import os, sys
@@ -14,32 +14,19 @@ from math import ceil
 from datetime import datetime
 import logging
 
-
-""" Operating system """
-POSIX_OS = False
-
-""" Functionalities """
-ROUTING_ENABLED = True
-GRAPH_ENABLED = True
-VEHICLE_ENABLED = True
-SIMULATION_ENABLED = True
-TLL_ENABLED = True
-
-
-class ClosedSocketException(Exception):
+"""
+============================================================================================================================================
+===                                                             REQUIRED VARIABLES                                                       ===
+============================================================================================================================================
+"""
+def getNetworkFilesDict(networkId, configFile, networkFile):
     """
-    Exception threw when the socket the process is trying to listen or write is closed
+    Returns a network linked with its configuration files
     """
-    pass
-
-""" Main directories """
-ASTRA_DIRECTORY = os.path.abspath('C:/Users/Deeper/Downloads/astra/ASTra')
-SUMO_DIRECTORY = os.path.abspath('C:/Users/Deeper/Downloads/sumo-0.17.1')
-CONFIG_DIRECTORY = ASTRA_DIRECTORY + "/config"
-DICT_DIRECTORY = ASTRA_DIRECTORY + "/dict"
-LOG_DIRECTORY = ASTRA_DIRECTORY + "/log"
-TMP_DIRECTORY = ASTRA_DIRECTORY + "/tmp"
-SCREEN_DIRECTORY = ASTRA_DIRECTORY + "/screen"
+    filesDict = dict()
+    filesDict[CONFIG_FILE_KEY] = configFile
+    filesDict[NETWORK_FILE_KEY] = networkFile
+    return filesDict
 
 """ Networks constants """
 """
@@ -55,32 +42,120 @@ SUMO_CONFIG_DICT = dict()
 CONFIG_FILE_KEY = "Config"
 NETWORK_FILE_KEY = "Network"
 
-def addNetworkToConfigDict(networkId, configFile, networkFile):
-    """
-    Add a network linked with its configuration files to the sumo config dictionary
-    """
-    filesDict = dict()
-    filesDict[CONFIG_FILE_KEY] = configFile
-    filesDict[NETWORK_FILE_KEY] = networkFile
-    SUMO_CONFIG_DICT[networkId] = filesDict
-    
 
-""" Networks configuration """
+
+"""
+============================================================================================================================================
+===                                                               USER CONSTANTS                                                         ===
+============================================================================================================================================
+"""
+""" ===== COMPUTER CONFIGURATION ===== """
+""" Operating system """
+POSIX_OS = False
+
+
+""" ===== ENABLE/DISABLE FUNCTIONALITIES ===== """
+ROUTING_ENABLED = True
+GRAPH_ENABLED = True
+VEHICLE_ENABLED = True
+SIMULATION_ENABLED = True
+TLL_ENABLED = True
+
+
+""" ===== MAIN PATHS ===== """
+""" ASTRA main directories """
+ASTRA_DIRECTORY = os.path.abspath('C:/Temp/workspace/cardemo/src/main/app/astra')
+SUMO_TOOLS_DIRECTORY = os.path.abspath('C:/Temp/sumo-0.17.1/tools')
+SUMO_BINARY = os.path.abspath('C:/Temp/sumo-0.17.1/bin/sumo-gui')
+DUAROUTER_BINARY = os.path.abspath('C:/Temp/sumo-0.17.1/bin/duarouter.exe')
+
+
+""" ===== ASTRA MAIN DIRECTORIES (DO NOT MODIFY) ===== """
+CONFIG_DIRECTORY = ASTRA_DIRECTORY + "/config"
+DICT_DIRECTORY = ASTRA_DIRECTORY + "/dict"
+LOG_DIRECTORY = ASTRA_DIRECTORY + "/log"
+TMP_DIRECTORY = ASTRA_DIRECTORY + "/tmp"
+SCREEN_DIRECTORY = ASTRA_DIRECTORY + "/screen"
+
+    
+""" ===== NETWORKS CONFIGURATION ===== """
 """ Dublin """
 DUBLIN_NETWORK_ID = "Dublin"
 DUBLIN_CONFIG_FILE = CONFIG_DIRECTORY + "/Dublin.sumocfg"
 DUBLIN_NET_FILE = CONFIG_DIRECTORY + "/Dublin.net.xml"
-addNetworkToConfigDict(DUBLIN_NETWORK_ID, DUBLIN_CONFIG_FILE, DUBLIN_NET_FILE)
+SUMO_CONFIG_DICT[DUBLIN_NETWORK_ID] = getNetworkFilesDict(DUBLIN_NETWORK_ID, DUBLIN_CONFIG_FILE, DUBLIN_NET_FILE)
 
 """ Chosen network """
 SUMO_CHOSEN_NETWORK = DUBLIN_NETWORK_ID
 
-""" Config file """
-SUMO_BINARY = os.path.abspath(SUMO_DIRECTORY + "/bin/sumo-gui")
-DUAROUTER_BINARY = os.path.abspath(SUMO_DIRECTORY + "/bin/duarouter.exe")
-SUMO_TOOLS_DIRECTORY = os.path.abspath(SUMO_DIRECTORY + "/tools")
-sys.path.append(SUMO_TOOLS_DIRECTORY)
 
+"""
+Duration of a SUMO step :
+This duration is the one which will be taken into account when calling the traci simulationStep function.
+It is not linked to the processing time of a simulation step, but to the simulated time between a step and
+an other. 
+"""
+SUMO_SIMULATION_STEP_TIME = 1
+
+
+"""
+Time the simulation thread will sleep between each step iteration. The real time the thread will wait
+will be this time minus the computation time of the previous simulation step
+"""
+SIMULATOR_SLEEP = 1
+
+
+"""
+The following constant must contain a regular expression which will be evaluated for
+every vehicle when requested for all vehicles information (delete / coordinates / speed / arrived messages)
+If you want access the information of a vehicle you ignore, you must specify the corresponding vehicle ID
+in one of the previous messages
+=> These vehicles are ignored ONLY with messages about ALL VEHICLES
+=> These ones cannot be priority
+"""
+IGNORED_VEHICLES = "^(MOC*)$"
+
+
+""" ===== SIMULATION REGULAR MESSAGES ===== """
+""" Send regular messages even if these ones are empty ? (except the header) """
+SEND_MSG_EVEN_IF_EMPTY = False
+
+""" Send regular messages containing vehicles coordinates ? """
+SEND_VEHICLES_COORDS = True
+
+""" Send regular messages containing arrived vehicles ID ? """
+SEND_ARRIVED_VEHICLES = True
+
+
+""" ===== TRAFFIC LIGHTS FOR PRIORITY VEHICLES ===== """
+# A traffic light will be set to green for the priority vehicle when this one is close enough (distance <= GREEN_LENGTH_ANTICIPATION)
+GREEN_LENGTH_ANTICIPATION = 50
+# A yellow temporary phase will be set on the junction when this one is close enough (distance <= YELLOW_LENGTH_ANTICIPATION)
+YELLOW_LENGTH_ANTICIPATION = 100
+
+
+    
+"""
+============================================================================================================================================
+===                                                              SYSTEM CONSTANTS                                                        ===
+============================================================================================================================================
+"""
+""" Socket configuration """
+TRACI_PORT = 8813
+HOST = "127.0.0.1"
+GRAPH_INPUT_PORT = 18001
+GRAPH_OUTPUT_PORT = 18002
+ROUTER_INPUT_PORT = 18003
+ROUTER_OUTPUT_PORT = 18004
+VEHICLE_INPUT_PORT = 18005
+VEHICLE_OUTPUT_PORT = 18006
+TLL_INPUT_PORT = 18007
+TLL_OUTPUT_PORT = 18008
+SIMULATOR_OUTPUT_PORT = 18009
+
+    
+""" Config files """
+sys.path.append(SUMO_TOOLS_DIRECTORY)
 SUMO_NETWORK_FILE = SUMO_CONFIG_DICT[SUMO_CHOSEN_NETWORK][NETWORK_FILE_KEY]
 SUMO_CONFIG_FILE = SUMO_CONFIG_DICT[SUMO_CHOSEN_NETWORK][CONFIG_FILE_KEY]
 SUMO_GUI_SETTINGS_FILE = CONFIG_DIRECTORY + "/sumo-gui-settings.xml"
@@ -93,7 +168,7 @@ SUMO_GRAPH_FILE = DICT_DIRECTORY + "/{}GraphDictionary".format(SUMO_CHOSEN_NETWO
 
 """ Shared constants """
 SLEEP_SYNCHRONISATION = 0.1
-MESSAGES_SEPARATOR = "\r\n"
+MESSAGES_SEPARATOR = "\n"
 END_OF_LINE = '\n'
 END_OF_MESSAGE = '\n'
 EMPTY_STRING = ''
@@ -123,22 +198,8 @@ VEHICLE_MOCK_FAILED = 9
 VEHICLE_DELETE_FAILED_UNKNOWN = 11
 
 TLL_PHASE_INDEX_ERROR = 21
-TLL_PHASE_STATE_ERROR = 22
+TLL_PHASE_STATE_ERROR = 22  # Error code returned when a phase state is invalid, or if the current phase index is invalid
 TLL_PHASE_DURATION_ERROR = 23
-
-
-""" Socket configuration """
-TRACI_PORT = 8813
-HOST = "127.0.0.1"
-GRAPH_INPUT_PORT = 18001
-GRAPH_OUTPUT_PORT = 18002
-ROUTER_INPUT_PORT = 18003
-ROUTER_OUTPUT_PORT = 18004
-VEHICLE_INPUT_PORT = 18005
-VEHICLE_OUTPUT_PORT = 18006
-TLL_INPUT_PORT = 18007
-TLL_OUTPUT_PORT = 18008
-SIMULATOR_OUTPUT_PORT = 18009
 
 
 """ Logger """
@@ -152,7 +213,6 @@ LOG_FILE_PATH = LOG_DIRECTORY + "/sumo.log.{}.log".format(datetime.strftime(NOW,
 """  Manager """
 PRINT_PREFIX_MANAGER = "Manager >>> "
 TRACI_CONNECT_MAX_STEPS = 20
-SUMO_SIMULATION_STEP_TIME = 1
 SUMO_GUI_QUIT_ON_END = "true"
 SUMO_GUI_GAME_MODE = "false"
 SUMO_GUI_START_AUTO = "true"
@@ -248,15 +308,6 @@ DUAROUTER_MAX_SLEEP_TIME = 20
 
 """ Vehicle """
 PRINT_PREFIX_VEHICLE = "Vehicle >>> "
-"""
-The following constant must contain a regular expression which will be evaluated for
-every vehicle when requested for all vehicles information (delete / coordinates / speed / arrived messages)
-If you want access the information of a vehicle you ignore, you must specify the corresponding vehicle ID
-in one of the previous messages
-=> These vehicles are ignored ONLY with messages about ALL VEHICLES
-=> These ones cannot be priority
-"""
-IGNORED_VEHICLES = "^(COL*)|(MOC*)$"
 IGNORED_VEHICLES_REGEXP = re.compile(IGNORED_VEHICLES)
 
 VEHICLE_ADD_REQUEST_HEADER = "ADD"
@@ -272,8 +323,6 @@ VEHICLE_ARRIVED_REQUEST_HEADER = "ARR"
 VEHICLE_ARRIVED_RESPONSE_HEADER = "ARR"
 
 DEFAULT_VEHICLE_TYPE = "DEFAULT_VEHTYPE"
-ROUTE_ID_PREFIX = 'R'
-VEHICLE_ID_PREFIX = 'V'
 PRIORITY_VEHICLE = '1'
 
 
@@ -298,10 +347,6 @@ GREEN_PRIO = 'G'
 IGNORE = 0
 SET_YELLOW = 1
 SET_GREEN = 2
-# How many meters the priority vehicle must be before a junction for changing the traffic light phase to green 
-GREEN_LENGTH_ANTICIPATION = 50
-# How many meters the priority vehicle must be before a junction for changing the traffic light phase to yellow
-YELLOW_LENGTH_ANTICIPATION = 100
 PRIORITY_VEHICLE_KM_PER_HOUR_SPEED = 50
 PRIORITY_VEHICLE_KM_PER_SEC_SPEED = PRIORITY_VEHICLE_KM_PER_HOUR_SPEED * 1000 / 3600.0
 GREEN_STEPS_ANTICIPATION = int(ceil(GREEN_LENGTH_ANTICIPATION / PRIORITY_VEHICLE_KM_PER_SEC_SPEED / SUMO_SIMULATION_STEP_TIME))
@@ -310,7 +355,9 @@ YELLOW_STEPS_ANTICIPATION = int(ceil(YELLOW_LENGTH_ANTICIPATION / PRIORITY_VEHIC
 
 """ Simulation """
 PRINT_PREFIX_SIMULATOR = "Simulation >>> "
-SIMULATOR_SLEEP = 1
-SEND_MSG_EVEN_IF_EMPTY = False
-SEND_VEHICLES_COORDS = True
-SEND_ARRIVED_VEHICLES = True
+
+class ClosedSocketException(Exception):
+    """
+    Exception threw when the socket the process is trying to listen or write is closed
+    """
+    pass
