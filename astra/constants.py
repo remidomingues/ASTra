@@ -106,6 +106,13 @@ SIMULATOR_SLEEP = 1
 
 
 """
+Time before a car stopped teleports to the end of the edge
+If negative, the car won't teleport
+"""
+SUMO_TIME_BEFORE_TELEPORT = -1
+
+
+"""
 The following constant must contain a regular expression which will be evaluated for
 every vehicle when requested for all vehicles information (delete / coordinates / speed / arrived messages)
 If you want access the information of a vehicle you ignore, you must specify the corresponding vehicle ID
@@ -216,7 +223,7 @@ TRACI_CONNECT_MAX_STEPS = 20
 SUMO_GUI_QUIT_ON_END = "true"
 SUMO_GUI_GAME_MODE = "false"
 SUMO_GUI_START_AUTO = "true"
-SUMO_GUI_START_COMMAND = "{} -c {} --gui-settings-file {} --step-length {} --quit-on-end {} --game {} --start {}" .format(SUMO_BINARY, SUMO_CONFIG_FILE, SUMO_GUI_SETTINGS_FILE, SUMO_SIMULATION_STEP_TIME, SUMO_GUI_QUIT_ON_END, SUMO_GUI_GAME_MODE, SUMO_GUI_START_AUTO)
+SUMO_GUI_START_COMMAND = "{} -c {} --gui-settings-file {} --step-length {} --time-to-teleport {} --quit-on-end {} --game {} --start {}" .format(SUMO_BINARY, SUMO_CONFIG_FILE, SUMO_GUI_SETTINGS_FILE, SUMO_SIMULATION_STEP_TIME, SUMO_TIME_BEFORE_TELEPORT, SUMO_GUI_QUIT_ON_END, SUMO_GUI_GAME_MODE, SUMO_GUI_START_AUTO)
 READY_HEADER = "SOK"
 
 
