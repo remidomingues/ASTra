@@ -195,7 +195,7 @@ def addVehicle(vehicleId, priority, route, mtraci, cRouteId, outputSocket, prior
     if returnCode == constants.ACK_OK:
         savePriorityVehicles(mtraci, vehicleId, priority, priorityVehicles, mPriorityVehicles)
         
-		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicle):
+		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicleId):
 			mVehicles.acquire()
 			vehicles.append(vehicleId)
 			mVehicles.release()
