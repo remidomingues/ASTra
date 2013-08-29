@@ -195,9 +195,10 @@ def addVehicle(vehicleId, priority, route, mtraci, cRouteId, outputSocket, prior
     if returnCode == constants.ACK_OK:
         savePriorityVehicles(mtraci, vehicleId, priority, priorityVehicles, mPriorityVehicles)
         
-        mVehicles.acquire()
-        vehicles.append(vehicleId)
-        mVehicles.release()
+		if not constants.IGNORED_VEHICLES_REGEXP.match(vehicle):
+			mVehicles.acquire()
+			vehicles.append(vehicleId)
+			mVehicles.release()
         
     sendIdentifiedAck(vehicleId, returnCode, outputSocket)    
     
@@ -255,7 +256,8 @@ def addRandomVehicles(vehicleIdPrefix, vehiclesNumber, routeSize, mtraci, output
         if route != -1:
             # Adding route and vehicle to SUMO
             mVehicles.acquire()
-            vehicles.append(vehicleId)
+			if not constants.IGNORED_VEHICLES_REGEXP.match(vehicle):
+				vehicles.append(vehicleId)
             mtraci.acquire()
             traci.route.add(routeId, route)
             traci.vehicle.add(vehicleId, routeId, -2, 0, 0, 0, "DEFAULT_VEHTYPE")

@@ -64,7 +64,7 @@ TLL_ENABLED = True
 
 """ ===== MAIN PATHS ===== """
 """ ASTRA main directories """
-ASTRA_DIRECTORY = os.path.abspath('C:/Temp/workspace/cardemo/src/main/app/astra')
+ASTRA_DIRECTORY = os.path.abspath('C:/Temp/astra')
 SUMO_TOOLS_DIRECTORY = os.path.abspath('C:/Temp/sumo-0.17.1/tools')
 SUMO_BINARY = os.path.abspath('C:/Temp/sumo-0.17.1/bin/sumo-gui')
 DUAROUTER_BINARY = os.path.abspath('C:/Temp/sumo-0.17.1/bin/duarouter.exe')
